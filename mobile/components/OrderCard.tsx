@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../constants/colors";
-import { orderCardStyles } from '../assets/styles/order-card.styles';
+import { orderCardStyles } from '../assets/styles/components.styles';
 
-const { width } = Dimensions.get('window');
 
 interface OrderItemProps {
   item: {
@@ -20,11 +20,14 @@ interface OrderItemProps {
 }
 
 const OrderItemCard: React.FC<OrderItemProps> = ({ item }) => {
+  // Using useRouter from expo-router to handle navigation
+  const router = useRouter();
+
   const isCompleted = item.status === 'Completed';
 
   return (
     <TouchableOpacity
-        onPress={() => console.log('View order details for:', item.id)}
+        onPress={() => router.push(`/order/${item.id}`)}
     >
         <View style={orderCardStyles.card}>
         <View style={orderCardStyles.imageContainer}>

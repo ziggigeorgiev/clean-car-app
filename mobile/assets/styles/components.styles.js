@@ -90,3 +90,25 @@ export const orderCardStyles = StyleSheet.create({
         color: COLORS.primary,
     },
 });
+
+export const CleaningProcessStepStyles = StyleSheet.create({
+  stepContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start', // Align text to start
+    marginBottom: 15,
+  },
+  iconAndLine: {
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  line: {
+    width: 2,
+    height: 30, // Adjust height of line
+    marginTop: 5,
+  },
+  stepLabel: {
+    fontSize: 16,
+    flex: 1, // Allow text to wrap
+    paddingTop: 3, // Align text with icon visually
+  },
+});

@@ -3,19 +3,14 @@ import { SafeAreaView, StyleSheet, Text, View, FlatList, StatusBar } from 'react
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import OrderItemCard from '../components/OrderCard';
+import OrderItemCard, OrderItemProps from '../components/OrderCard';
 import { orderListStyles } from '../assets/styles/order-list.styles';
 
 
 // You might consider react-native-vector-icons for the back arrow icon if you add one.
 // import Icon from 'react-native-vector-icons/Ionicons';
 
-const OrderListScreen: React.FC = () => {
-
-    // Using useRouter from expo-router to handle navigation
-    const router = useRouter();
-
-    const totalOrders = [
+const DUMMY_ORDERS = [
     {
         id: '1',
         image: require('../assets/images/react-logo.png'), // Replace with your actual image paths
@@ -54,19 +49,23 @@ const OrderListScreen: React.FC = () => {
     },
   ];
 
+const OrderListScreen: React.FC = () => {
+
+    // Using useRouter from expo-router to handle navigation
+    const router = useRouter();
+
   return (
     <View>
-      
       <View style={orderListStyles.header}>
         {/* You could add a back arrow icon here */}
         {/* <Icon name="arrow-back" size={24} color="#333" style={styles.backIcon} /> */}
         <Ionicons name="chevron-back-outline" size={24} style={orderListStyles.backIcon} onPress={() => router.push("/")} />
         <Text style={orderListStyles.headerTitle}>Cleaning Orders</Text>
-        <Text style={orderListStyles.orderCount}>({totalOrders.length})</Text>
+        <Text style={orderListStyles.orderCount}>({DUMMY_ORDERS.length})</Text>
       </View>
 
       <FlatList
-        data={totalOrders}
+        data={DUMMY_ORDERS}
         keyExtractor={( item ) => item.id}
         renderItem={({ item }) => <OrderItemCard item={item} />}
         contentContainerStyle={orderListStyles.listContentContainer}
