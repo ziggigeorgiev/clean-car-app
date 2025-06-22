@@ -8,8 +8,13 @@ import {
 } from 'react-native';
 
 import { homeStyles } from '../assets/styles/home.styles';
+import { useRouter } from 'expo-router';
 
-const AppScreen = () => {
+const HomeScreen = () => {
+
+  // Using useRouter from expo-router to handle navigation
+  const router = useRouter();
+
   return (
     <View>
       <ScrollView>
@@ -51,7 +56,7 @@ const AppScreen = () => {
               Keep track of all your{' '}
               <Text
                 style={homeStyles.cleaningOrdersLink}
-                onPress={() => console.log('Cleaning orders link pressed')}
+                onPress={() => router.push("/list-orders")}
               >
                 cleaning orders
               </Text>
@@ -61,7 +66,7 @@ const AppScreen = () => {
           {/* "Add New Order" Button */}
           <TouchableOpacity
             style={homeStyles.addButton}
-            onPress={() => console.log('Add New Order button pressed')}
+            onPress={() => console.log('Add New Order Pressed')}
           >
             <Text style={homeStyles.addButtonIcon}>+</Text>
             <Text style={homeStyles.addButtonText}>Add New Order</Text>
@@ -73,4 +78,4 @@ const AppScreen = () => {
   );
 };
 
-export default AppScreen;
+export default HomeScreen;
