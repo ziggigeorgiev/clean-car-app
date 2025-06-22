@@ -1,72 +1,76 @@
-import React, { useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import React from 'react';
+import {
+  ScrollView,
+  Text,
+  View,
+  Image,
+  TouchableOpacity
+} from 'react-native';
 
-export default function App() {
-  const [orders, setOrders] = useState([]);
+import { homeStyles } from '../assets/styles/home.styles';
 
-  const addOrder = () => {
-    const newOrder = {
-      id: Date.now().toString(),
-      description: `Order #${orders.length + 1}`,
-    };
-    setOrders([...orders, newOrder]);
-  };
-
-  const renderOrder = ({ item }) => (
-    <View style={styles.orderItem}>
-      <Text>{item.description}</Text>
-    </View>
-  );
-
+const AppScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome to ShineClean!</Text>
-      <Text style={styles.subtext}>Your go-to app for professional car interior cleaning.</Text>
-      
-      <Button title="Add New Order" onPress={addOrder} />
+    <View>
+      <ScrollView>
+        <View style={homeStyles.container}>
 
-      {orders.length === 0 ? (
-        <Text style={styles.noOrders}>No cleaning orders yet. Tap "Add New Order" to get started.</Text>
-      ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={item => item.id}
-          renderItem={renderOrder}
-          style={styles.orderList}
-        />
-      )}
+          {/* Header Section */}
+          <View>
+            <Text style={homeStyles.welcomeText}>Welcome</Text>
+            <Text style={homeStyles.text}>
+              Get your car interior cleaned while you take care of your day.
+            </Text>
+          </View>
+
+          {/* Image Section */}
+          <View style={homeStyles.imageContainer}>
+            <Image
+              source={require('../assets/images/react-logo.png')}
+              style={homeStyles.logoImage}
+              resizeMode="cover"
+            />
+          </View>
+
+          {/* Order Summary */}
+          <View style={homeStyles.orderSummaryContainer}>
+            <View style={homeStyles.orderCard}>
+              <Text style={homeStyles.orderNumber}>1</Text>
+              <Text style={homeStyles.orderLabel}>Active Orders</Text>
+            </View>
+            <View style={homeStyles.separator} />
+            <View style={homeStyles.orderCard}>
+              <Text style={homeStyles.orderNumber}>3</Text>
+              <Text style={homeStyles.text}>Completed Orders</Text>
+            </View>
+          </View>
+
+          {/* "Keep track of all your cleaning orders" text */}
+          <View style={homeStyles.trackingTextContainer}>
+            <Text style={homeStyles.text}>
+              Keep track of all your{' '}
+              <Text
+                style={homeStyles.cleaningOrdersLink}
+                onPress={() => console.log('Cleaning orders link pressed')}
+              >
+                cleaning orders
+              </Text>
+            </Text>
+          </View>
+
+          {/* "Add New Order" Button */}
+          <TouchableOpacity
+            style={homeStyles.addButton}
+            onPress={() => console.log('Add New Order button pressed')}
+          >
+            <Text style={homeStyles.addButtonIcon}>+</Text>
+            <Text style={homeStyles.addButtonText}>Add New Order</Text>
+          </TouchableOpacity>
+          
+        </View>
+      </ScrollView>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: '#f9f9f9',
-  },
-  welcome: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  subtext: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: '#555',
-  },
-  noOrders: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#888',
-  },
-  orderList: {
-    marginTop: 20,
-  },
-  orderItem: {
-    padding: 15,
-    backgroundColor: '#e0f7fa',
-    borderRadius: 6,
-    marginBottom: 10,
-  },
-});
+export default AppScreen;
