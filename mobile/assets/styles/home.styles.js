@@ -70,6 +70,7 @@ export const homeStyles = StyleSheet.create({
   cleaningOrdersLink: {
     color: COLORS.primary,
     fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   addButton: {
     flexDirection: 'row',
