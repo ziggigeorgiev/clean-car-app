@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../constants/colors";
-import { orderCardStyles } from '../assets/styles/components.styles';
+import { orderCardStyles as styles } from '../assets/styles/components.styles';
 
 
 interface OrderItemProps {
@@ -29,37 +29,37 @@ const OrderItemCard: React.FC<OrderItemProps> = ({ item }) => {
     <TouchableOpacity
         onPress={() => router.push(`/order/${item.id}`)}
     >
-        <View style={orderCardStyles.card}>
-        <View style={orderCardStyles.imageContainer}>
+        <View style={styles.card}>
+        <View style={styles.imageContainer}>
             <Image
             source={item.image}
-            style={orderCardStyles.itemImage}
+            style={styles.itemImage}
             onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
             defaultSource={{uri: 'https://placehold.co/60x60/EEF4FF/4285F4?text=Car'}} // Fallback placeholder
             />
         </View>
 
-        <View style={orderCardStyles.detailsContainer}>
-            <View style={orderCardStyles.detailRow}>
+        <View style={styles.detailsContainer}>
+            <View style={styles.detailRow}>
             {/* Use Icon component if installed, otherwise use emoji/text */}
             {/* <Icon name="map-marker" size={16} color="#666" style={styles.icon} /> */}
-            <Ionicons name='pin-outline' size={16} color={COLORS.textLight} style={orderCardStyles.icon} />
-            <Text style={orderCardStyles.addressText}>{item.address}</Text>
+            <Ionicons name='pin-outline' size={16} color={COLORS.textLight} style={styles.icon} />
+            <Text style={styles.addressText}>{item.address}</Text>
             </View>
-            <View style={orderCardStyles.detailRow}>
+            <View style={styles.detailRow}>
             {/* <Icon name="clock-o" size={16} color="#666" style={styles.icon} /> */}
-            <Ionicons name='time-outline' size={16} color={COLORS.textLight} style={orderCardStyles.icon} />
-            <Text style={orderCardStyles.dateText}>
+            <Ionicons name='time-outline' size={16} color={COLORS.textLight} style={styles.icon} />
+            <Text style={styles.dateText}>
                 {item.date} - {item.time}
             </Text>
             </View>
-            <View style={orderCardStyles.bottomRow}>
-            <View style={[orderCardStyles.statusBadge, isCompleted ? orderCardStyles.completedBadge : orderCardStyles.openBadge]}>
-                <Text style={[orderCardStyles.statusText, isCompleted ? orderCardStyles.completedText : orderCardStyles.openText]}>
+            <View style={styles.bottomRow}>
+            <View style={[styles.statusBadge, isCompleted ? styles.completedBadge : styles.openBadge]}>
+                <Text style={[styles.statusText, isCompleted ? styles.completedText : styles.openText]}>
                 {item.status}
                 </Text>
             </View>
-            <Text style={orderCardStyles.priceText}>{item.price}</Text>
+            <Text style={styles.priceText}>{item.price}</Text>
             </View>
         </View>
         </View>

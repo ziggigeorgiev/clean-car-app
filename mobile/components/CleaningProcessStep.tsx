@@ -2,43 +2,44 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 // If using vector icons:
 // import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { CleaningProcessStepStyles } from '../assets/styles/components.styles';
+import { CleaningProcessStepStyles as styles } from '../assets/styles/components.styles';
+import { COLORS } from "../constants/colors";
 
 interface CleaningProcessStepProps {
   label: string;
   status: 'completed' | 'in-progress' | 'pending';
-  isLast?: boolean;
 }
 
-const CleaningProcessStep: React.FC<CleaningProcessStepProps> = ({ label, status, isLast }) => {
-  const iconName =
-    status === 'completed'
-      ? 'check-circle' // Example for completed (green check)
-      : status === 'in-progress'
-      ? 'checkbox-marked-circle-outline' // Example for in-progress (blue dot/outline)
-      : 'circle-outline'; // Example for pending (gray circle)
-
+const CleaningProcessStep: React.FC<CleaningProcessStepProps> = ({ label, status }) => {
+  
   const iconColor =
-    status === 'completed'
-      ? '#28A745' // Green
-      : status === 'in-progress'
-      ? '#007AFF' // Blue
-      : '#CCC'; // Light gray
+    status === 'pending'
+      ? '#90949C' // Gray
+      : '#28A745'; // Green 
+  const shadowColor =
+    status === 'pending'
+      ? '#E0E0E0' // Light gray
+      : '#D1EAD0'; // Light green 
 
-  const textColor = status === 'in-progress' ? '#007AFF' : '#333';
-  const fontWeight = status === 'in-progress' ? 'bold' : 'normal';
+  const textColor = status === 'in-progress' ? COLORS.primary : COLORS.text;
+  const fontWeight = status === 'in-progress' ? '700' : 'normal';
 
   return (
-    <View style={CleaningProcessStepStyles.stepContainer}>
-      <View style={CleaningProcessStepStyles.iconAndLine}>
-        {/* Use Icon component if installed, otherwise use emoji/text */}
-        {/* <Icon name={iconName} size={24} color={iconColor} /> */}
-        <Text style={{ fontSize: 24, color: iconColor }}>
-          {status === 'completed' ? '✅' : status === 'in-progress' ? '🔵' : '⚪'}
-        </Text>
-        {!isLast && <View style={[CleaningProcessStepStyles.line, { backgroundColor: iconColor }]} />}
+    <View style={styles.stepContainer}>
+      <View style={styles.iconAndLine}>
+
+        <View style={[styles.outerCheckboxContainer, { backgroundColor: shadowColor }]}>
+          <View style={[styles.innerCheckboxContainer, { backgroundColor: iconColor }]}>
+            {/* Option 1: Using react-native-vector-icons (Recommended) */}
+            {/* <Icon name="check" style={dynamicStyles.checkmarkIcon} /> */}
+
+            {/* Option 2: Using a simple text character (Fallback if no icon library) */}
+            <Text style={styles.checkmarkIcon}>✓</Text>
+          </View>
+        </View>
+
       </View>
-      <Text style={[CleaningProcessStepStyles.stepLabel, { color: textColor, fontWeight: fontWeight }]}>
+      <Text style={[styles.stepLabel, { color: textColor, fontWeight: fontWeight }]}>
         {label}
       </Text>
     </View>

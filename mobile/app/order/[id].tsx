@@ -8,17 +8,18 @@ import {
   Linking,
   StatusBar,
 } from 'react-native';
-// If using vector icons:
-// import Icon from 'react-native-vector-icons/Ionicons'; // For arrow icons
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'; // For car, map, phone, etc.
-
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
 import CleaningProcessStep from '../../components/CleaningProcessStep';
+import ServiceDetailsList from '../../components/ServiceDetailsList';
+import { COLORS } from "../../constants/colors";
 import { orderStyles } from '../../assets/styles/order.styles';
 
 interface ServiceItem {
   name: string;
   price: string;
+  type: 'primary' | 'secondary'; // Added type for service item
 }
 
 interface CleaningStep {
@@ -28,10 +29,12 @@ interface CleaningStep {
 }
 
 const DUMMY_SERVICES: ServiceItem[] = [
-  { name: 'Basic cleaning', price: '$70.97' },
-  { name: '1 x Exterior Wash', price: '$29.99' },
-  { name: '1 x Interior Vacuum', price: '$19.99' },
-  { name: '1 x Dashboard Cleaning', price: '$14.99' },
+  { name: 'Basic cleaning', price: '$70.97', type: 'primary' },
+  { name: '1 x Exterior Wash', price: '$29.99', type: 'secondary' },
+  { name: '1 x Interior Vacuum', price: '$19.99', type: 'secondary' },
+  { name: '1 x Dashboard Cleaning', price: '$14.99', type: 'secondary' },
+  { name: 'Extras', price: '$30.00', type: 'primary' },
+  { name: '1 x Baby Chair Cleaning', price: '$29.99', type: 'secondary' },
 ];
 
 const DUMMY_CLEANING_PROCESS: CleaningStep[] = [
@@ -55,7 +58,7 @@ const OrderDetailScreen: React.FC = () => {
   const { id: orderId } = useLocalSearchParams();
   const router = useRouter();
 
-  const renderServiceItem = ({ name, price }: ServiceItem) => (
+  const renderServiceItem = ({ name, price, type }: ServiceItem) => (
     <View key={name} style={orderStyles.serviceItem}>
       <Text style={orderStyles.serviceName}>{name}</Text>
       <Text style={orderStyles.servicePrice}>{price}</Text>
@@ -74,30 +77,40 @@ const OrderDetailScreen: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
       <ScrollView contentContainerStyle={orderStyles.scrollViewContent}>
 
-        {/* Header Section */}
-        <View style={orderStyles.headerContainer}>
-          <View style={orderStyles.statusRow}>
-            <Text style={orderStyles.statusText}>Open</Text>
-            <Text style={orderStyles.dateTimeText}>Today, 2:30 PM</Text>
+        <View style={orderStyles.header}>
+            {/* You could add a back arrow icon here */}
+            {/* <Icon name="arrow-back" size={24} color="#333" style={styles.backIcon} /> */}
+            <Ionicons name="chevron-back-outline" size={24} style={orderStyles.backIcon} onPress={() => router.push("/list-orders")} />
+            <Text style={orderStyles.headerTitle}>Order Details</Text>
           </View>
+        
 
-          <View style={orderStyles.carDetails}>
-            {/* Using emojis as fallback for icons */}
-            <Text style={orderStyles.carIcon}>🚗</Text>
-            {/* <MaterialCommunityIcons name="car" size={20} color="#333" style={styles.iconStyle} /> */}
-            <Text style={orderStyles.carPlate}>M-ST 2026</Text>
+        {/* Header Section */}
+        <View>
+          <View style={orderStyles.statusContainer}>
+            <View style={orderStyles.statusRow}>
+              <Text style={orderStyles.statusText}>Open</Text>
+              <Text style={orderStyles.dateTimeText}>Today, 2:30 PM</Text>
+            </View>
+
+            <View style={orderStyles.carDetails}>
+              {/* Using emojis as fallback for icons */}
+              <Ionicons name='car-sport-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
+              {/* <MaterialCommunityIcons name="car" size={20} color="#333" style={styles.iconStyle} /> */}
+              <Text style={orderStyles.carPlate}>M-ST 2026</Text>
+            </View>
           </View>
 
           <View style={orderStyles.contactDetails}>
             <View style={orderStyles.detailRow}>
-              <Text style={orderStyles.iconStyle}>📍</Text>
+              <Ionicons name='pin-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
               {/* <MaterialCommunityIcons name="map-marker" size={20} color="#333" style={styles.iconStyle} /> */}
               <Text style={orderStyles.detailText}>
                 123 Park Avenue, New York, NY{'\n'}10002
               </Text>
             </View>
             <View style={orderStyles.detailRow}>
-              <Text style={orderStyles.iconStyle}>📞</Text>
+              <Ionicons name='call-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
               {/* <MaterialCommunityIcons name="phone" size={20} color="#333" style={styles.iconStyle} /> */}
               <Text style={orderStyles.detailText}>+1 (555) 123-4567</Text>
             </View>
@@ -105,14 +118,10 @@ const OrderDetailScreen: React.FC = () => {
         </View>
 
         {/* Service Details Section */}
-        <View style={orderStyles.sectionContainer}>
-          {DUMMY_SERVICES.map(renderServiceItem)}
-          <View style={orderStyles.totalLine} />
-          <View style={orderStyles.totalRow}>
-            <Text style={orderStyles.totalLabel}>Obligation to pay</Text>
-            <Text style={orderStyles.totalPrice}>$135.94</Text> {/* Sum of prices */}
-          </View>
-        </View>
+        <ServiceDetailsList
+          services={DUMMY_SERVICES}
+          sectionTitle="Services Provided" // Optional: customize the title
+        />
 
         {/* Cleaning Process Section */}
         <View style={orderStyles.sectionContainer}>
@@ -122,7 +131,6 @@ const OrderDetailScreen: React.FC = () => {
               key={step.id}
               label={step.label}
               status={step.status}
-              isLast={index === DUMMY_CLEANING_PROCESS.length - 1}
             />
           ))}
         </View>

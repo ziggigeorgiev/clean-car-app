@@ -9,12 +9,9 @@ export const orderStyles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: 20, // Add some padding at the bottom of the scroll view
   },
-  headerContainer: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 10,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+  statusContainer: {
+    padding: 10,
+    backgroundColor: '#E0F2F7',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -28,13 +25,13 @@ export const orderStyles = StyleSheet.create({
     marginBottom: 15,
   },
   statusText: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
     color: '#007AFF', // Blue for "Open" status
   },
   dateTimeText: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textLight,
   },
   carDetails: {
     flexDirection: 'row',
@@ -46,12 +43,12 @@ export const orderStyles = StyleSheet.create({
     marginRight: 10,
   },
   carPlate: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.text,
   },
   contactDetails: {
-    marginTop: 10,
+    margin: 20,
   },
   detailRow: {
     flexDirection: 'row',
@@ -61,11 +58,11 @@ export const orderStyles = StyleSheet.create({
   iconStyle: {
     fontSize: 20, // Adjust for emoji size
     marginRight: 10,
-    color: '#333',
+    color: COLORS.text, 
   },
   detailText: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text,
   },
   sectionContainer: {
     backgroundColor: '#fff',
@@ -82,7 +79,7 @@ export const orderStyles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text,
     marginBottom: 15,
   },
   serviceItem: {
@@ -93,12 +90,12 @@ export const orderStyles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text,
   },
   servicePrice: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.text,
   },
   totalLine: {
     borderTopWidth: 1,
@@ -118,7 +115,7 @@ export const orderStyles = StyleSheet.create({
   totalPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text,
   },
   expectationItem: {
     flexDirection: 'row',
@@ -127,16 +124,16 @@ export const orderStyles = StyleSheet.create({
   },
   bulletPoint: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text,
     marginRight: 8,
   },
   expectationText: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text,
     flex: 1,
   },
   policyLinksContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     marginHorizontal: 10,
     borderRadius: 15,
     marginBottom: 10,
@@ -154,14 +151,37 @@ export const orderStyles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: COLORS.border,
   },
   policyLinkText: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text,
   },
   policyArrow: {
     fontSize: 20,
-    color: '#A0A0A0', // Light gray arrow
+    color: COLORS.text, // Light gray arrow
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.background,
+    marginBottom: 10, // Space below header
+  },
+  // If you use a back icon:
+  // backIcon: {
+  //   marginRight: 10,
+  // },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    flex: 1, // Takes up available space
+  },
+  backIcon: {
+    marginRight: 10,
   },
 });

@@ -1,16 +1,24 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, FlatList, StatusBar } from 'react-native';
+import { Text, View, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import OrderItemCard, OrderItemProps from '../components/OrderCard';
+import OrderItemCard from '../components/OrderCard';
 import { orderListStyles } from '../assets/styles/order-list.styles';
 
 
 // You might consider react-native-vector-icons for the back arrow icon if you add one.
 // import Icon from 'react-native-vector-icons/Ionicons';
 
-const DUMMY_ORDERS = [
+const DUMMY_ORDERS: {
+    id: string;
+    image: any;
+    address: string;
+    date: string;
+    time: string;
+    status: 'Open' | 'Completed';
+    price: string;
+}[] = [
     {
         id: '1',
         image: require('../assets/images/react-logo.png'), // Replace with your actual image paths
@@ -51,8 +59,8 @@ const DUMMY_ORDERS = [
 
 const OrderListScreen: React.FC = () => {
 
-    // Using useRouter from expo-router to handle navigation
-    const router = useRouter();
+  // Using useRouter from expo-router to handle navigation
+  const router = useRouter();
 
   return (
     <View>
