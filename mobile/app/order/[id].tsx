@@ -77,14 +77,6 @@ const OrderDetailScreen: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
       <ScrollView contentContainerStyle={orderStyles.scrollViewContent}>
 
-        <View style={orderStyles.header}>
-            {/* You could add a back arrow icon here */}
-            {/* <Icon name="arrow-back" size={24} color="#333" style={styles.backIcon} /> */}
-            <Ionicons name="chevron-back-outline" size={24} style={orderStyles.backIcon} onPress={() => router.push("/list-orders")} />
-            <Text style={orderStyles.headerTitle}>Order Details</Text>
-          </View>
-        
-
         {/* Header Section */}
         <View>
           <View style={orderStyles.statusContainer}>

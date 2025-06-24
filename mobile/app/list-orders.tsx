@@ -64,14 +64,6 @@ const OrderListScreen: React.FC = () => {
 
   return (
     <View>
-      <View style={orderListStyles.header}>
-        {/* You could add a back arrow icon here */}
-        {/* <Icon name="arrow-back" size={24} color="#333" style={styles.backIcon} /> */}
-        <Ionicons name="chevron-back-outline" size={24} style={orderListStyles.backIcon} onPress={() => router.push("/")} />
-        <Text style={orderListStyles.headerTitle}>Cleaning Orders</Text>
-        <Text style={orderListStyles.orderCount}>({DUMMY_ORDERS.length})</Text>
-      </View>
-
       <FlatList
         data={DUMMY_ORDERS}
         keyExtractor={( item ) => item.id}
