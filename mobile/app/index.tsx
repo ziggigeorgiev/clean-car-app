@@ -66,7 +66,7 @@ const HomeScreen = () => {
           {/* "Add New Order" Button */}
           <TouchableOpacity
             style={homeStyles.addButton}
-            onPress={() => console.log('Add New Order Pressed')}
+            onPress={() => router.push("/location")}
           >
             <Text style={homeStyles.addButtonIcon}>+</Text>
             <Text style={homeStyles.addButtonText}>Add New Order</Text>
