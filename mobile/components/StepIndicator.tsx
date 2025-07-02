@@ -29,7 +29,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
           height: dotSize,
           borderRadius: dotSize / 2,
           marginHorizontal: spacing / 2,
-          backgroundColor: index + 1 === currentStep ? activeColor : inactiveColor,
+          backgroundColor: index + 1 <= currentStep ? activeColor : inactiveColor,
            // Optional: Add some padding to the right for better spacing
         },
       ]}

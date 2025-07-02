@@ -211,10 +211,10 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
 
           {/* Recent Addresses */}
           <Text style={styles.recentAddressesTitle}>Recent Addresses</Text>
-          <TouchableOpacity style={styles.recentAddressItem}>
+          <View style={styles.recentAddressItem}>
             <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAddressIcon} />
             <Text style={styles.recentAddressText}>{address}</Text>
-          </TouchableOpacity>
+          </View>
           {/* Add more recent addresses here if needed */}
 
           {/* Confirm Location Button */}
