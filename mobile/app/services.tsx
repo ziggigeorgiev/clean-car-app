@@ -41,7 +41,7 @@ const ServicesScreen = () => {
   ];
 
   // Dummy data for basic cleaning and extras
-  const DUMMY_SERVICES = [
+  const DUMMY_SERVICES: { name: string; price: string; type: "primary" | "secondary" }[] = [
     { name: 'Basic cleaning', price: '$70.97', type: 'primary' },
     { name: '1 x Exterior Wash', price: '$29.99', type: 'secondary' },
     { name: '1 x Interior Vacuum', price: '$19.99', type: 'secondary' },
