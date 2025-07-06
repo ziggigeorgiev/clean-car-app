@@ -44,7 +44,7 @@ async def read_orders(phone_identifier: str, skip: int = 0, limit: int = 100, db
 
 # Get Order By ID Endpoint (NEW)
 @app.get(
-    "/api/orders/get/phone_identifier/{phone_identifier}id/{order_id}",
+    "/api/orders/get/phone_identifier/{phone_identifier}/id/{order_id}",
     response_model=schemas.Order, # Response model is a single Order object
     summary="Get Order by ID",
     description="Retrieves a single order by its unique ID, including associated location, services, and availability."
@@ -56,7 +56,7 @@ async def read_order_by_id(phone_identifier: str, order_id: int, db: Session = D
     - **order_id**: The unique integer ID of the order to retrieve.
     """
     print("Fetching order with ID:", order_id)  # Debugging line
-    db_order = crud.get_order_by_id(db, phone_identifier=phone_identifier, order_id=order_id)
+    db_order = crud.get_order_by_phone_identifier_and_id(db, phone_identifier=phone_identifier, order_id=order_id)
     if db_order is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -125,7 +125,7 @@ async def read_active_services(skip: int = 0, limit: int = 100, db: Session = De
 
 
 @app.put(
-    "/api/services/craeate",
+    "/api/services/create",
     response_model=schemas.Service,
     status_code=status.HTTP_201_CREATED,
     summary="Create a New Service",

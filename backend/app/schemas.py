@@ -19,6 +19,10 @@ class OrderStatusEnum(str, enum.Enum): # Inherit from str for PostgreSQL compati
     CANCELLED = "cancelled"
     # Add other statuses as needed
 
+class ServiceCategoryEnum(str, enum.Enum): # Inherit from str for PostgreSQL compatibility and Pydantic
+    BASIC= "Basic"
+    EXTRA = "Extra"
+
 # --- Location Schemas ---
 class LocationBase(BaseModel):
     address: str
@@ -37,6 +41,7 @@ class Location(LocationBase):
 
 # --- Service Schemas ---
 class ServiceBase(BaseModel):
+    category: ServiceCategoryEnum = ServiceCategoryEnum.BASIC # Default category
     name: str
     description: Optional[str] = None
     price: float

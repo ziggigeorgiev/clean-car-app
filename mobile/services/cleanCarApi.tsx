@@ -25,16 +25,16 @@ export const CleanCarAPI = {
     }
   },
   
-  getOrderById: async (id: number) => {
+  getOrderByByPhoneIdentifierAndId: async (phone_identifier: string, order_id: number) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/orders/get/id/${id}`);
+      const response = await fetch(`${BASE_URL}/api/orders/get/phone_identifier/${phone_identifier}/id/${order_id}`);
       const data = await response.json();
       return data;
     } catch (error) {
       console.error("Error getting order by id:", error);
       return null;
     }
-  },
+  }
 
   // // lookup a single random meal
   // getRandomMeal: async () => {

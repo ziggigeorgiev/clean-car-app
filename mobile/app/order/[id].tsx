@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -8,13 +8,18 @@ import {
   Linking,
   StatusBar,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import CleaningProcessStep from '../../components/CleaningProcessStep';
-import ServiceDetailsList from '../../components/ServiceDetailsList';
 import { COLORS } from "../../constants/colors";
 import { orderStyles } from '../../assets/styles/order.styles';
+import CleaningProcessStep from '../../components/CleaningProcessStep';
+import ServiceDetailsList from '../../components/ServiceDetailsList';
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { Device } from '../../services/Device';
+import { CleanCarAPI } from "../../services/CleanCarApi";
+import { Transformations } from "../../services/Transformations";
+import { format } from "date-fns";
 
 interface ServiceItem {
   name: string;
@@ -28,14 +33,20 @@ interface CleaningStep {
   status: 'completed' | 'in-progress' | 'pending';
 }
 
-const DUMMY_SERVICES: ServiceItem[] = [
-  { name: 'Basic cleaning', price: '$70.97', type: 'primary' },
-  { name: '1 x Exterior Wash', price: '$29.99', type: 'secondary' },
-  { name: '1 x Interior Vacuum', price: '$19.99', type: 'secondary' },
-  { name: '1 x Dashboard Cleaning', price: '$14.99', type: 'secondary' },
-  { name: 'Extras', price: '$30.00', type: 'primary' },
-  { name: '1 x Baby Chair Cleaning', price: '$29.99', type: 'secondary' },
-];
+interface Order {
+  id: number;
+  status: string;
+  plate_number: string;
+  location: {
+    address: string;
+  };
+  phone_number: string;
+  services: any[];
+  availability?: {
+    time: string;
+  };
+  // Add other fields as needed
+}
 
 const DUMMY_CLEANING_PROCESS: CleaningStep[] = [
   { id: '1', label: 'Booking Confirmed', status: 'completed' },
@@ -46,17 +57,49 @@ const DUMMY_CLEANING_PROCESS: CleaningStep[] = [
   { id: '6', label: 'Completed', status: 'pending' },
 ];
 
-const DUMMY_EXPECTATIONS: string[] = [
-  'Cleaner arrives at scheduled time',
-  'Average cleaning duration: 25 minutes',
-  'Quality inspection after cleaning',
-  'Payment processed after service completion',
-];
-
 const OrderDetailScreen: React.FC = () => {
 
-  const { id: orderId } = useLocalSearchParams();
-  const router = useRouter();
+  const { id: orderIdParam } = useLocalSearchParams();
+  const orderId = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
+
+  const [loading, setLoading] = useState(false);
+  
+  
+  const [order, setOrder] = useState<Order | null>(null);
+  const [services, setServices] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const phoneIdentifier = await Device.getPhoneIdentifier();
+      if (!phoneIdentifier) {
+        console.error("Phone identifier is not available.");
+        return;
+      }
+
+      try {
+        const order = await CleanCarAPI.getOrderByByPhoneIdentifierAndId(phoneIdentifier, parseInt(orderId));
+        setOrder(order);
+
+        const transformedServices = Transformations.transformServices(order?.services || []);
+        setServices(transformedServices);
+      } catch (error) {
+        console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  const expectations: string[] = [
+    'Cleaner arrives at scheduled time',
+    'Average cleaning duration: 25 minutes',
+    'Quality inspection after cleaning',
+    'Payment processed after service completion',
+  ];
 
   const renderServiceItem = ({ name, price, type }: ServiceItem) => (
     <View key={name} style={orderStyles.serviceItem}>
@@ -72,6 +115,9 @@ const OrderDetailScreen: React.FC = () => {
     </View>
   );
 
+
+  if (loading) return <LoadingSpinner message="Loading order details..." />;
+  
   return (
     <SafeAreaView style={orderStyles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
@@ -81,15 +127,19 @@ const OrderDetailScreen: React.FC = () => {
         <View>
           <View style={orderStyles.statusContainer}>
             <View style={orderStyles.statusRow}>
-              <Text style={orderStyles.statusText}>Open</Text>
-              <Text style={orderStyles.dateTimeText}>Today, 2:30 PM</Text>
+              <Text style={orderStyles.statusText}>{order?.status}</Text>
+              <Text style={orderStyles.dateTimeText}>
+                {order?.availability?.time
+                  ? format(order.availability.time, "MMMM do, yyyy H:mm")
+                  : '-'}
+              </Text>
             </View>
 
             <View style={orderStyles.carDetails}>
               {/* Using emojis as fallback for icons */}
               <Ionicons name='car-sport-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
               {/* <MaterialCommunityIcons name="car" size={20} color="#333" style={styles.iconStyle} /> */}
-              <Text style={orderStyles.carPlate}>M-ST 2026</Text>
+              <Text style={orderStyles.carPlate}>{order?.plate_number}</Text>
             </View>
           </View>
 
@@ -98,20 +148,20 @@ const OrderDetailScreen: React.FC = () => {
               <Ionicons name='pin-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
               {/* <MaterialCommunityIcons name="map-marker" size={20} color="#333" style={styles.iconStyle} /> */}
               <Text style={orderStyles.detailText}>
-                123 Park Avenue, New York, NY{'\n'}10002
+                {order?.location.address}
               </Text>
             </View>
             <View style={orderStyles.detailRow}>
               <Ionicons name='call-outline' size={16} color={COLORS.textLight} style={orderStyles.iconStyle} />
               {/* <MaterialCommunityIcons name="phone" size={20} color="#333" style={styles.iconStyle} /> */}
-              <Text style={orderStyles.detailText}>+1 (555) 123-4567</Text>
+              <Text style={orderStyles.detailText}>{order?.phone_number}</Text>
             </View>
           </View>
         </View>
 
         {/* Service Details Section */}
         <ServiceDetailsList
-          services={DUMMY_SERVICES}
+          services={services}
           sectionTitle="Services Provided" // Optional: customize the title
         />
 
@@ -130,7 +180,7 @@ const OrderDetailScreen: React.FC = () => {
         {/* What to Expect Section */}
         <View style={orderStyles.sectionContainer}>
           <Text style={orderStyles.sectionTitle}>What to Expect</Text>
-          {DUMMY_EXPECTATIONS.map(renderExpectationItem)}
+          {expectations.map(renderExpectationItem)}
         </View>
 
         {/* Policy Links Section */}

@@ -9,7 +9,7 @@ export const Device = {
         installationId = Crypto.randomUUID(); // Generate a new UUID
         await AsyncStorage.setItem('phone_identifier', installationId);
       }
-      return installationId;
+      return 'Zdravko\'s Phone'; // installationId;
     } catch (error) {
       console.error("Error getting/creating phone_identifier:", error);
       return null; // Handle error appropriately

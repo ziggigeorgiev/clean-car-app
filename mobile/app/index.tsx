@@ -11,8 +11,8 @@ import { useRouter } from 'expo-router';
 
 import { homeStyles } from '../assets/styles/home.styles';
 import LoadingSpinner from "../components/LoadingSpinner";
-import { Device } from '../services/device';
-import { CleanCarAPI } from "../services/cleanCarApi";
+import { Device } from '../services/Device';
+import { CleanCarAPI } from "../services/CleanCarApi";
 
 const HomeScreen = () => {
 
@@ -36,8 +36,8 @@ const HomeScreen = () => {
       try {
         const orders = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
 
-        setPending(orders.filter((order: { status: string; }) => order.status === 'pending').length);
-        setCompleted(orders.filter((order: { status: string; }) => order.status !== 'pending').length);
+        setPending(orders.filter((order: { status: string; }) => order.status === 'open').length);
+        setCompleted(orders.filter((order: { status: string; }) => order.status !== 'open').length);
       } catch (error) {
         console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
       } finally {

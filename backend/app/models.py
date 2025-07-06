@@ -22,6 +22,10 @@ class OrderStatusEnum(str, enum.Enum): # Inherit from str for PostgreSQL compati
     CANCELLED = "cancelled"
     # Add other statuses as needed
 
+class ServiceCategoryEnum(str, enum.Enum): # Inherit from str for PostgreSQL compatibility and Pydantic
+    BASIC= "Basic"
+    EXTRA = "Extra"
+
 class Location(Base):
     __tablename__ = "locations"
 
@@ -40,7 +44,8 @@ class Service(Base):
     __tablename__ = "services"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String, index=True, nullable=False)
+    category: Mapped[ServiceCategoryEnum] = mapped_column(Enum(ServiceCategoryEnum), nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True) # Optional
     price: Mapped[float] = mapped_column(Float, nullable=False)
     currency: Mapped[CurrencyEnum] = mapped_column(Enum(CurrencyEnum), nullable=False)
@@ -57,7 +62,7 @@ class Service(Base):
     )
 
     def __repr__(self):
-        return f"<Service(id={self.id}, name='{self.name}', price={self.price})>"
+        return f"<Service(id={self.id}, category='{self.category}', name='{self.name}', price={self.price})>"
 
 class Availability(Base):
     __tablename__ = "availabilities"

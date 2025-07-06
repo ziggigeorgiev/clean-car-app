@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Text, View, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 import OrderItemCard from '../components/OrderCard';
 import LoadingSpinner from "../components/LoadingSpinner";
 import NoResultsFound from "../components/NoResultsFound";
-import { CleanCarAPI } from "../services/cleanCarApi";
-import { Device } from '../services/device';
+import { CleanCarAPI } from "../services/CleanCarApi";
+import { Device } from '../services/Device';
 import { orderListStyles } from '../assets/styles/order-list.styles';
 
 

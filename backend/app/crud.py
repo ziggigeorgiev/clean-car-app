@@ -29,7 +29,7 @@ def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 1
     )
 
 
-def get_order_by_id(db: Session, phone_identifier: str, order_id: int) -> Optional[models.Order]:
+def get_order_by_phone_identifier_and_id(db: Session, phone_identifier: str, order_id: int) -> Optional[models.Order]:
     """
     Retrieves a single order by its ID,
     eagerly loading related location, services, and availability.
@@ -134,6 +134,7 @@ def get_active_services(db: Session, skip: int = 0, limit: int = 100) -> List[mo
 
 def create_service(db: Session, service: schemas.ServiceCreate) -> models.Service:
     db_service = models.Service(
+        category=service.category,
         name=service.name,
         description=service.description,
         price=service.price,

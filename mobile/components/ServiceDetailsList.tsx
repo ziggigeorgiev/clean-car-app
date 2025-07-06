@@ -6,7 +6,8 @@ import {ServiceDetailsListSyles as styles} from '../assets/styles/components.sty
 // Define the interface for a single service item
 export interface ServiceItem {
   name: string;
-  price: string;
+  price: number;
+  currency: string; // Assuming currency is a string like 'USD', 'EUR', etc.
   type: 'primary' | 'secondary'; // Added type for service item
 }
 
@@ -24,8 +25,7 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
   .filter((service) => service.type === 'primary')
   .reduce((acc, service) => {
     // Assuming price is a string like '$70.97', we need to convert it to a number
-    const price = parseFloat(service.price.replace(/[^0-9.-]+/g, ''));
-    return acc + (isNaN(price) ? 0 : price);
+    return acc + service.price;
   }, 0);
   return (
     <View style={styles.container}>
@@ -41,7 +41,7 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
       {services.map((service, index) => (
         <View key={index} style={service.type === 'primary' ? styles.serviceItemPrimary: styles.serviceItemSecondary}>
           <Text style={[styles.serviceName, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.name}</Text>
-          <Text style={[styles.servicePrice, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.price}</Text>
+          <Text style={[styles.servicePrice, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.price} {service.currency}</Text>
         </View>
       ))}
 
@@ -53,7 +53,7 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
       <View style={styles.totalRow}>
         <Text style={styles.totalLabel}>Obligation to pay</Text>
         {/* This would be a calculated sum in a real app */}
-        <Text style={styles.totalPrice}>{total}</Text>
+        <Text style={styles.totalPrice}>{total} {services[0]?.currency}</Text>
       </View>
     </View>
   );
