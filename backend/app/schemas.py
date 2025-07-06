@@ -13,6 +13,12 @@ class CurrencyEnum(str, enum.Enum): # Inherit from str for JSON serialization
     GBP = "GBP"
     # Add other currencies as needed
 
+class OrderStatusEnum(str, enum.Enum): # Inherit from str for PostgreSQL compatibility and Pydantic
+    OPEN = "open"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    # Add other statuses as needed
+
 # --- Location Schemas ---
 class LocationBase(BaseModel):
     address: str
@@ -66,9 +72,11 @@ class Availability(AvailabilityBase):
 
 # --- Order Schemas ---
 class OrderBase(BaseModel):
+    phone_identifier: str
+    status: OrderStatusEnum = OrderStatusEnum.OPEN # Default status
     plate_number: str
     phone_number: str
-    location_id: int
+    location: LocationCreate
     availability_id: int
     service_ids: List[int] = [] # For creating an order, provide service IDs
 

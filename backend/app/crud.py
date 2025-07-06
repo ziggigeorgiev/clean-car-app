@@ -28,38 +28,47 @@ def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 1
         .all()
     )
 
+
 def get_order_by_id(db: Session, order_id: int) -> Optional[models.Order]:
     """
     Retrieves a single order by its ID,
     eagerly loading related location, services, and availability.
     """
+    print("Fetching order with ID:", order_id)  # Debugging line
     return (
         db.query(models.Order)
+        .filter(models.Order.id == order_id)
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
             selectinload(models.Order.services)
         )
-        .filter(models.Order.id == order_id)
         .first()
     )
 
 
 # Example for creating an order (simplified, without full error handling):
 def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
-    db_location = db.query(models.Location).filter(models.Location.id == order.location_id).first()
-    if not db_location:
-        raise ValueError("Location not found")
-
+    
     db_availability = db.query(models.Availability).filter(models.Availability.id == order.availability_id).first()
+    db_availability = db_availability if db_availability and not db_availability.is_taken else None
     if not db_availability:
         raise ValueError("Availability not found")
+    db_availability.is_taken = True  # Mark as taken
 
     db_services = db.query(models.Service).filter(models.Service.id.in_(order.service_ids)).all()
     if len(db_services) != len(order.service_ids):
         raise ValueError("One or more services not found")
 
+    db_location = models.Location(
+        address=order.location.address,
+        longitude=order.location.longitude,
+        latitude=order.location.latitude
+    )
+    db.add(db_location)
+
     db_order = models.Order(
+        phone_identifier=order.phone_identifier,
         plate_number=order.plate_number,
         phone_number=order.phone_number,
         location=db_location,
@@ -67,6 +76,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
         services=db_services # Assign the list of service objects
     )
     db.add(db_order)
+
     db.commit()
     db.refresh(db_order)
     return db_order
@@ -92,6 +102,19 @@ def get_available_availabilities(db: Session, start_date: datetime.date, end_dat
         .all()
     )
 
+
+def create_availability(db: Session, availability: schemas.AvailabilityCreate) -> models.Availability:
+    db_availability = models.Availability(
+        date=availability.date,
+        time=availability.time,
+        is_taken=availability.is_taken
+    )
+    db.add(db_availability)
+    db.commit()
+    db.refresh(db_availability)
+    return db_availability
+
+
 def get_active_services(db: Session, skip: int = 0, limit: int = 100) -> List[models.Service]:
     """
     Retrieves a list of services that are currently active.
@@ -104,3 +127,17 @@ def get_active_services(db: Session, skip: int = 0, limit: int = 100) -> List[mo
         .limit(limit)
         .all()
     )
+
+
+def create_service(db: Session, service: schemas.ServiceCreate) -> models.Service:
+    db_service = models.Service(
+        name=service.name,
+        description=service.description,
+        price=service.price,
+        currency=service.currency,
+        is_active=service.is_active
+    )
+    db.add(db_service)
+    db.commit()
+    db.refresh(db_service)
+    return db_service

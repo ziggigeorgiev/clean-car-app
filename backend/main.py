@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from fastapi import FastAPI, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -32,18 +33,18 @@ async def health_check():
 
 # Get All Orders Endpoint
 @app.get(
-    "/api/orders/get",
+    "/api/orders/get/phone_identifier/{phone_identifier}",
     response_model=List[schemas.Order],
     summary="Get All Orders",
     description="Retrieves a list of all orders with their associated location, services, and availability."
 )
-async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    orders = crud.get_orders(db, skip=skip, limit=limit)
+async def read_orders(phone_identifier: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    orders = crud.get_orders(db, phone_identifier, skip=skip, limit=limit)
     return orders
 
 # Get Order By ID Endpoint (NEW)
 @app.get(
-    "/api/orders/get/{order_id}",
+    "/api/orders/get/id/{order_id}",
     response_model=schemas.Order, # Response model is a single Order object
     summary="Get Order by ID",
     description="Retrieves a single order by its unique ID, including associated location, services, and availability."
@@ -54,6 +55,7 @@ async def read_order_by_id(order_id: int, db: Session = Depends(get_db)):
 
     - **order_id**: The unique integer ID of the order to retrieve.
     """
+    print("Fetching order with ID:", order_id)  # Debugging line
     db_order = crud.get_order_by_id(db, order_id=order_id)
     if db_order is None:
         raise HTTPException(
@@ -94,9 +96,21 @@ async def read_available_availabilities(skip: int = 0, limit: int = 100, db: Ses
     return availabilities
 
 
-# NEW: Get Active Services Endpoint
+# Create Availability Endpoint
+@app.put(
+    "/api/availabilities/create",
+    response_model=schemas.Availability,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a New Availability Slot",
+    description="Creates a new availability slot."
+)
+async def create_availability_slot(availability: schemas.AvailabilityCreate, db: Session = Depends(get_db)):
+    db_availability = crud.create_availability(db=db, availability=availability)
+    return db_availability
+
+# Get Active Services Endpoint
 @app.get(
-    "/api/services/active",
+    "/api/services/get",
     response_model=List[schemas.Service], # Response is a list of Service schemas
     summary="Get Active Services",
     description="Retrieves a list of all services that are currently active (is_active = True)."
@@ -110,6 +124,16 @@ async def read_active_services(skip: int = 0, limit: int = 100, db: Session = De
     return active_services
 
 
+@app.put(
+    "/api/services/craeate",
+    response_model=schemas.Service,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a New Service",
+    description="Creates a new service."
+)
+async def create_service_entry(service: schemas.ServiceCreate, db: Session = Depends(get_db)):
+    db_service = crud.create_service(db=db, service=service)
+    return db_service
 # @app.put("/api/order/{order_id}/process/{process_id}/status/{status}")
 
 

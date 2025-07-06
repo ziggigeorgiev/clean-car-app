@@ -16,6 +16,12 @@ class CurrencyEnum(enum.Enum):
     GBP = "GBP"
     # Add other currencies as needed
 
+class OrderStatusEnum(str, enum.Enum): # Inherit from str for PostgreSQL compatibility and Pydantic
+    OPEN = "open"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    # Add other statuses as needed
+
 class Location(Base):
     __tablename__ = "locations"
 
@@ -87,6 +93,12 @@ class Order(Base):
     plate_number: Mapped[str] = mapped_column(String, nullable=False)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
+    status: Mapped[OrderStatusEnum] = mapped_column(
+        Enum(OrderStatusEnum), # Use the Enum type
+        default=OrderStatusEnum.OPEN, # Set the default value for new rows
+        nullable=False # This will be enforced after the migration
+    )
 
     # Foreign Key to Location (one-to-many: one location can have many orders)
     location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
