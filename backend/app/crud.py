@@ -38,7 +38,7 @@ def get_order_by_id(db: Session, phone_identifier: str, order_id: int) -> Option
     return (
         db.query(models.Order)
         .filter(
-            models.Order.phone_identifier == phone_identifier  # Ensure the order belongs to the user
+            models.Order.phone_identifier == phone_identifier,  # Ensure the order belongs to the user
             models.Order.id == order_id
         )
         .options(
