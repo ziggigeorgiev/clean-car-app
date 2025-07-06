@@ -44,19 +44,19 @@ async def read_orders(phone_identifier: str, skip: int = 0, limit: int = 100, db
 
 # Get Order By ID Endpoint (NEW)
 @app.get(
-    "/api/orders/get/id/{order_id}",
+    "/api/orders/get/phone_identifier/{phone_identifier}id/{order_id}",
     response_model=schemas.Order, # Response model is a single Order object
     summary="Get Order by ID",
     description="Retrieves a single order by its unique ID, including associated location, services, and availability."
 )
-async def read_order_by_id(order_id: int, db: Session = Depends(get_db)):
+async def read_order_by_id(phone_identifier: str, order_id: int, db: Session = Depends(get_db)):
     """
     Retrieves a single order from the database by its ID.
 
     - **order_id**: The unique integer ID of the order to retrieve.
     """
     print("Fetching order with ID:", order_id)  # Debugging line
-    db_order = crud.get_order_by_id(db, order_id=order_id)
+    db_order = crud.get_order_by_id(db, phone_identifier=phone_identifier, order_id=order_id)
     if db_order is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

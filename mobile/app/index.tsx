@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -7,13 +7,48 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-import { homeStyles } from '../assets/styles/home.styles';
 import { useRouter } from 'expo-router';
+
+import { homeStyles } from '../assets/styles/home.styles';
+import LoadingSpinner from "../components/LoadingSpinner";
+import { Device } from '../services/device';
+import { CleanCarAPI } from "../services/cleanCarApi";
 
 const HomeScreen = () => {
 
   // Using useRouter from expo-router to handle navigation
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [completed, setCompleted] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const phoneIdentifier = await Device.getPhoneIdentifier();
+      if (!phoneIdentifier) {
+        console.error("Phone identifier is not available.");
+        return;
+      }
+
+      try {
+        const orders = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
+
+        setPending(orders.filter((order: { status: string; }) => order.status === 'pending').length);
+        setCompleted(orders.filter((order: { status: string; }) => order.status !== 'pending').length);
+      } catch (error) {
+        console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  if (loading) return <LoadingSpinner message="Loading..." />;
 
   return (
     <View>
@@ -40,12 +75,12 @@ const HomeScreen = () => {
           {/* Order Summary */}
           <View style={homeStyles.orderSummaryContainer}>
             <View style={homeStyles.orderCard}>
-              <Text style={homeStyles.orderNumber}>1</Text>
+              <Text style={homeStyles.orderNumber}>{pending}</Text>
               <Text style={homeStyles.orderLabel}>Active Orders</Text>
             </View>
             <View style={homeStyles.separator} />
             <View style={homeStyles.orderCard}>
-              <Text style={homeStyles.orderNumber}>3</Text>
+              <Text style={homeStyles.orderNumber}>{completed}</Text>
               <Text style={homeStyles.text}>Completed Orders</Text>
             </View>
           </View>

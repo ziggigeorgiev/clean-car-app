@@ -29,7 +29,7 @@ def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 1
     )
 
 
-def get_order_by_id(db: Session, order_id: int) -> Optional[models.Order]:
+def get_order_by_id(db: Session, phone_identifier: str, order_id: int) -> Optional[models.Order]:
     """
     Retrieves a single order by its ID,
     eagerly loading related location, services, and availability.
@@ -37,7 +37,10 @@ def get_order_by_id(db: Session, order_id: int) -> Optional[models.Order]:
     print("Fetching order with ID:", order_id)  # Debugging line
     return (
         db.query(models.Order)
-        .filter(models.Order.id == order_id)
+        .filter(
+            models.Order.phone_identifier == phone_identifier  # Ensure the order belongs to the user
+            models.Order.id == order_id
+        )
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
