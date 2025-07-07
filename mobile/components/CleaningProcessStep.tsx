@@ -6,11 +6,11 @@ import { CleaningProcessStepStyles as styles } from '../assets/styles/components
 import { COLORS } from "../constants/colors";
 
 interface CleaningProcessStepProps {
-  label: string;
+  name: string;
   status: 'completed' | 'in-progress' | 'pending';
 }
 
-const CleaningProcessStep: React.FC<CleaningProcessStepProps> = ({ label, status }) => {
+const CleaningProcessStep: React.FC<CleaningProcessStepProps> = ({ name, status }) => {
   
   const iconColor =
     status === 'pending'
@@ -40,7 +40,7 @@ const CleaningProcessStep: React.FC<CleaningProcessStepProps> = ({ label, status
 
       </View>
       <Text style={[styles.stepLabel, { color: textColor, fontWeight: fontWeight }]}>
-        {label}
+        {name}
       </Text>
     </View>
   );

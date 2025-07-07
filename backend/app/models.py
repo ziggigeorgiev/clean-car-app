@@ -26,6 +26,12 @@ class ServiceCategoryEnum(str, enum.Enum): # Inherit from str for PostgreSQL com
     BASIC= "Basic"
     EXTRA = "Extra"
 
+class ProcessStepStatusEnum(str, enum.Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
 class Location(Base):
     __tablename__ = "locations"
 
@@ -88,6 +94,25 @@ class OrderServiceAssociation(Base):
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
     service_id: Mapped[int] = mapped_column(ForeignKey("services.id"), primary_key=True)
 
+class ProcessStep(Base):
+    __tablename__ = "process_steps"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[ProcessStepStatusEnum] = mapped_column(
+        Enum(ProcessStepStatusEnum),
+        default=ProcessStepStatusEnum.PENDING,
+        nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
+    # Foreign Key to Order (many-to-one: many steps belong to one order)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    order: Mapped["Order"] = relationship(back_populates="process_steps")
+
+    def __repr__(self):
+        return f"<ProcessStep(id={self.id}, name='{self.name}', status='{self.status}', order_id={self.order_id})>"
+
 
 class Order(Base):
     __tablename__ = "orders"
@@ -114,6 +139,12 @@ class Order(Base):
     # If one availability slot can only be taken by ONE order, consider unique=True on the FK
     availability_id: Mapped[int] = mapped_column(ForeignKey("availabilities.id"), unique=True, nullable=False)
     availability: Mapped["Availability"] = relationship(back_populates="orders")
+
+    # One-to-Many relationship to ProcessStep
+    process_steps: Mapped[List["ProcessStep"]] = relationship(
+        back_populates="order",
+        order_by="ProcessStep.created_at" # Optional: Order steps by creation time
+    )
 
     # Many-to-Many relationship with Service
     # 'secondary' points to the association table

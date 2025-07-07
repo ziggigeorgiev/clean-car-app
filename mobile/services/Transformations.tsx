@@ -1,5 +1,6 @@
 export const Transformations = {
-  transformServices: (services) => {
+
+  transformServices: (services: any[]) => {
     // Step 1: Group services by category and calculate total price per category
     const groupedByCategory = services.reduce((acc, service) => {
         const { category, price, currency } = service;
@@ -23,12 +24,12 @@ export const Transformations = {
     // To maintain original order of categories, we can get unique categories first
     const uniqueCategories = [...new Set(services.map(s => s.category))];
 
-    const categoryName = {
+    const categoryName: Record<string, string> = {
         "Basic": "Basic cleaning",
         "Extra": "Extra services",
     }
 
-    uniqueCategories.forEach(category => {
+    uniqueCategories.forEach((category: string) => {
         const categoryData = groupedByCategory[category];
 
         // Add the "primary" category entry
@@ -40,7 +41,7 @@ export const Transformations = {
         });
 
         // Add "secondary" entries for each service in the category
-        categoryData.items.forEach(service => {
+        categoryData.items.forEach((service: { name: any; price: any; currency: any; }) => {
             transformedList.push({
                 name: service.name,
                 price: service.price,
@@ -51,5 +52,20 @@ export const Transformations = {
     });
 
     return transformedList;
+  },
+
+  transformProcessSteps: (processSteps: any[]) => {
+    const transformedList: { id: any; name: any; status: any; }[] = [];
+    processSteps.sort((a, b) => a.id - b.id);
+    
+    processSteps.forEach((processStep) => {
+        transformedList.push({
+            id: processStep.id,
+            name: processStep.name,
+            status: processStep.status
+        });
+    });
+
+    return transformedList
   }
 };

@@ -23,6 +23,12 @@ class ServiceCategoryEnum(str, enum.Enum): # Inherit from str for PostgreSQL com
     BASIC= "Basic"
     EXTRA = "Extra"
 
+class ProcessStepStatusEnum(str, enum.Enum): # Must match the enum in models.py
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
 # --- Location Schemas ---
 class LocationBase(BaseModel):
     address: str
@@ -75,6 +81,22 @@ class Availability(AvailabilityBase):
     # class Config: # For Pydantic v1
     #     orm_mode = True
 
+# --- ProcessStep Schemas ---
+class ProcessStepBase(BaseModel):
+    name: str
+    status: ProcessStepStatusEnum = ProcessStepStatusEnum.PENDING
+
+class ProcessStepCreate(ProcessStepBase):
+    # order_id is removed here as it will be set by the backend during Order creation
+    pass
+
+class ProcessStep(ProcessStepBase):
+    id: int
+    created_at: datetime
+    order_id: int # Still present in the full schema for response
+
+    model_config = ConfigDict(from_attributes=True)
+
 # --- Order Schemas ---
 class OrderBase(BaseModel):
     phone_identifier: str
@@ -96,7 +118,8 @@ class Order(OrderBase):
     # These will be populated by SQLAlchemy's ORM when fetched
     location: Location # Reference the Location schema
     availability: Availability # Reference the Availability schema
-    services: List[Service] # Reference the Service schema (list for many-to-many)
+    services: List[Service]# Reference the Service schema (list for many-to-many)
+    process_steps: List[ProcessStep]
 
     model_config = ConfigDict(from_attributes=True) # For Pydantic v2+
     # class Config: # For Pydantic v1

@@ -79,6 +79,15 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
         services=db_services # Assign the list of service objects
     )
     db.add(db_order)
+    db.flush() # Flush to get the db_order.id before committing
+
+    for step_data in order.initial_process_steps:
+        db_process_step = models.ProcessStep(
+            name=step_data.name,
+            status=step_data.status,
+            order_id=db_order.id # Assign the ID of the newly created order
+        )
+        db.add(db_process_step)
 
     db.commit()
     db.refresh(db_order)
@@ -145,3 +154,12 @@ def create_service(db: Session, service: schemas.ServiceCreate) -> models.Servic
     db.commit()
     db.refresh(db_service)
     return db_service
+
+
+def update_process_step_status(db: Session, step_id: int, new_status: schemas.ProcessStepStatusEnum) -> Optional[models.ProcessStep]:
+    db_step = db.query(models.ProcessStep).filter(models.ProcessStep.id == step_id).first()
+    if db_step:
+        db_step.status = new_status
+        db.commit()
+        db.refresh(db_step)
+    return db_step

@@ -134,9 +134,32 @@ async def read_active_services(skip: int = 0, limit: int = 100, db: Session = De
 async def create_service_entry(service: schemas.ServiceCreate, db: Session = Depends(get_db)):
     db_service = crud.create_service(db=db, service=service)
     return db_service
-# @app.put("/api/order/{order_id}/process/{process_id}/status/{status}")
 
 
+@app.put(
+    "/api/process_steps/{step_id}/statu/{status}",
+    response_model=schemas.ProcessStep, # Return the updated step
+    summary="Update Process Step Status",
+    description="Modifies the status of a specific process step by its ID."
+)
+async def update_process_step(
+    step_id: int,
+    status: schemas.ProcessStepStatusEnum,
+    db: Session = Depends(get_db)
+):
+    """
+    Updates the status of a process step.
+
+    - **step_id**: The unique integer ID of the process step to update.
+    - **status**: The new status (e.g., "in_progress", "completed", "failed").
+    """
+    db_step = crud.update_process_step_status(db=db, step_id=step_id, new_status=status)
+    if db_step is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Process step not found"
+        )
+    return db_step
 
 
 

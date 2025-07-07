@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   StatusBar,
+  RefreshControl
 } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -48,51 +49,53 @@ interface Order {
   // Add other fields as needed
 }
 
-const DUMMY_CLEANING_PROCESS: CleaningStep[] = [
-  { id: '1', label: 'Booking Confirmed', status: 'completed' },
-  { id: '2', label: 'Cleaner Assigned', status: 'completed' },
-  { id: '3', label: 'On the way', status: 'completed' },
-  { id: '4', label: 'Cleaning in Progress', status: 'in-progress' },
-  { id: '5', label: 'Quality Check', status: 'pending' },
-  { id: '6', label: 'Completed', status: 'pending' },
-];
-
 const OrderDetailScreen: React.FC = () => {
 
   const { id: orderIdParam } = useLocalSearchParams();
   const orderId = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
 
   const [loading, setLoading] = useState(false);
-  
-  
+  const [refreshing, setRefreshing] = useState(false);
+
   const [order, setOrder] = useState<Order | null>(null);
   const [services, setServices] = useState<any>([]);
+  const [processSteps, setProcessSteps] = useState<any>([]);
 
+  const fetchData = async () => {
+    setLoading(true);
+
+    const phoneIdentifier = await Device.getPhoneIdentifier();
+    if (!phoneIdentifier) {
+      console.error("Phone identifier is not available.");
+      return;
+    }
+
+    try {
+      const order = await CleanCarAPI.getOrderByByPhoneIdentifierAndId(phoneIdentifier, parseInt(orderId));
+      setOrder(order);
+
+      const transformedServices = Transformations.transformServices(order?.services || []);
+      setServices(transformedServices);
+
+      const transformedProcessSteps = Transformations.transformProcessSteps(order?.process_steps || [])
+      setProcessSteps(transformedProcessSteps)
+    } catch (error) {
+      console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const phoneIdentifier = await Device.getPhoneIdentifier();
-      if (!phoneIdentifier) {
-        console.error("Phone identifier is not available.");
-        return;
-      }
-
-      try {
-        const order = await CleanCarAPI.getOrderByByPhoneIdentifierAndId(phoneIdentifier, parseInt(orderId));
-        setOrder(order);
-
-        const transformedServices = Transformations.transformServices(order?.services || []);
-        setServices(transformedServices);
-      } catch (error) {
-        console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchData();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // await sleep(1000);
+    await fetchData();
+    setRefreshing(false);
+  };
 
   const expectations: string[] = [
     'Cleaner arrives at scheduled time',
@@ -116,12 +119,21 @@ const OrderDetailScreen: React.FC = () => {
   );
 
 
-  if (loading) return <LoadingSpinner message="Loading order details..." />;
+  if (loading && !refreshing) return <LoadingSpinner message="Loading order details..." />;
   
   return (
     <SafeAreaView style={orderStyles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
-      <ScrollView contentContainerStyle={orderStyles.scrollViewContent}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={COLORS.primary}
+          />
+        }
+        contentContainerStyle={orderStyles.scrollViewContent}>
 
         {/* Header Section */}
         <View>
@@ -168,11 +180,15 @@ const OrderDetailScreen: React.FC = () => {
         {/* Cleaning Process Section */}
         <View style={orderStyles.sectionContainer}>
           <Text style={orderStyles.sectionTitle}>Cleaning Process</Text>
-          {DUMMY_CLEANING_PROCESS.map((step, index) => (
+          {processSteps.map((step: { id: Key | null | undefined; name: string; status: string; }, index: any) => (
             <CleaningProcessStep
               key={step.id}
-              label={step.label}
-              status={step.status}
+              name={step.name}
+              status={
+                (['completed', 'in-progress', 'pending'].includes(step.status)
+                  ? step.status
+                  : 'pending') as 'completed' | 'in-progress' | 'pending'
+              }
             />
           ))}
         </View>
@@ -216,3 +232,7 @@ const OrderDetailScreen: React.FC = () => {
 };
 
 export default OrderDetailScreen;
+
+function sleep(arg0: number) {
+  throw new Error("Function not implemented.");
+}
