@@ -74,7 +74,6 @@ class Availability(Base):
     __tablename__ = "availabilities"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    date: Mapped[date] = mapped_column(Date, nullable=False) # Store only date
     time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False) # Store time part (e.g., 'HH:MM:SS')
     is_taken: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
@@ -85,7 +84,7 @@ class Availability(Base):
     # __table_args__ = (UniqueConstraint("date", "time", name="uq_availability_date_time"),)
 
     def __repr__(self):
-        return f"<Availability(id={self.id}, date={self.date}, time={self.time.strftime('%H:%M')}, taken={self.is_taken})>"
+        return f"<Availability(id={self.id}, time={self.time.strftime('%H:%M')}, taken={self.is_taken})>"
 
 # Association table for the many-to-many relationship between Order and Service
 # This is a simple table just for the foreign keys

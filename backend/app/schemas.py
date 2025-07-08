@@ -67,7 +67,6 @@ class Service(ServiceBase):
 
 # --- Availability Schemas ---
 class AvailabilityBase(BaseModel):
-    date: date
     time: datetime # Will store time part
     is_taken: bool = False
 

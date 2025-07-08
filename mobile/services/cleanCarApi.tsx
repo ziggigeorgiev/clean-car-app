@@ -34,6 +34,17 @@ export const CleanCarAPI = {
       console.error("Error getting order by id:", error);
       return null;
     }
+  }, 
+
+  getAvailabilities: async() => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/availabilities/get`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting availabilities:", error);
+      return {};
+    }
   }
 
   // // lookup a single random meal

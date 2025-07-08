@@ -56,8 +56,8 @@ export const Transformations = {
 
   transformProcessSteps: (processSteps: any[]) => {
     const transformedList: { id: any; name: any; status: any; }[] = [];
-    processSteps.sort((a, b) => a.id - b.id);
     
+    processSteps.sort((a, b) => a.id - b.id);
     processSteps.forEach((processStep) => {
         transformedList.push({
             id: processStep.id,

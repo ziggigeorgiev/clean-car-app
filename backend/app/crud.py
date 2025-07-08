@@ -105,10 +105,10 @@ def get_available_availabilities(db: Session, start_date: datetime.date, end_dat
         db.query(models.Availability)
         .filter(
             models.Availability.is_taken == False,
-            models.Availability.date >= start_date, # Start from today
-            models.Availability.date <= end_date # Up to two weeks from now
+            models.Availability.time >= start_date, # Start from today
+            models.Availability.time <= end_date # Up to two weeks from now
         )
-        .order_by(models.Availability.date, models.Availability.time) # Optional: order by date/time
+        .order_by(models.Availability.time) # Optional: order by date/time
         .offset(skip)
         .limit(limit)
         .all()
@@ -117,7 +117,6 @@ def get_available_availabilities(db: Session, start_date: datetime.date, end_dat
 
 def create_availability(db: Session, availability: schemas.AvailabilityCreate) -> models.Availability:
     db_availability = models.Availability(
-        date=availability.date,
         time=availability.time,
         is_taken=availability.is_taken
     )

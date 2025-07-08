@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from fastapi import FastAPI, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict
 
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
@@ -84,16 +84,28 @@ async def create_new_order(order: schemas.OrderCreate, db: Session = Depends(get
 # Get Available Availabilities Endpoint
 @app.get(
     "/api/availabilities/get",
-    response_model=List[schemas.Availability],
+    response_model=Dict[date, List[schemas.Availability]],
     summary="Get Available Availabilities",
     description="Retrieves a list of all availability slots that are not yet taken, filtered for the next two weeks."
 )
 async def read_available_availabilities(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    today = date.today()
-    two_weeks_from_now = today + timedelta(weeks=2)
+    start_date = date.today()
+    end_date = start_date + timedelta(weeks=2)
 
-    availabilities = crud.get_available_availabilities(db, start_date=today, end_date=two_weeks_from_now)
-    return availabilities
+    result = {}
+
+    current = start_date
+    while current <= end_date:
+        result[current] = []
+        current += timedelta(days=1)
+    print("------------")
+    print(f"result: {result}")
+    availabilities = crud.get_available_availabilities(db, start_date=start_date, end_date=end_date)
+    for availability in availabilities:
+        result[availability.time.date()].append(availability)
+    print("------------")
+    print(f"result: {result}")
+    return result
 
 
 # Create Availability Endpoint

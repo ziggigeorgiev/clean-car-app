@@ -1,150 +1,198 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView, // For safe area on iOS
 } from 'react-native';
 
 import { Ionicons } from "@expo/vector-icons";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { format, parseISO } from "date-fns";
 
+import { CleanCarAPI } from "../services/CleanCarApi";
 import { COLORS } from '../constants/colors';
 import StepIndocator from '../components/StepIndicator';
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const AvailabilityScreen = () => {
-  const [selectedDate, setSelectedDate] = useState('16 Oct'); // Initialize with default selected
-  const [selectedTime, setSelectedTime] = useState('10:30 AM'); // Initialize with default selected
+  const [loading, setLoading] = useState(false);
+  const [availabilities, setAvailabilities] = useState<{ [date: string]: any[] }>({});
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedAvailability, setSelectedAvailability] = useState<any | null>(null);
 
-  // Dummy data for dates (you'd generate this dynamically in a real app)
-  const dates = [
-    { dayOfWeek: 'Mon', dayOfMonth: '16', month: 'Oct' },
-    { dayOfWeek: 'Tue', dayOfMonth: '17', month: 'Oct' },
-    { dayOfWeek: 'Wed', dayOfMonth: '18', month: 'Oct' },
-    { dayOfWeek: 'Thu', dayOfMonth: '19', month: 'Oct' },
-    { dayOfWeek: 'Fri', dayOfMonth: '20', month: 'Oct' },
-    { dayOfWeek: 'Sat', dayOfMonth: '21', month: 'Oct' },
-    { dayOfWeek: 'Sun', dayOfMonth: '22', month: 'Oct' },
-    { dayOfWeek: 'Mon', dayOfMonth: '23', month: 'Oct' },
-    { dayOfWeek: 'Tue', dayOfMonth: '24', month: 'Oct' },
-    { dayOfWeek: 'Wed', dayOfMonth: '25', month: 'Oct' },
-  ];
+  // Fetch availabilities from API
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await CleanCarAPI.getAvailabilities();
+        setAvailabilities(data);
 
-  // Dummy data for available times
-  const availableTimes = [
-    '9:00 AM',
-    '9:45 AM',
-    '10:30 AM',
-    '11:15 AM',
-    '12:00 PM',
-    '12:45 PM',
-    '1:30 PM',
-    '2:15 PM',
-    '3:00 PM',
-    '3:45 PM',
-    '4:30 PM',
-    '5:15 PM',
-  ];
+        // Pre-select the first date with availabilities
+        const datesWithAvail = Object.keys(data).filter(date => data[date]?.length > 0);
+        if (datesWithAvail.length > 0) {
+          setSelectedDate(datesWithAvail[0]);
+          setSelectedAvailability(data[datesWithAvail[0]][0]);
+        } else {
+          setSelectedDate(null);
+          setSelectedAvailability(null);
+        }
+      } catch (error) {
+        console.error(`Error fetching availabilities:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // When selectedDate changes, pre-select first available time
+  useEffect(() => {
+    if (selectedDate && availabilities[selectedDate]?.length > 0) {
+      setSelectedAvailability(availabilities[selectedDate][0]);
+    } else {
+      setSelectedAvailability(null);
+    }
+  }, [selectedDate, availabilities]);
+
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+    // The effect above will pre-select the first availability for this date
+  };
+
+  const handleTimeSelect = (availability: any) => {
+    setSelectedAvailability(availability);
+  };
 
   const handleConfirmAvailability = () => {
-    // Logic to handle confirmation, e.g., navigate to next screen, make API call
-    console.log('Confirmed Availability:', { selectedDate, selectedTime });
-    alert(`Appointment confirmed for ${selectedDate} at ${selectedTime}`);
+    if (!selectedAvailability) {
+      alert('Please select an available time.');
+      return;
+    }
+    // Persist the entire availability object (with id)
+    console.log('Confirmed Availability:', selectedAvailability);
+    alert(
+      `Appointment confirmed for ${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy 'at' h:mm a")}`
+    );
   };
+
+  if (loading) return <LoadingSpinner message="Loading..." />;
+
+  // Prepare date pills from API keys
+  const dateKeys = Object.keys(availabilities).sort();
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
-            <StepIndocator totalSteps={3} currentStep={2} />
+          <StepIndocator totalSteps={3} currentStep={2} />
         </View>
 
         {/* Select Date Section */}
         <Text style={styles.sectionTitle}>Select Date</Text>
         <ScrollView style={styles.datePickerContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
-          {dates.map((date, index) => (
-            
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.datePill,
-                selectedDate === `${date.dayOfMonth} ${date.month}` && styles.selectedDatePill,
-              ]}
-              onPress={() => setSelectedDate(`${date.dayOfMonth} ${date.month}`)}
-            >
-              <Text
+          {dateKeys.map((dateKey, index) => {
+            const dateObj = parseISO(dateKey);
+            const isSelected = selectedDate === dateKey;
+            return (
+              <TouchableOpacity
+                key={dateKey}
                 style={[
-                  styles.datePillDayOfWeek,
-                  selectedDate === `${date.dayOfMonth} ${date.month}` && styles.selectedDatePillText,
+                  styles.datePill,
+                  isSelected && styles.selectedDatePill,
+                  availabilities[dateKey]?.length === 0 && { opacity: 0.5 }
                 ]}
+                onPress={() => handleDateSelect(dateKey)}
+                disabled={availabilities[dateKey]?.length === 0}
               >
-                {date.dayOfWeek}
-              </Text>
-              <Text
-                style={[
-                  styles.datePillDayOfMonth,
-                  selectedDate === `${date.dayOfMonth} ${date.month}` && styles.selectedDatePillText,
-                ]}
-              >
-                {date.dayOfMonth}
-              </Text>
-              <Text
-                style={[
-                  styles.datePillMonth,
-                  selectedDate === `${date.dayOfMonth} ${date.month}` && styles.selectedDatePillText,
-                ]}
-              >
-                {date.month}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.datePillDayOfWeek,
+                    isSelected && styles.selectedDatePillText,
+                  ]}
+                >
+                  {format(dateObj, 'EEE')}
+                </Text>
+                <Text
+                  style={[
+                    styles.datePillDayOfMonth,
+                    isSelected && styles.selectedDatePillText,
+                  ]}
+                >
+                  {format(dateObj, 'd')}
+                </Text>
+                <Text
+                  style={[
+                    styles.datePillMonth,
+                    isSelected && styles.selectedDatePillText,
+                  ]}
+                >
+                  {format(dateObj, 'MMM')}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* Available Times Section */}
         <Text style={styles.sectionTitle}>Available Times</Text>
         <View style={styles.timeSlotsContainer}>
-          {availableTimes.map((time, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.timeSlotPill,
-                selectedTime === time && styles.selectedTimeSlotPill,
-              ]}
-              onPress={() => setSelectedTime(time)}
-            >
-              <Text
-                style={[
-                  styles.timeSlotText,
-                  selectedTime === time && styles.selectedTimeSlotText,
-                ]}
-              >
-                {time}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {selectedDate && availabilities[selectedDate]?.length > 0 ? (
+            availabilities[selectedDate].map((availability: any) => {
+              const timeLabel = format(parseISO(availability.time), 'h:mm a');
+              const isSelected = selectedAvailability?.id === availability.id;
+              return (
+                <TouchableOpacity
+                  key={availability.id}
+                  style={[
+                    styles.timeSlotPill,
+                    isSelected && styles.selectedTimeSlotPill,
+                  ]}
+                  onPress={() => handleTimeSelect(availability)}
+                >
+                  <Text
+                    style={[
+                      styles.timeSlotText,
+                      isSelected && styles.selectedTimeSlotText,
+                    ]}
+                  >
+                    {timeLabel}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <Text style={{ color: '#888', fontStyle: 'italic' }}>
+              No available times for this date.
+            </Text>
+          )}
         </View>
 
         {/* Recent Availability Section */}
         <Text style={styles.sectionTitle}>Recent Availability</Text>
         <View style={styles.recentAvailabilityItem}>
-            <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAvailabilityIcon} />
-            <Text style={styles.recentAvailabilityText}>Monday, Oct 15, 2023 - 10:30 AM</Text>
+          <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAvailabilityIcon} />
+          <Text style={styles.recentAvailabilityText}>
+            {selectedAvailability
+              ? `${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy - h:mm a")}`
+              : 'No recent availability selected.'}
+          </Text>
         </View>
       </ScrollView>
-    
-    {/* Confirm Availability Button */}
-    <View style={styles.confirmButtonContainer}>
+
+      {/* Confirm Availability Button */}
+      <View style={styles.confirmButtonContainer}>
         <TouchableOpacity
-        style={styles.confirmButton}
-        onPress={handleConfirmAvailability}
+          style={styles.confirmButton}
+          onPress={handleConfirmAvailability}
+          disabled={!selectedAvailability}
         >
-        <Text style={styles.confirmButtonText}>Confirm Availability</Text>
+          <Text style={styles.confirmButtonText}>Confirm Availability</Text>
         </TouchableOpacity>
-    </View>
-    
+      </View>
     </View>
   );
 };
