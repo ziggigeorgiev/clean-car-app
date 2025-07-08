@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,86 +11,88 @@ import {
   Platform, // To check platform for KeyboardAvoidingView
 } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
+import { CleanCarAPI } from "../services/CleanCarApi";
 
 import { COLORS } from '../constants/colors';
 import StepIndocator from '../components/StepIndicator';
+import LoadingSpinner from "../components/LoadingSpinner";
 import ServiceDetailsList from '../components/ServiceDetailsList';
+import { Transformations } from "../services/Transformations";
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
 // For iOS, also run: cd ios && pod install
 
-type ServiceId = 'interiorDeepClean' | 'waxProtection' | 'wheelDetailing' | 'airFreshener';
+type Service = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  category: string;
+  is_active: boolean;
+  // Add other fields as needed
+};
 
 const ServicesScreen = () => {
+  const [loading, setLoading] = useState(false);
+
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedServices, setSelectedServices] = useState({
-    interiorDeepClean: false,
-    waxProtection: false,
-    wheelDetailing: false,
-    airFreshener: false,
-  });
 
-  // Dummy data for additional services with their prices
-  const additionalServicesData: { id: ServiceId; name: string; description: string; price: number }[] = [
-    { id: 'interiorDeepClean', name: 'Interior Deep Clean', description: 'Thorough cleaning of all interior surfaces', price: 30 },
-    { id: 'waxProtection', name: 'Wax Protection', description: 'Premium wax coating for 3 months protection', price: 25 },
-    { id: 'wheelDetailing', name: 'Wheel Detailing', description: 'Professional wheel cleaning and dressing', price: 15 },
-    { id: 'airFreshener', name: 'Air Freshener', description: 'Natural air freshener spray', price: 5 },
-  ];
+  const [services, setServices] = useState<Service[]>([]);
+  const [selectedExtras, setSelectedExtras] = useState<{ [id: number]: boolean }>({});
 
-  // Dummy data for basic cleaning and extras
-  const DUMMY_SERVICES: { name: string; price: string; type: "primary" | "secondary" }[] = [
-    { name: 'Basic cleaning', price: '$70.97', type: 'primary' },
-    { name: '1 x Exterior Wash', price: '$29.99', type: 'secondary' },
-    { name: '1 x Interior Vacuum', price: '$19.99', type: 'secondary' },
-    { name: '1 x Dashboard Cleaning', price: '$14.99', type: 'secondary' },
-    { name: 'Extras', price: '$30.00', type: 'primary' },
-    { name: '1 x Baby Chair Cleaning', price: '$29.99', type: 'secondary' },
-  ];
+  // Fetch services from API
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await CleanCarAPI.getServices();
+        setServices(data.filter((s: { is_active: any; }) => s.is_active));
 
-  // Calculate total price
-  const calculateTotal = () => {
-    let total = 0;
-
-    // Basic cleaning total
-    DUMMY_SERVICES.forEach(item => {
-        if (item.type === 'primary') {
-            total += parseFloat(item.price.replace('$', ''));
-        }
-    });
-
-    // Additional services total
-    additionalServicesData.forEach(service => {
-      if (selectedServices[service.id]) {
-        total += service.price;
+        // Preselect all extras as false
+        const extras = data.filter((s: { category: string; }) => s.category === 'Extra');
+        setSelectedExtras(
+          Object.fromEntries(extras.map((e: { id: any; }) => [e.id, false]))
+        );
+      } catch (error) {
+        console.error(`Error fetching services:`, error);
+      } finally {
+        setLoading(false);
       }
-    });
+    };
+    fetchData();
+  }, []);
 
-    return total.toFixed(2); // Format to 2 decimal places
-  };
+  // Split services
+  const basicServices = services.filter(s => s.category === 'Basic');
+  const extraServices = services.filter(s => s.category === 'Extra');
 
-  const handleServiceToggle = (serviceId: ServiceId) => {
-    setSelectedServices(prev => ({
+  const handleExtraToggle = (id: number) => {  
+    setSelectedExtras(prev => ({
       ...prev,
-      [serviceId]: !prev[serviceId],
+      [id]: !prev[id],
     }));
+    const selectedExtraServices = extraServices.filter(
+      service => selectedExtras[service.id]
+    );
   };
+
+  const totalSelectedServices = () => {
+    return [
+      ...basicServices,
+      ...extraServices.filter(
+        service => selectedExtras[service.id]
+      )
+    ]
+  }
 
   const handlePlaceOrder = () => {
-    const total = calculateTotal();
-    // Logic to handle placing the order, e.g., navigate to confirmation, make API call
-    console.log('Placing Order:', {
-      registrationNumber,
-      phoneNumber,
-      selectedServices,
-      totalAmount: total,
-    });
-    alert(`Order placed for $${total}!`);
+    alert(`Order placed for €${(totalSelectedServices())}!`);
   };
 
-  const totalAmount = calculateTotal();
+  // ...existing styles...
 
   return (
     <View style={styles.container}>
@@ -131,11 +133,11 @@ const ServicesScreen = () => {
 
           {/* Additional Services Section */}
           <Text style={styles.sectionTitle}>Additional Services</Text>
-          {additionalServicesData.map(service => (
+          {extraServices.map(service => (
             <TouchableOpacity
               key={service.id}
               style={styles.serviceItem}
-              onPress={() => handleServiceToggle(service.id)}
+              onPress={() => handleExtraToggle(service.id)}
             >
               <View style={styles.serviceLeft}>
                 {/* <View
@@ -148,8 +150,8 @@ const ServicesScreen = () => {
                     <MaterialCommunityIcons name="check" size={16} color="#fff" />
                   )}
                 </View> */}
-                <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedServices[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
-                    <View style={[styles.innerCheckboxContainer, { backgroundColor: selectedServices[service.id] ? '#28A745': '#90949C' }]}>
+                <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
+                    <View style={[styles.innerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#28A745': '#90949C' }]}>
                     {/* Option 1: Using react-native-vector-icons (Recommended) */}
                     {/* <Icon name="check" style={dynamicStyles.checkmarkIcon} /> */}
         
@@ -162,13 +164,13 @@ const ServicesScreen = () => {
                   <Text style={styles.serviceDescription}>{service.description}</Text>
                 </View>
               </View>
-              <Text style={styles.servicePrice}>+${service.price}</Text>
+              <Text style={styles.servicePrice}>{service.price} {service.currency}</Text>
             </TouchableOpacity>
           ))}
 
           {/* Service Details Section */}
           <ServiceDetailsList
-            services={DUMMY_SERVICES}
+            services={Transformations.transformServices(totalSelectedServices())}
             sectionTitle="Services Provided" // Optional: customize the title
           />
 
@@ -192,7 +194,8 @@ const ServicesScreen = () => {
             onPress={handlePlaceOrder}
           >
             <Text style={styles.placeOrderButtonText}>
-              Place Order • ${totalAmount}
+              {/* Place Order • ${totalAmount} */}
+              Place Order
             </Text>
           </TouchableOpacity>
         </View>

@@ -18,7 +18,7 @@ export const Transformations = {
     }, {});
 
     // Step 2: Build the new structured list
-    const transformedList: { name: string; price: number; currency: string; type: string }[] = [];
+    const transformedList: { name: string; price: number; currency: string; type: 'primary' | 'secondary'; }[] = [];
 
     // Iterate over the categories in the order they appear in the original list
     // To maintain original order of categories, we can get unique categories first
