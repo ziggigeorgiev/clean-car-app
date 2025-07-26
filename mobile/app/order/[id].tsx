@@ -27,6 +27,7 @@ import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";
 import StatusDetails from "@/components/StatusDetails";
 import ProgressDetails from "@/components/ProgressDetails";
+import Details from "@/components/Details";
 
 interface ServiceItem {
   name: string;
@@ -103,12 +104,7 @@ const OrderDetailScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  const expectations: string[] = [
-    'Cleaner arrives at scheduled time',
-    'Average cleaning duration: 25 minutes',
-    'Quality inspection after cleaning',
-    'Payment processed after service completion',
-  ];
+  const expectations: string = "The cleaner arrives at the scheduled time, with an average cleaning duration of 25 minutes. A quality inspection is performed after cleaning, and payment is processed upon service completion.";
 
   const renderServiceItem = ({ name, price, type }: ServiceItem) => (
     <View key={name} style={styles.serviceItem}>
@@ -155,6 +151,8 @@ const OrderDetailScreen: React.FC = () => {
 
         <AddressDetails
           address={order?.location.address ?? ""}
+          latitude={order?.location.latitude ?? 0}
+          longitude={order?.location.longitude ?? 0}
           sectionTitle="Location"
         />
         {/* Service Details Section */}
@@ -165,7 +163,7 @@ const OrderDetailScreen: React.FC = () => {
         />
 
         {/* Cleaning Process Section */}
-        <View style={styles.sectionContainer}>
+        {/* <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Cleaning Process</Text>
           {processSteps.map((step: { id: Key | null | undefined; name: string; status: string; }, index: any) => (
             <CleaningProcessStep
@@ -178,13 +176,11 @@ const OrderDetailScreen: React.FC = () => {
               }
             />
           ))}
-        </View>
-
-        {/* What to Expect Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>What to Expect</Text>
-          {expectations.map(renderExpectationItem)}
-        </View>
+        </View> */}
+        <Details
+          text={expectations} 
+          sectionTitle="What to expect?"
+        />
 
         {/* Policy Links Section */}
         <View style={styles.policyLinksContainer}>
@@ -371,7 +367,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   policyLinkText: {
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.text,
   },
   policyArrow: {

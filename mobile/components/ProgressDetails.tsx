@@ -8,7 +8,7 @@ const ACTIVE_COLOR = '#5BA064'; // Color for the active segment
 const INACTIVE_COLOR = '#D3D3D3'; // Color for the inactive segments
 
 // Helper function to convert polar coordinates to cartesian
-const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0; // -90 to start from the top
   return {
     x: centerX + (radius * Math.cos(angleInRadians)),
@@ -17,7 +17,7 @@ const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
 };
 
 // Helper function to generate SVG arc path data
-const describeArc = (x, y, radius, startAngle, endAngle) => {
+const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
   const start = polarToCartesian(x, y, radius, endAngle);
   const end = polarToCartesian(x, y, radius, startAngle);
   const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
@@ -71,23 +71,35 @@ const DeliveryIcon = ({step}: {step: number}) => {
   );
 };
 
-const ProgressDetails = ({process_steps}) => {
+type ProcessStep = {
+  id?: number;
+  name: string;
+  text: string;
+  status: string;
+  updated_at?: string | Date;
+};
+
+type ProgressDetailsProps = {
+  process_steps: ProcessStep[];
+};
+
+const ProgressDetails = ({process_steps}: ProgressDetailsProps) => {
   // 1. Number of completed items
   const completedItems = process_steps.filter(item => item.status === 'completed');
   const numberOfCompletedItems = completedItems.length;
 
   // 2. The completed entry with the largest id
-  let currentEntry = {
+  let currentEntry: { name: string; text: string; updated_at?: string | Date; id?: number } = {
     name: "Thanks for you order",
     text: "We are preparing your order",
   };
 
   if (completedItems.length > 0) {
     currentEntry = completedItems.reduce((prev, current) => {
-        return (prev.id > current.id) ? prev : current;
+        return ((prev.id ?? 0) > (current.id ?? 0)) ? prev : current;
     });
   }
-  console.log("Current Entry: ", currentEntry);
+
   return (
     <View style={styles.container}>
       <DeliveryIcon step={numberOfCompletedItems} />

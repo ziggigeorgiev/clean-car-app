@@ -1,5 +1,5 @@
-const BASE_URL = "http://127.0.0.1:8000";
-// const BASE_URL = "https://clean-car-app.onrender.com";
+// const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = "https://clean-car-app.onrender.com";
 
 export type ProcessStepStatus = 'not_started' | 'in_progress' | 'completed' | 'failed';
 export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
