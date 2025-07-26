@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
 import { COLORS } from "../../constants/colors";
 
 export const orderStyles = StyleSheet.create({
@@ -183,5 +183,24 @@ export const orderStyles = StyleSheet.create({
   },
   backIcon: {
     marginRight: 10,
+  },
+  placeOrderButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10, // Adjust for iOS home indicator
+    backgroundColor: '#f8f8f8',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#e0e0e0',
+  },
+  placeOrderButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 15,
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeOrderButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

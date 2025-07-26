@@ -83,6 +83,7 @@ class Availability(AvailabilityBase):
 # --- ProcessStep Schemas ---
 class ProcessStepBase(BaseModel):
     name: str
+    text: Optional[str] = None # Optional text field for additional info
     status: ProcessStepStatusEnum = ProcessStepStatusEnum.PENDING
 
 class ProcessStepCreate(ProcessStepBase):
@@ -92,6 +93,7 @@ class ProcessStepCreate(ProcessStepBase):
 class ProcessStep(ProcessStepBase):
     id: int
     created_at: datetime
+    updated_at: Optional[datetime] = None # Optional field for updates
     order_id: int # Still present in the full schema for response
 
     model_config = ConfigDict(from_attributes=True)

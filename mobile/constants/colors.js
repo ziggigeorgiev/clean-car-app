@@ -86,6 +86,17 @@ const roseGoldTheme = {
   shadow: "#000000",
 };
 
+const cleenTheme = {
+  primary: "#204EA5",
+  background: "#FFFFFF",
+  text: "#222222",
+  border: "#ECECEC",
+  white: "#FFFFFF",
+  textLight: "#686868",
+  card: "#FFFFFF",
+  shadow: "#000000",
+};
+
 export const THEMES = {
   coffee: coffeeTheme,
   forest: forestTheme,
@@ -95,7 +106,8 @@ export const THEMES = {
   mint: mintTheme,
   midnight: midnightTheme,
   roseGold: roseGoldTheme,
+  cleen: cleenTheme,
 };
 
 // 👇 change this to switch theme
-export const COLORS = THEMES.midnight;
+export const COLORS = THEMES.cleen;

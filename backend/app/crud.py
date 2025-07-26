@@ -23,6 +23,7 @@ def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 1
             joinedload(models.Order.availability),
             selectinload(models.Order.services)
         )
+        .order_by(models.Order.created_at.desc())  # Optional: order by creation date
         .offset(skip)
         .limit(limit)
         .all()
@@ -76,16 +77,39 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
         phone_number=order.phone_number,
         location=db_location,
         availability=db_availability,
-        services=db_services # Assign the list of service objects
+        services=db_services, # Assign the list of service objects
     )
     db.add(db_order)
     db.flush() # Flush to get the db_order.id before committing
 
-    for step_data in order.initial_process_steps:
+    process_steps = [
+        {
+            "name": "Booking confirmed",
+            "text": "We are looking for an availalble cleaner",
+        },
+        {
+            "name": "Cleaner assigned",
+            "text": "We will inform you when the cleaner is on the way",
+        },
+        {
+            "name": "On the way",
+            "text": "Cleaner is going to call you when he arrives",
+        },
+        {
+            "name": "Cleaning in progress",
+            "text": "Almost done, please be patient",
+        },
+        {
+            "name": "Completed",
+            "text": "Thanks for your order, we hope you are satisfied",
+        }
+    ]
+    for process_step in process_steps:
         db_process_step = models.ProcessStep(
-            name=step_data.name,
-            status=step_data.status,
-            order_id=db_order.id # Assign the ID of the newly created order
+            name=process_step['name'],
+            text=process_step['text'],
+            status=schemas.ProcessStepStatusEnum.PENDING,
+            order_id=db_order.id
         )
         db.add(db_process_step)
 
@@ -95,6 +119,13 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
 
 
 # --- MODIFIED: Get available availabilities for the next 2 weeks ---
+def get_availability_by_id(db: Session, availability_id: int):
+    return (
+        db.query(models.Availability)
+        .filter(models.Availability.id == availability_id)
+        .first()
+    )
+
 def get_available_availabilities(db: Session, start_date: datetime.date, end_date: datetime.date, skip: int = 0, limit: int = 100) -> List[models.Availability]:
     """
     Retrieves a list of availability slots that are not taken
@@ -159,6 +190,7 @@ def update_process_step_status(db: Session, step_id: int, new_status: schemas.Pr
     db_step = db.query(models.ProcessStep).filter(models.ProcessStep.id == step_id).first()
     if db_step:
         db_step.status = new_status
+        # db_step.updated_at = datetime.datetime.utcnow()  # Update the timestamp
         db.commit()
         db.refresh(db_step)
     return db_step

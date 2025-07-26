@@ -1,3 +1,4 @@
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -21,6 +22,8 @@ const AvailabilityScreen = () => {
   const [availabilities, setAvailabilities] = useState<{ [date: string]: any[] }>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedAvailability, setSelectedAvailability] = useState<any | null>(null);
+
+  const { location } = useLocalSearchParams();
 
   // Fetch availabilities from API
   useEffect(() => {
@@ -67,15 +70,23 @@ const AvailabilityScreen = () => {
   };
 
   const handleConfirmAvailability = () => {
+    console.log("handleConfirmAvailability")
     if (!selectedAvailability) {
       alert('Please select an available time.');
       return;
     }
+
     // Persist the entire availability object (with id)
     console.log('Confirmed Availability:', selectedAvailability);
     alert(
       `Appointment confirmed for ${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy 'at' h:mm a")}`
     );
+    
+    router.push({ pathname: '/services', params: { 
+        location: JSON.stringify(location), 
+        availability: JSON.stringify(selectedAvailability.id)
+      } 
+    });
   };
 
   if (loading) return <LoadingSpinner message="Loading..." />;

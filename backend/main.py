@@ -98,14 +98,26 @@ async def read_available_availabilities(skip: int = 0, limit: int = 100, db: Ses
     while current <= end_date:
         result[current] = []
         current += timedelta(days=1)
-    print("------------")
-    print(f"result: {result}")
     availabilities = crud.get_available_availabilities(db, start_date=start_date, end_date=end_date)
     for availability in availabilities:
         result[availability.time.date()].append(availability)
-    print("------------")
-    print(f"result: {result}")
     return result
+
+
+@app.get(
+    "/api/availabilities/get/{availability_id}",
+    response_model=schemas.Availability,
+    summary="Get Available Availability by id",
+    description="Retrieves an availability slot by id."
+)
+async def read_availability(availability_id: int, db: Session = Depends(get_db)):
+    db_availability = crud.get_availability_by_id(db, availability_id=availability_id)
+    if db_availability is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Availability not found"
+        )
+    return db_availability
 
 
 # Create Availability Endpoint
@@ -149,7 +161,7 @@ async def create_service_entry(service: schemas.ServiceCreate, db: Session = Dep
 
 
 @app.put(
-    "/api/process_steps/{step_id}/statu/{status}",
+    "/api/process_steps/{step_id}/status/{status}",
     response_model=schemas.ProcessStep, # Return the updated step
     summary="Update Process Step Status",
     description="Modifies the status of a specific process step by its ID."

@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../constants/colors";
-import { orderCardStyles as styles } from '../assets/styles/components.styles';
+import Price from './Price';
 
 import { format } from "date-fns";
 
@@ -47,10 +47,8 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
         <View style={styles.card}>
         <View style={styles.imageContainer}>
             <Image
-            source={require('../assets/images/react-logo.png')} 
+            source={require('../assets/images/cleen-logo.png')} 
             style={styles.itemImage}
-            onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-            defaultSource={{uri: 'https://placehold.co/60x60/EEF4FF/4285F4?text=Car'}} // Fallback placeholder
             />
         </View>
 
@@ -74,12 +72,108 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
                 {item.status}
                 </Text>
             </View>
-            <Text style={styles.priceText}>{totalPrice} {item.services[0].currency}</Text>
+            {/* <Text style={styles.priceText}>{totalPrice} {item.services[0].currency}</Text> */}
+            <Price
+              price={totalPrice}
+              dollarStyle={{ color: '#00000' }}
+              centStyle={{ color: '#000000' }}
+            />
             </View>
         </View>
         </View>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+    card: {
+        flexDirection: 'row',
+        backgroundColor: COLORS.white,
+        borderRadius: 10,
+        marginHorizontal: 20,
+        marginBottom: 15,
+        padding: 15,
+        borderColor: COLORS.border,
+        borderWidth: 1,
+        shadowColor: COLORS.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.11,
+        shadowRadius: 5,
+        elevation: 3, // For Android shadow
+        alignItems: 'center',
+    },
+    imageContainer: {
+        width: 50, // Fixed width for image container
+        height: 35, // Fixed height for image container
+        borderRadius: 0, // Half of width/height for circular image
+        overflow: 'hidden',
+        marginRight: 15,
+        backgroundColor: COLORS.background, // Placeholder background
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    itemImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    detailsContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
+    },
+    detailRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    icon: {
+        fontSize: 16, // Adjust font size for emoji/text icons
+        color: COLORS.text,
+        marginRight: 8,
+    },
+    addressText: {
+        fontSize: 14,
+        color: COLORS.text,
+        fontWeight: '600',
+        flexShrink: 1, // Allows text to wrap
+    },
+    dateText: {
+        fontSize: 13,
+        color: COLORS.textLight,
+        flexShrink: 1, // Allows text to wrap
+    },
+    bottomRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    statusBadge: {
+        paddingVertical: 5,
+        paddingHorizontal: 12,
+        borderRadius: 5,
+    },
+    openBadge: {
+        backgroundColor: COLORS.primary, // '#E0F2F7', // Light blue
+    },
+    completedBadge: {
+        backgroundColor: '#E6FFE6', // Light green
+    },
+    statusText: {
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    openText: {
+        color: COLORS.white// '#007AFF', // Blue
+    },
+    completedText: {
+        color: '#28A745', // Green
+    },
+    priceText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.primary,
+    },
+});
 
 export default OrderItemCard;

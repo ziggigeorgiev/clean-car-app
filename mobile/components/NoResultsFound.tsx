@@ -1,11 +1,14 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { COLORS } from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function NoResultsFound({ message = "Loading..."}) {
   return (
     <View style={styles.emptyState}>
-      <Ionicons name="search-outline" size={64} color={COLORS.textLight} />
+      <Image
+        source={require('../assets/images/cleen-logo.png')} 
+        style={styles.itemImage}
+      />
       <Text style={styles.emptyTitle}>No orders found</Text>
       <Text style={styles.emptyDescription}>
         {message}
@@ -33,5 +36,13 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     textAlign: "center",
     lineHeight: 20,
+  },
+  itemImage: {
+    width: 160,
+    height: 100,
+    borderRadius: 0,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

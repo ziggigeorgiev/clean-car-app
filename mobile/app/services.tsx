@@ -18,6 +18,7 @@ import StepIndocator from '../components/StepIndicator';
 import LoadingSpinner from "../components/LoadingSpinner";
 import ServiceDetailsList from '../components/ServiceDetailsList';
 import { Transformations } from "../services/Transformations";
+import { router, useLocalSearchParams } from 'expo-router';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
@@ -37,12 +38,14 @@ type Service = {
 const ServicesScreen = () => {
   const [loading, setLoading] = useState(false);
 
-  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [plateNumber, setPlateNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const [services, setServices] = useState<Service[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<{ [id: number]: boolean }>({});
 
+  const { location, availability} = useLocalSearchParams();
+  
   // Fetch services from API
   useEffect(() => {
     const fetchData = async () => {
@@ -89,10 +92,20 @@ const ServicesScreen = () => {
   }
 
   const handlePlaceOrder = () => {
-    alert(`Order placed for €${(totalSelectedServices())}!`);
+    const services = totalSelectedServices().map(s => s.id)
+    alert(
+      `Services confirmed: ${services}`
+    );
+    console.log("location", location)
+    router.push({ pathname: '/confirm', params: { 
+        location: location, 
+        availability: availability,
+        services: JSON.stringify(services),
+        plateNumber: plateNumber,
+        phoneNumber: phoneNumber
+      } 
+    });
   };
-
-  // ...existing styles...
 
   return (
     <View style={styles.container}>
@@ -114,8 +127,8 @@ const ServicesScreen = () => {
               style={styles.input}
               placeholder="Registration Number"
               placeholderTextColor="#8e8e93"
-              value={registrationNumber}
-              onChangeText={setRegistrationNumber}
+              value={plateNumber}
+              onChangeText={setPlateNumber}
               autoCapitalize="characters"
             />
           </View>
@@ -218,11 +231,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20, // Ensure padding for content above the fixed button
   },
   headerContainer: {
-      paddingHorizontal: 20,
-      paddingTop: 10,
-      paddingBottom: 20,
-      backgroundColor: COLORS.background,
-      alignItems: 'flex-start', // Align content to left
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    backgroundColor: COLORS.background,
+    alignItems: 'flex-start', // Align content to left
   },
   sectionTitle: {
     fontSize: 16,
@@ -325,28 +338,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-    outerCheckboxContainer: {
-        width: 23,
-        height: 23,
-        borderRadius: 12, // Makes it perfectly round
-        backgroundColor: '#D1EAD0', // A lighter shade of green for the outer circle
-        justifyContent: 'center',
-        alignItems: 'center',
-        opacity: 0.75, // Slightly transparent for a modern look
-        },
-    innerCheckboxContainer: {
-        width: 14,
-        height: 14, // Adjusted size for a more compact checkbox
-        borderRadius: 20, // Makes it perfectly round
-        backgroundColor: '#28A745', // Darker green background for the checkmark itself
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    checkmarkIcon: {
-        fontSize: 10, // Adjust icon size relative to container size
-        color: COLORS.white, // White checkmark
-        fontWeight: '800', // Make the checkmark bold for better visibility
-    },
+  outerCheckboxContainer: {
+    width: 23,
+    height: 23,
+    borderRadius: 12, // Makes it perfectly round
+    backgroundColor: '#D1EAD0', // A lighter shade of green for the outer circle
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.75, // Slightly transparent for a modern look
+  },
+  innerCheckboxContainer: {
+    width: 14,
+    height: 14, // Adjusted size for a more compact checkbox
+    borderRadius: 20, // Makes it perfectly round
+    backgroundColor: '#28A745', // Darker green background for the checkmark itself
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkmarkIcon: {
+    fontSize: 10, // Adjust icon size relative to container size
+    color: COLORS.white, // White checkmark
+    fontWeight: '800', // Make the checkmark bold for better visibility
+  },
 });
 
 export default ServicesScreen;

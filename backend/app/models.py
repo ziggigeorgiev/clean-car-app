@@ -98,12 +98,14 @@ class ProcessStep(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
+    text: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[ProcessStepStatusEnum] = mapped_column(
         Enum(ProcessStepStatusEnum),
         default=ProcessStepStatusEnum.PENDING,
         nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, onupdate=datetime.utcnow)
 
     # Foreign Key to Order (many-to-one: many steps belong to one order)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)

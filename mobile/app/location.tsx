@@ -1,5 +1,6 @@
 // screens/SelectLocationScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
+import { router } from "expo-router";
 import {
   SafeAreaView,
   StyleSheet,
@@ -95,11 +96,13 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   const handleConfirmLocation = () => {
     // In a real app, you would typically save the selected location
     // and navigate to the next step of the booking process.
-    Alert.alert(
-      'Location Confirmed!',
-      `You selected:\nLatitude: ${region.latitude}\nLongitude: ${region.longitude}\nAddress: ${address || 'Unknown'}`
-    );
-    console.log('Location confirmed:', region);
+    const selectedLocation = {
+      longitude: region.longitude,
+      latitude: region.latitude,
+      address: address
+    }
+    Alert.alert('Location Confirmed!', JSON.stringify(selectedLocation))
+    router.push({ pathname: '/availability', params: { location: JSON.stringify(selectedLocation) } });
   };
 
   const moveTimeout = useRef<NodeJS.Timeout | number | null>(null);

@@ -1,17 +1,65 @@
 const BASE_URL = "http://127.0.0.1:8000";
+// const BASE_URL = "https://clean-car-app.onrender.com";
+
+export type ProcessStepStatus = 'not_started' | 'in_progress' | 'completed' | 'failed';
+export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
+
+export interface Order {
+  id: number;
+  plate_number: string;
+  phone_number: string;
+  location_id: number;
+  availability_id: number;
+  service_ids: number[];
+  created_at: string;
+  status: OrderStatus;
+  location: Location;
+  availability: Availability;
+  services: Service[];
+  process_steps: ProcessStep[];
+}
+
+export interface Service {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  currency: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface ProcessStep {
+  id: number;
+  name: string;
+  status: ProcessStepStatus;
+  order_id: number;
+  created_at: string;
+}
+
+// Schema for creating an order (matches FastAPI's OrderCreate)
+export interface OrderCreatePayload {
+  plate_number: string;
+  phone_number: string;
+  location_id: number;
+  availability_id: number;
+  service_ids: number[];
+}
+
+// Schema for creating a process step (matches FastAPI's ProcessStepCreate)
+export interface ProcessStepCreatePayload {
+  name: string;
+  status?: ProcessStepStatus;
+}
+
+export interface Availability {
+  id: number;
+  date: string; // YYYY-MM-DD
+  time: string; // ISO format string
+  is_taken: boolean;
+}
 
 export const CleanCarAPI = {
-  // // search meal by name
-  // searchMealsByName: async (query) => {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/search.php?s=${encodeURIComponent(query)}`);
-  //     const data = await response.json();
-  //     return data.meals || [];
-  //   } catch (error) {
-  //     console.error("Error searching meals by name:", error);
-  //     return [];
-  //   }
-  // },
 
   getOrdersByPhoneIdentifier: async (phone_identifier: string) => {
     try {
@@ -36,6 +84,17 @@ export const CleanCarAPI = {
     }
   }, 
 
+  getAvailability: async(availability_id: number) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/availabilities/get/${availability_id}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting availability by id", error);
+      return null;
+    }
+  },
+
   getAvailabilities: async() => {
     try {
       const response = await fetch(`${BASE_URL}/api/availabilities/get`);
@@ -56,104 +115,37 @@ export const CleanCarAPI = {
       console.error("Error getting services:", error);
       return {};
     }
-  }
+  },
 
-  // // lookup a single random meal
-  // getRandomMeal: async () => {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/random.php`);
-  //     const data = await response.json();
-  //     return data.meals ? data.meals[0] : null;
-  //   } catch (error) {
-  //     console.error("Error getting random meal:", error);
-  //     return null;
-  //   }
-  // },
+  /**
+   * Creates a new order in the backend.
+   * @param orderData The payload for creating the order.
+   * @returns A Promise that resolves to the created Order object.
+   */
+  createOrder: async (orderData: OrderCreatePayload): Promise<Order> => {
+    const url = `${BASE_URL}/api/orders/create`;
+    console.log('Creating order with data:', orderData);
+    console.log('Body: ', JSON.stringify(orderData))
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+      console.log("response", response)
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Error in createOrder:', error);
+      throw error; // Re-throw to be handled by the calling component
+    }
+  },
 
-  // // get multiple random meals
-  // getRandomMeals: async (count = 6) => {
-  //   try {
-  //     const promises = Array(count)
-  //       .fill()
-  //       .map(() => MealAPI.getRandomMeal());
-  //     const meals = await Promise.all(promises);
-  //     return meals.filter((meal) => meal !== null);
-  //   } catch (error) {
-  //     console.error("Error getting random meals:", error);
-  //     return [];
-  //   }
-  // },
-
-  // // list all meal categories
-  // getCategories: async () => {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/categories.php`);
-  //     const data = await response.json();
-  //     return data.categories || [];
-  //   } catch (error) {
-  //     console.error("Error getting categories:", error);
-  //     return [];
-  //   }
-  // },
-
-  // // filter by main ingredient
-  // filterByIngredient: async (ingredient) => {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/filter.php?i=${encodeURIComponent(ingredient)}`);
-  //     const data = await response.json();
-  //     return data.meals || [];
-  //   } catch (error) {
-  //     console.error("Error filtering by ingredient:", error);
-  //     return [];
-  //   }
-  // },
-
-  // // filter by category
-  // filterByCategory: async (category) => {
-  //   try {
-  //     const response = await fetch(`${BASE_URL}/filter.php?c=${encodeURIComponent(category)}`);
-  //     const data = await response.json();
-  //     return data.meals || [];
-  //   } catch (error) {
-  //     console.error("Error filtering by category:", error);
-  //     return [];
-  //   }
-  // },
-
-  // // transform TheMealDB meal data to our app format
-  // transformMealData: (meal) => {
-  //   if (!meal) return null;
-
-  //   // extract ingredients from the meal object
-  //   const ingredients = [];
-  //   for (let i = 1; i <= 20; i++) {
-  //     const ingredient = meal[`strIngredient${i}`];
-  //     const measure = meal[`strMeasure${i}`];
-  //     if (ingredient && ingredient.trim()) {
-  //       const measureText = measure && measure.trim() ? `${measure.trim()} ` : "";
-  //       ingredients.push(`${measureText}${ingredient.trim()}`);
-  //     }
-  //   }
-
-  //   // extract instructions
-  //   const instructions = meal.strInstructions
-  //     ? meal.strInstructions.split(/\r?\n/).filter((step) => step.trim())
-  //     : [];
-
-  //   return {
-  //     id: meal.idMeal,
-  //     title: meal.strMeal,
-  //     description: meal.strInstructions
-  //       ? meal.strInstructions.substring(0, 120) + "..."
-  //       : "Delicious meal from TheMealDB",
-  //     image: meal.strMealThumb,
-  //     cookTime: "30 minutes",
-  //     servings: 4,
-  //     category: meal.strCategory || "Main Course",
-  //     area: meal.strArea,
-  //     ingredients,
-  //     instructions,
-  //     originalData: meal,
-  //   };
-  // },
 };
