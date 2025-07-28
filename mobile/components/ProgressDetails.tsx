@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Align items vertically in the center
     backgroundColor: COLORS.background,
     padding: 20,
-    marginBottom: 10,
+    // marginBottom: 10,
     marginTop: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 3, // For Android shadow
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 5,
+    // elevation: 3, // For Android shadow
   },
   iconContainer: {
     marginRight: 15,

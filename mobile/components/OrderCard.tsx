@@ -88,19 +88,19 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
 const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: COLORS.white,
         borderRadius: 10,
         marginHorizontal: 20,
         marginBottom: 15,
-        padding: 15,
+        padding: 10,
         borderColor: COLORS.border,
         borderWidth: 1,
         shadowColor: COLORS.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.11,
-        shadowRadius: 5,
+        shadowRadius: 1.00,
         elevation: 3, // For Android shadow
-        alignItems: 'center',
     },
     imageContainer: {
         width: 50, // Fixed width for image container
@@ -154,17 +154,17 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     openBadge: {
-        backgroundColor: COLORS.primary, // '#E0F2F7', // Light blue
+        backgroundColor: '#C8DEFC', // '#E0F2F7', // Light blue
     },
     completedBadge: {
         backgroundColor: '#E6FFE6', // Light green
     },
     statusText: {
         fontSize: 13,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     openText: {
-        color: COLORS.white// '#007AFF', // Blue
+        color: COLORS.primary// '#007AFF', // Blue
     },
     completedText: {
         color: '#28A745', // Green

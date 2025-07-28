@@ -12,20 +12,16 @@ import {
   Platform
 } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../../constants/colors";
-import CleaningProcessStep from '../../components/CleaningProcessStep';
 import ServiceDetailsList from '../../components/ServiceDetailsList';
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { Device } from '../../services/Device';
 import { CleanCarAPI } from "../../services/CleanCarApi";
 import { Transformations } from "../../services/Transformations";
-import { format } from "date-fns";
 import ContactDetails from "@/components/ContactDetails";
 import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";
-import StatusDetails from "@/components/StatusDetails";
 import ProgressDetails from "@/components/ProgressDetails";
 import Details from "@/components/Details";
 
@@ -47,6 +43,8 @@ interface Order {
   plate_number: string;
   location: {
     address: string;
+    latitude: number;
+    longitude: number;
   };
   phone_number: string;
   services: any[];

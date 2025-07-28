@@ -44,13 +44,15 @@ const ContactDetails = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.background,
-    padding: 20,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 3, // For Android shadow
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    // shadowColor: COLORS.shadow,
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 5,
+    // elevation: 3, // For Android shadow
   },
   titleRow: {
     flexDirection: 'row',
