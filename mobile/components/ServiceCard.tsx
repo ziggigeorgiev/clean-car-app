@@ -6,14 +6,14 @@ import { COLORS } from '@/constants/colors';
 
 const { width, height } = Dimensions.get('window');
 
-const ServiceCard = ({ iconName, title, description, includeText, includeIcon, colors, cardStyle }: {
+const ServiceCard = ({ iconName, title, description, includeText, includeIcon, colors, cardStyle = {} }: {
     iconName: any;
     title: any;
     description: any;
     includeText: any;
     includeIcon: any;
     colors: any;
-    cardStyle: any;
+    cardStyle?: any;
 }) => (
   <TouchableOpacity style={[styles.serviceCard, cardStyle]}>
     <LinearGradient

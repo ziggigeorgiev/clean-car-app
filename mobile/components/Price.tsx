@@ -4,7 +4,13 @@ import * as Font from 'expo-font';
 
 // import PropTypes from 'prop-types';
 
-const Price = ({ price, dollarStyle, centStyle }) => {
+type PriceProps = {
+    price: number;
+    dollarStyle?: object;
+    centStyle?: object;
+};
+
+const Price: React.FC<PriceProps> = ({ price, dollarStyle, centStyle }) => {
 
     useEffect(() => {
         async function loadFonts() {
