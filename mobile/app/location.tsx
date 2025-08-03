@@ -1,6 +1,6 @@
 // screens/SelectLocationScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { router } from "expo-router";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { router, useLocalSearchParams } from "expo-router";
 import {
   SafeAreaView,
   StyleSheet,
@@ -13,6 +13,7 @@ import {
   Platform,
   Alert,
   KeyboardAvoidingView,
+  Pressable,
   Image,
   PermissionsAndroid, // For Android permissions
 } from 'react-native';
@@ -29,7 +30,7 @@ import { COLORS } from '@/constants/colors';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.0922;
+const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 interface SelectLocationScreenProps {
@@ -39,6 +40,12 @@ interface SelectLocationScreenProps {
 const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   const [address, setAddress] = useState<string>('');
   const [isMoving, setIsMoving] = useState(false);
+
+  // Flag to ensure initial map centering only happens once
+  const initialCenterDone = useRef(false);
+  // Flag to prevent reverse geocoding on initial map animation
+  const isInitialAnimation = useRef(true);
+
   const [region, setRegion] = useState({
     latitude: 37.78825, // Default San Francisco
     longitude: -122.4324,
@@ -48,50 +55,99 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
 
   const mapRef = useRef<MapView>(null);
 
-  const centerMap = async () => {
+  const params = useLocalSearchParams(); // Get parameters from navigation
+  
+  useEffect(() => {
+    console.log('use effect');
+    centerMap(); // Center map on user's location when component mounts
+  }, []);
 
+  const centerMap = useCallback(async () => {
     const getCurrentPosition = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
 
-        if (status !== 'granted') {
-            alert('Permission denied');
-            return;
-        }
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Location permission is required to center the map on your current location.');
+        return null; // Explicitly return null if permission denied
+      }
 
-        const position = await Location.getCurrentPositionAsync({});
-        return position
+      const position = await Location.getCurrentPositionAsync({});
+      return position;
     };
 
     const position = await getCurrentPosition();
     if (!position) {
-        return;
+      return;
     }
     const { latitude, longitude } = position.coords;
     const currentRegion = {
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-    }
-
-    mapRef.current?.animateToRegion(currentRegion, 1000);
-    setRegion(currentRegion);
-  };
-
-  const getAddress = async (lat: number, lng: number) => {
-    try {
-        const [address] = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-        // return `${address.name}, ${address.street}, ${address.city}, ${address.region}, ${address.country}`;
-        return `${address.name}, ${address.city}, ${address.country}`;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
+      latitude,
+      longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
     };
 
+    // Set a flag to tell handleRegionChangeComplete to skip address lookup temporarily
+    isInitialAnimation.current = true;
+    mapRef.current?.animateToRegion(currentRegion, 500);
+    setRegion(currentRegion);
+
+    const addr = await getAddress(latitude, longitude);
+    if (addr) {
+      setAddress(addr);
+    } else {
+      setAddress('Unknown Address');
+    }
+    // After animation, getAddress will be called by onRegionChangeComplete
+  }, []); // No dependencies, as it should not change
+
+  const getAddress = useCallback(async (lat: number, lng: number) => {
+    try {
+        const [addressResult] = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+        return `${addressResult.name || ''}, ${addressResult.city || ''}, ${addressResult.country || ''}`.replace(/^, |^,|, $/, '');
+    } catch (error) {
+        console.error("Error reverse geocoding:", error);
+        return null;
+    }
+  }, []); // No dependencies, as it should not change
+
   useEffect(() => {
-    centerMap(); // Center map on user's location when component mounts
-  }, []);
+    console.log('SelectLocationScreen useEffect invoked. Params:', params, 'initialCenterDone:', initialCenterDone.current);
+
+    // Prioritize handling selected location from search screen
+    if (params.selectedLatitude && params.selectedLongitude && params.selectedAddress) {
+      const newLatitude = parseFloat(params.selectedLatitude as string);
+      const newLongitude = parseFloat(params.selectedLongitude as string);
+      const newAddress = params.selectedAddress as string;
+
+      if (isNaN(newLatitude) || isNaN(newLongitude)) {
+        console.warn('Received invalid latitude or longitude from search params. Skipping map update.');
+        return;
+      }
+
+      const newRegion = {
+        latitude: newLatitude,
+        longitude: newLongitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      };
+
+      // Set flag to prevent reverse geocoding if this is a programmatically set region
+      isInitialAnimation.current = true;
+      mapRef.current?.animateToRegion(newRegion, 1000);
+      setRegion(newRegion);
+      setAddress(newAddress); // Set address directly since it's already provided by search screen
+      // Clear params after processing to avoid re-triggering this branch on subsequent re-renders
+      router.setParams({ selectedLatitude: undefined, selectedLongitude: undefined, selectedAddress: undefined });
+      initialCenterDone.current = true; // Mark as done as we've handled a specific location
+    }
+    // Only center map on current location if it hasn't been done yet
+    else if (!initialCenterDone.current) {
+        centerMap();
+        initialCenterDone.current = true; // Mark that we've initiated the centering
+    }
+
+  }, [params, centerMap]); // Add centerMap to dependencies because it's used inside (due to useCallback)
 
   const handleConfirmLocation = () => {
     // In a real app, you would typically save the selected location
@@ -111,25 +167,54 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
           latitude: number; // Default San Francisco
           longitude: number; latitudeDelta: number; longitudeDelta: number;
       }>) => {
-    if (moveTimeout.current) clearTimeout(moveTimeout.current);
-    moveTimeout.current = setTimeout(() => {
-      setIsMoving(true);
-      setRegion(newRegion);
-    }, 15);
-
+    // if (moveTimeout.current) clearTimeout(moveTimeout.current);
+    // moveTimeout.current = setTimeout(() => {
     //   setIsMoving(true);
     //   setRegion(newRegion);
+    // }, 10);
+
+    setIsMoving(true);
+    setRegion(newRegion);
   };
 
-  const handleRegionChangeComplete = () => {
-    setIsMoving(false);
-    getAddress(region.latitude, region.longitude).then((addr) => {
-      if (addr) {
-        setAddress(addr);
-      } else {
-        setAddress('Unknown Address');
-      }
-    });
+  const handleRegionChangeComplete = useCallback((region) => {
+    console.log('Region change complete:', region);
+    setTimeout(() => {
+      setIsMoving(false);
+    }, 100); // optional smoothing
+
+    // Only perform reverse geocoding if it's not the initial programmatic animation
+    // or if the address is currently empty (meaning it hasn't been set by a search)
+    if (isInitialAnimation.current) {
+        // Reset the flag after the initial programmatic animation has completed
+        isInitialAnimation.current = false;
+        // Optionally, if address is empty, get it for the initial centered location
+        if (!address) {
+            getAddress(region.latitude, region.longitude).then((addr) => {
+                if (addr) {
+                    setAddress(addr);
+                } else {
+                    setAddress('Unknown Address');
+                }
+            });
+        }
+    } else {
+        // If it's a user-initiated drag, always get the address
+        getAddress(region.latitude, region.longitude).then((addr) => {
+            if (addr) {
+                setAddress(addr);
+            } else {
+                setAddress('Unknown Address');
+            }
+        });
+    }
+  }, [getAddress, region, address]); // Dependencies: getAddress (from useCallback), region, address
+
+
+  // Function to navigate to search screen
+  const handleAddressInputFocus = () => {
+    console.log('Address input focused, navigating to search screen');
+    router.push({ pathname: '/search', params: {} });
   };
 
   return (      
@@ -148,8 +233,8 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
             style={styles.map}
             initialRegion={region}
             // onRegionChange={setRegion} // Update region when map moves
-            onRegionChange={handleRegionChange}
-            onRegionChangeComplete={handleRegionChangeComplete}
+            onRegionChange={(newRegion) => handleRegionChange(newRegion)}
+            onRegionChangeComplete={(region) => handleRegionChangeComplete(region)}
             showsUserLocation={true} // Show user's current location
             showsMyLocationButton={true} // Show the button to center on user's location
             mapPadding={{top:0, right:0, left:0, bottom:230}}
@@ -165,21 +250,34 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
                 <Ionicons name="locate-outline" size={24} color={COLORS.primary} />
             </TouchableOpacity>
 
-            <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }}>
-                <View style={styles.markerContainer}>
+            {/* <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }}> */}
+                {/* <View style={styles.markerContainer}>
                     <MaterialCommunityIcons name="map-marker" size={40} color={COLORS.primary} />
-
                     {isMoving && (
-                    <Ionicons
-                        name="ellipse"
-                        size={12}
-                        color={COLORS.primary}
-                        style={styles.mapShadow}
-                    />
+                      <Ionicons
+                          name="ellipse"
+                          size={12}
+                          color={COLORS.primary}
+                          style={styles.mapShadow}
+                      />
                     )}
-                </View>
-            </Marker>
+                </View> */}
+            {/* </Marker> */}
         </MapView>
+        <View style={styles.markerContainer}>
+            <MaterialCommunityIcons name="map-marker" size={40} color={COLORS.primary} />
+            {/* <Text style={{ color: COLORS.textLight, fontSize: 12, marginTop: 5 }}>
+                {isMoving ? 'Moving...' : 'Not moving'}
+            </Text> */}
+            {isMoving && (
+              <Ionicons
+                  name="ellipse"
+                  size={12}
+                  color={COLORS.primary}
+                  style={styles.mapShadow}
+              />
+            )}
+        </View>
 
         {/* <View style={styles.fixedPinContainer}>
             <MaterialCommunityIcons name="map-marker" size={40} color="#007AFF" />
@@ -201,21 +299,34 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
         <ScrollView contentContainerStyle={styles.overlayScrollViewContent}>
           {/* Address Input */}
           <View style={styles.inputContainer}>
-            <Icon name="search" size={20} color="#888" style={styles.searchIcon} />
-            <TextInput
+            <Icon name="search" size={16} color="#888" style={styles.searchIcon} />
+            <Pressable onPress={handleAddressInputFocus}>
+                <TextInput
+                    style={styles.addressInput}
+                    placeholder="Enter your address"
+                    placeholderTextColor="#999"
+                    value={address}
+                    editable={false} // Keep this as false
+                    pointerEvents="none"
+                    // Remove onFocus from here as it won't fire
+                    // You don't need onChangeText if it's not directly editable
+                />
+            </Pressable>
+            {/* <TextInput
               style={styles.addressInput}
               placeholder="Enter your address"
               placeholderTextColor="#999"
               value={address}
-              onChangeText={setAddress}
-              // You would integrate a geocoding/autocomplete API here
-            />
+              // onChangeText={setAddress} // No direct editing here, it's for display
+              onFocus={handleAddressInputFocus} // Open search screen on focus
+              editable={false} // Make it not directly editable by keyboard
+            /> */}
           </View>
 
           {/* Recent Addresses */}
           <Text style={styles.recentAddressesTitle}>Recent Addresses</Text>
           <View style={styles.recentAddressItem}>
-            <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAddressIcon} />
+            <MaterialCommunityIcons name="map-marker-outline" size={16} color="#666" style={styles.recentAddressIcon} />
             <Text style={styles.recentAddressText}>{address}</Text>
           </View>
           {/* Add more recent addresses here if needed */}
@@ -296,15 +407,14 @@ const styles = StyleSheet.create({
   },
   addressInput: {
     flex: 1,
-    height: 50,
+    height: 45,
     fontSize: 16,
-    color: '#333',
+    color: COLORS.textLight,
   },
   recentAddressesTitle: {
     fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.primary,
-    marginBottom: 5,
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
   recentAddressItem: {
     flexDirection: 'row',
@@ -330,8 +440,8 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     color: COLORS.white,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
   },
   bottomOverlay: {
     position: 'absolute', // Position above the map
@@ -365,6 +475,13 @@ const styles = StyleSheet.create({
   },
   markerContainer: {
     alignItems: 'center', // centers the shadow under the marker
+
+    //position: 'absolute',
+    // top: height / 2 - 20, // Adjust to center the marker vertically
+    // left: width / 2 - 20, // Adjust to center the marker horizontally
+    marginLeft: 0,      // half of icon width (40px icon)
+    marginTop: -230 - 20, // icon height offset + map padding offset (230 / 2)
+    justifyContent: 'center',
   },
   mapShadow: {
     // marginTop: -5, // adjust as needed to bring the shadow closer

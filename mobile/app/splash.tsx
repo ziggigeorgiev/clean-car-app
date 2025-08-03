@@ -1,16 +1,12 @@
 // SplashScreen.tsx
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { router, useLocalSearchParams } from "expo-router";
 
 const SplashScreen = ({ navigation }: any) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push({
-          pathname: '/home', // Navigate back to SelectLocationScreen
-          params: {}
-      });
-    }, 1500); // 1 second
+      navigation.replace('Home'); // Or whatever your main screen is
+    }, 1000); // 1 second
 
     return () => clearTimeout(timer);
   }, [navigation]);
