@@ -4,14 +4,16 @@ import { COLORS } from "../constants/colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
 
 type ContactDetailsProps = {
-  phoneNumber: string;
-  plateNumber: string;
+  phoneNumber?: string;
+  plateNumber?: string;
+  email?: string;
   sectionTitle?: string;
 };
 
 const ContactDetails = ({
   phoneNumber,
   plateNumber,
+  email,
   sectionTitle = 'Contact info', // Default title, can be overridden
 }: ContactDetailsProps) => {
   return (
@@ -25,18 +27,24 @@ const ContactDetails = ({
       </View>
 
       {/* Render each service item */}
-      <View style={styles.detailRow}>
-        <MaterialCommunityIcons name="phone" size={20} color="#666" style={styles.icon} />
+      { phoneNumber && (<View style={styles.detailRow}>
+        <MaterialCommunityIcons name="phone" size={20} color={COLORS.textLight} style={styles.icon} />
         <Text style={styles.detailText}>
           {phoneNumber}
         </Text>
-      </View>
-      <View style={styles.detailRow}>
-        <MaterialCommunityIcons name="car" size={20} color="#666" style={styles.icon} />
+      </View>) }
+      { plateNumber && (<View style={styles.detailRow}>
+        <MaterialCommunityIcons name="car" size={20} color={COLORS.textLight} style={styles.icon} />
         <Text style={styles.detailText}>
           {plateNumber}
         </Text>
-      </View>
+      </View>) }
+      { email && (<View style={styles.detailRow}>
+        <MaterialCommunityIcons name="email" size={20} color={COLORS.textLight} style={styles.icon} />
+        <Text style={styles.detailText}>
+          {email}
+        </Text>
+      </View>) }
     </View>
   );
 };

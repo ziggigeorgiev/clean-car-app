@@ -12,10 +12,10 @@ import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { format, parseISO } from "date-fns";
 
-import { CleanCarAPI } from "../services/CleanCarApi";
-import { COLORS } from '../constants/colors';
-import StepIndocator from '../components/StepIndicator';
-import LoadingSpinner from "../components/LoadingSpinner";
+import { CleanCarAPI } from "../../services/CleanCarApi";
+import { COLORS } from '../../constants/colors';
+import StepIndocator from '../../components/StepIndicator';
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const AvailabilityScreen = () => {
   const [loading, setLoading] = useState(false);

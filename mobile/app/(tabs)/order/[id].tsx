@@ -13,12 +13,12 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
 
-import { COLORS } from "../../constants/colors";
-import ServiceDetailsList from '../../components/ServiceDetailsList';
-import LoadingSpinner from "../../components/LoadingSpinner";
-import { Device } from '../../services/Device';
-import { CleanCarAPI } from "../../services/CleanCarApi";
-import { Transformations } from "../../services/Transformations";
+import { COLORS } from "../../../constants/colors";
+import ServiceDetailsList from '../../../components/ServiceDetailsList';
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import { Device } from '../../../services/Device';
+import { CleanCarAPI } from "../../../services/CleanCarApi";
+import { Transformations } from "../../../services/Transformations";
 import ContactDetails from "@/components/ContactDetails";
 import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";

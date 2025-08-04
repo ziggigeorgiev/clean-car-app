@@ -11,13 +11,13 @@ import {
   Platform, // To check platform for KeyboardAvoidingView
 } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
-import { CleanCarAPI } from "../services/CleanCarApi";
+import { CleanCarAPI } from "../../services/CleanCarApi";
 
-import { COLORS } from '../constants/colors';
-import StepIndocator from '../components/StepIndicator';
-import LoadingSpinner from "../components/LoadingSpinner";
-import ServiceDetailsList from '../components/ServiceDetailsList';
-import { Transformations } from "../services/Transformations";
+import { COLORS } from '../../constants/colors';
+import StepIndocator from '../../components/StepIndicator';
+import LoadingSpinner from "../../components/LoadingSpinner";
+import ServiceDetailsList from '../../components/ServiceDetailsList';
+import { Transformations } from "../../services/Transformations";
 import { router, useLocalSearchParams } from 'expo-router';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons

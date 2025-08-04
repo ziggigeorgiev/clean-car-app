@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import OrderItemCard from '../components/OrderCard';
-import LoadingSpinner from "../components/LoadingSpinner";
-import NoResultsFound from "../components/NoResultsFound";
-import { CleanCarAPI } from "../services/CleanCarApi";
-import { Device } from '../services/Device';
-import { COLORS } from '../constants/colors';
+import OrderItemCard from '../../components/OrderCard';
+import LoadingSpinner from "../../components/LoadingSpinner";
+import NoResultsFound from "../../components/NoResultsFound";
+import { CleanCarAPI } from "../../services/CleanCarApi";
+import { Device } from '../../services/Device';
+import { COLORS } from '../../constants/colors';
 
 
 // You might consider react-native-vector-icons for the back arrow icon if you add one.

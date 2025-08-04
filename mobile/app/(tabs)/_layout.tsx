@@ -5,7 +5,7 @@ import { View, TouchableOpacity, StyleSheet, Image, Text } from 'react-native';
 
 import SafeScreen from "@/components/SafeScreen";
 
-import { COLORS } from "../constants/colors";
+import { COLORS } from "../../constants/colors";
 
 
 // const CustomMenuIcon = ({ focused, color, size }) => (
@@ -15,17 +15,17 @@ import { COLORS } from "../constants/colors";
 //     />
 //   );
 
-import HouseIcon from '../assets/images/icons/bc-house.svg';
-import FlyerIcon from '../assets/images/icons/bc-flyer.svg';
-import UserIcon from '../assets/images/icons/bc-user.svg';
-import PlusIcon from '../assets/images/icons/bc-plus.svg';
-import LogoIcon from '../assets/images/icons/bc-logo-simple.svg';
+import HouseIcon from '../../assets/images/icons/bc-house.svg';
+import FlyerIcon from '../../assets/images/icons/bc-flyer.svg';
+import UserIcon from '../../assets/images/icons/bc-user.svg';
+import PlusIcon from '../../assets/images/icons/bc-plus.svg';
+import LogoIcon from '../../assets/images/icons/bc-logo-simple.svg';
 
 
 const TabsLayout = () => {
   // This layout is used for the main tabs of the app
   return (
-    <SafeScreen>
+    // <SafeScreen>
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -81,6 +81,13 @@ const TabsLayout = () => {
             tabBarIcon: ({ focused, color, size }) => (
               <TouchableOpacity
                 onPress={() => { router.push('/location') }}
+                style={{
+                  backgroundColor: "transparent",
+                  width: size + 40,
+                  height: size + 40,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
               >
                 <View style={{ marginTop: 15 }}>
                   <PlusIcon width={size} height={size} fill={COLORS.primary} />
@@ -124,10 +131,6 @@ const TabsLayout = () => {
         />
 
         <Tabs.Screen
-          name="index"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
           name="order/[id]"
           options={{ href: null }}
         />
@@ -151,12 +154,8 @@ const TabsLayout = () => {
           name="confirm"
           options={{ href: null }}
         />
-        <Tabs.Screen
-          name="splash"
-          options={{ href: null }}
-        />
       </Tabs>
-    </SafeScreen>
+    // </SafeScreen>
   );
 };
 

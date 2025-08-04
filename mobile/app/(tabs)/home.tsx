@@ -10,7 +10,7 @@ const HomeScreen = () => {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <FontAwesome5 name="car-wash" size={24} color="#007AFF" />
+        {/* <FontAwesome5 name="car-wash" size={24} color="#007AFF" /> */}
         <Text style={styles.headerTitle}>CleanCar Pro</Text>
       </View>
       <Text style={styles.headerSubtitle}>Professionelle Autoreinigung vor Ort</Text>

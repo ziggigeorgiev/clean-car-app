@@ -25,7 +25,7 @@ import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
 
 
-import StepIndocator from '../components/StepIndicator'; // Adjust path
+import StepIndocator from '../../components/StepIndicator'; // Adjust path
 import { COLORS } from '@/constants/colors';
 
 const { width, height } = Dimensions.get('window');
