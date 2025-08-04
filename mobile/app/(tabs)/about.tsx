@@ -13,11 +13,6 @@ import {
 import Details from "@/components/Details";
 import ContactDetails from "@/components/ContactDetails";
 
-// Make sure you have react-native-vector-icons installed
-// npm install react-native-vector-icons
-// npx react-native-vector-icons-android
-import Icon from 'react-native-vector-icons/Ionicons';
-
 // Define the main App component
 const AboutScreen = () => {
   return (
