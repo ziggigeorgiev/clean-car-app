@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -20,29 +21,32 @@ const OrderListScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
 
-      const phoneIdentifier = await Device.getPhoneIdentifier();
-      if (!phoneIdentifier) {
-        console.error("Phone identifier is not available.");
-        return;
-      }
+        const phoneIdentifier = await Device.getPhoneIdentifier();
+        if (!phoneIdentifier) {
+          console.error("Phone identifier is not available.");
+          return;
+        }
 
-      try {
-        const orders = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
-        
-        setOrders(orders);
-      } catch (error) {
-        console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        try {
+          const orders = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
+          
+          setOrders(orders);
+        } catch (error) {
+          console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
     
-    fetchData();
-  }, []);
+      fetchData();
+    }, [])
+  );
 
   if (loading) return <LoadingSpinner message="Loading..." />;
 

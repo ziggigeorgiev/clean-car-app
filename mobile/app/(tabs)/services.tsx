@@ -16,7 +16,6 @@ import { CleanCarAPI } from "../../services/CleanCarApi";
 
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
-import LoadingSpinner from "../../components/LoadingSpinner";
 import ServiceDetailsList from '../../components/ServiceDetailsList';
 import { Transformations } from "../../services/Transformations";
 import { router, useLocalSearchParams } from 'expo-router';
@@ -47,7 +46,10 @@ const ServicesScreen = () => {
   const [selectedExtras, setSelectedExtras] = useState<{ [id: number]: boolean }>({});
 
   const { location, availability} = useLocalSearchParams();
-  
+    
+  console.log("--------------------")
+  console.log("location", location)
+
   // Fetch services from API
   useEffect(() => {
     const fetchData = async () => {
@@ -115,11 +117,8 @@ const ServicesScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
+        <StepIndocator title={"Select services"} backRoute={"/availability"} backParams={{location: location}} totalSteps={3} currentStep={3} />
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {/* Header Section */}
-          <View style={styles.headerContainer}>
-            <StepIndocator totalSteps={3} currentStep={3} />
-          </View>
 
           {/* Vehicle Details Section */}
           <View style={styles.sectionContainer}>

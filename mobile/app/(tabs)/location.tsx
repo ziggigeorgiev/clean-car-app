@@ -220,9 +220,8 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   return (      
     <View style={styles.safeArea}>
         {/* Header */}
-        <StepIndocator totalSteps={3} currentStep={1} />
+        <StepIndocator title={"Select location"} backRoute={""} totalSteps={3} currentStep={1} />
         
-
         {/* Map Section */}
         <View style={styles.mapContainer}>
         <MapView
@@ -445,11 +444,11 @@ const styles = StyleSheet.create({
   },
   bottomOverlay: {
     position: 'absolute', // Position above the map
-    bottom: 5, // Adjust to position above the map
-    left: 5,
-    right: 5,
+    bottom: 0, // Adjust to position above the map
+    // left: 5,
+    // right: 5,
     backgroundColor: '#fff',
-    borderRadius: 15,
+    // borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 }, // Shadow pointing upwards
     shadowOpacity: 0.05,

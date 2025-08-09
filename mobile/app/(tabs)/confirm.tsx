@@ -23,7 +23,7 @@ import { Transformations } from "../../services/Transformations";
 import ContactDetails from "@/components/ContactDetails";
 import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";
-
+import StepIndocator from '../../components/StepIndicator';
 
 type Service = {
   id: number;
@@ -44,7 +44,7 @@ const ConfirmScreen: React.FC = () => {
   
   console.log("--------------------")
   console.log("location", location)
-  const dataObject = JSON.parse(JSON.parse(location));
+  const dataObject = JSON.parse(location);
   console.log("dataObject", dataObject)
   const keys = Object.keys(dataObject);
   console.log(keys);
@@ -97,7 +97,7 @@ const ConfirmScreen: React.FC = () => {
         status: "open",
         plate_number: plateNumber,
         phone_number: phoneNumber,
-        location: JSON.parse(JSON.parse(location as string)),
+        location: JSON.parse(location as string),
         availability_id: selectedAvailability?.id,
         service_ids: JSON.parse(services as string)
       }
@@ -110,6 +110,10 @@ const ConfirmScreen: React.FC = () => {
   
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StepIndocator title={"Confirm booking"} backRoute={"/services"} backParams={{ 
+        location: location, 
+        availability: availability
+      }} totalSteps={0} currentStep={0} />
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -127,9 +131,9 @@ const ConfirmScreen: React.FC = () => {
         />
 
         <AddressDetails
-          address={JSON.parse(JSON.parse(location as string))?.address ?? ""}
-          latitude={JSON.parse(JSON.parse(location as string))?.latitude ?? 0}
-          longitude={JSON.parse(JSON.parse(location as string))?.longitude ?? 0}
+          address={JSON.parse(location as string)?.address ?? ""}
+          latitude={JSON.parse(location as string)?.latitude ?? 0}
+          longitude={JSON.parse(location as string)?.longitude ?? 0}
           sectionTitle="Location"
         />
 

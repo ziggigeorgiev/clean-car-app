@@ -27,6 +27,8 @@ const AvailabilityScreen = () => {
   const [selectedAvailability, setSelectedAvailability] = useState<any | null>(null);
 
   const { location } = useLocalSearchParams();
+  console.log("--------------------")
+  console.log("location", location)
 
   // Fetch availabilities from API
   useEffect(() => {
@@ -86,7 +88,7 @@ const AvailabilityScreen = () => {
     );
     
     router.push({ pathname: '/services', params: { 
-        location: JSON.stringify(location), 
+        location: location, 
         availability: JSON.stringify(selectedAvailability.id)
       } 
     });
@@ -99,11 +101,10 @@ const AvailabilityScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StepIndocator title={"Select availability"} backRoute={"/location"} backParams={{}} totalSteps={3} currentStep={2} />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {/* Header Section */}
-        <View style={styles.headerContainer}>
-          <StepIndocator totalSteps={3} currentStep={2} />
-        </View>
+        
 
         {/* Select Date Section */}
         <Text style={[styles.sectionTitle, {marginBottom: 10, marginTop: 20}]}>Select Date</Text>

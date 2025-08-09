@@ -44,8 +44,8 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
           <Text style={[styles.serviceName, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.name}</Text>
           <Price
               price={service.price}
-              dollarStyle={service.type === 'primary' ? { fontSize: 14, fontWeight: 'bold', color: COLORS.text } : {fontSize: 13, fontWeight: '400', color: COLORS.textLight}}
-              centStyle={service.type === 'primary' ? { fontSize: 9, fontWeight: 'bold', color: COLORS.text } : {fontSize: 8, fontWeight: '400', color: COLORS.textLight}}
+              dollarStyle={service.type === 'primary' ? { fontSize: 14, fontWeight: '500', color: COLORS.text } : {fontSize: 13, fontWeight: '400', color: COLORS.textLight}}
+              centStyle={service.type === 'primary' ? { fontSize: 9, fontWeight: '500', color: COLORS.text } : {fontSize: 8, fontWeight: '400', color: COLORS.textLight}}
             />
           {/* <Text style={[styles.servicePrice, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.price} {service.currency}</Text> */}
         </View>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     marginBottom: 7, // Space between service lines
   },
   primary: {
-    fontWeight: 'bold', // Matches the screenshot's primary service weight
+    fontWeight: '500', // Matches the screenshot's primary service weight
     fontSize: 14,
     color: COLORS.text, // Darker color for primary services
   },

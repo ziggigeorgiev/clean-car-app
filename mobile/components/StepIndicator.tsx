@@ -7,6 +7,9 @@ import BackIcon from '../assets/images/icons/bc-arrow-left.svg';
 import { router } from 'expo-router';
 
 interface StepIndicatorProps {
+  title: string;
+  backRoute: string;
+  backParams: object;
   totalSteps: number;
   currentStep: number;
   activeColor?: string;
@@ -16,10 +19,13 @@ interface StepIndicatorProps {
 }
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({
+  title, 
+  backRoute,
+  backParams, 
   totalSteps,
   currentStep,
-  activeColor = '#007AFF', // Blue
-  inactiveColor = '#E0F2F7', // Light Grey
+  activeColor = COLORS.primary, 
+  inactiveColor = COLORS.textLight,
   dotSize = 8,
   spacing = 5,
 }) => {
@@ -44,20 +50,21 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     <View style={styles.container}>
       <View style={styles.row}>
         {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
-        <TouchableOpacity onPress={() => router.push('/location')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {backRoute && (<TouchableOpacity onPress={() => router.push({ pathname: backRoute, params: backParams})} style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* <BackIcon width={20} height={20} fill={COLORS.text} /> */}
           <Feather name="arrow-left" size={16} color={COLORS.textLight} />
           <Text style={styles.back}>Back</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>)}
+        {!backRoute && (<View style={{ flex: 1 }} />)}
         {/* </View> */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {totalSteps && (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {dots}
           <Text style={styles.stepText}>Step {currentStep} of {totalSteps}</Text>
-        </View>
+        </View>)}
       </View>
       
       <View style={[styles.row, {justifyContent: 'center', marginTop: 10}]}>
-        <Text style={styles.title}>Select location</Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
     </View>
   );
@@ -69,6 +76,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
     backgroundColor: COLORS.background,
+    // borderBottomColor: COLORS.border,
+    // borderBottomWidth: 2,
     // alignItems: 'flex-start', // Align content to left
   },
   row: {
