@@ -12,16 +12,16 @@ type PriceProps = {
 
 const Price: React.FC<PriceProps> = ({ price, dollarStyle, centStyle }) => {
 
-    useEffect(() => {
-        async function loadFonts() {
-            await Font.loadAsync({
-                'ComicNeue-Regular': require('../assets/fonts/ComicNeue-Regular.ttf'),
-                'ComicNeue-Bold': require('../assets/fonts/ComicNeue-Bold.ttf'),
-            });
-        }
+    // useEffect(() => {
+    //     async function loadFonts() {
+    //         await Font.loadAsync({
+    //             'ComicNeue-Regular': require('../assets/fonts/ComicNeue-Regular.ttf'),
+    //             'ComicNeue-Bold': require('../assets/fonts/ComicNeue-Bold.ttf'),
+    //         });
+    //     }
 
-        loadFonts();
-    }, []);
+    //     loadFonts();
+    // }, []);
     
     const dollars = Math.floor(price); // Gets the integer part
     const cents = Math.round((price % 1) * 100); // Gets the decimal part and converts to whole cents
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     color: '#000000',
     // Add some padding-right if the dot and cents are too close
     paddingRight: 2,
-    fontFamily: 'ComicNeue-Bold'
+    // fontFamily: 'ComicNeue-Bold'
   },
   centsText: {
     fontSize: 14,             // Smaller font size for cents
@@ -64,25 +64,10 @@ const styles = StyleSheet.create({
     // 'left' positions from the start of the dollarText, 'right' from the end
     // Use 'right' to align with the end of the dollar amount more consistently
     right: 2,               // Adjust this value to fine-tune horizontal position relative to the dot
-    fontFamily: 'ComicNeue-Bold'
+    // fontFamily: 'ComicNeue-Bold'
     // You can also use transform for fine-tuning, e.g., transform: [{ translateX: 5 }]
   },
 });
 
-
-// // PropTypes help ensure you're passing the correct data types to your component
-// Price.propTypes = {
-//   dollars: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-//   cents: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-//   dollarStyle: Text.propTypes.style,
-//   centStyle: Text.propTypes.style,
-// };
-
-// // Default props can be used if none are provided
-// Price.defaultProps = {
-//   cents: null,
-//   dollarStyle: {},
-//   centStyle: {},
-// };
 
 export default Price;

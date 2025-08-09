@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView, // For handling keyboard pushing content
   Platform, // To check platform for KeyboardAvoidingView
+  Linking
 } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
 import { CleanCarAPI } from "../../services/CleanCarApi";
@@ -19,6 +20,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import ServiceDetailsList from '../../components/ServiceDetailsList';
 import { Transformations } from "../../services/Transformations";
 import { router, useLocalSearchParams } from 'expo-router';
+import Price from '../../components/Price';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
@@ -120,66 +122,56 @@ const ServicesScreen = () => {
           </View>
 
           {/* Vehicle Details Section */}
-          <Text style={styles.sectionTitle}>Vehicle Details</Text>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Registration Number"
-              placeholderTextColor="#8e8e93"
-              value={plateNumber}
-              onChangeText={setPlateNumber}
-              autoCapitalize="characters"
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Phone Number"
-              placeholderTextColor="#8e8e93"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              keyboardType="phone-pad"
-            />
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>Vehicle Details</Text>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Registration Number"
+                placeholderTextColor="#8e8e93"
+                value={plateNumber}
+                onChangeText={setPlateNumber}
+                autoCapitalize="characters"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                placeholderTextColor="#8e8e93"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                keyboardType="phone-pad"
+              />
+            </View>
           </View>
 
           {/* Additional Services Section */}
-          <Text style={styles.sectionTitle}>Additional Services</Text>
-          {extraServices.map(service => (
-            <TouchableOpacity
-              key={service.id}
-              style={styles.serviceItem}
-              onPress={() => handleExtraToggle(service.id)}
-            >
-              <View style={styles.serviceLeft}>
-                {/* <View
-                  style={[
-                    styles.checkbox,
-                    [service.id] && styles.checkboxSelected,
-                  ]}
-                >
-                  {selectedServices[service.id] && (
-                    <MaterialCommunityIcons name="check" size={16} color="#fff" />
-                  )}
-                </View> */}
-                <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Additional Services</Text>
+            {extraServices.map(service => (
+              <TouchableOpacity
+                key={service.id}
+                style={styles.serviceItem}
+                onPress={() => handleExtraToggle(service.id)}
+              >
+                <View style={styles.serviceLeft}>
+                  <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
                     <View style={[styles.innerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#28A745': '#90949C' }]}>
-                    {/* Option 1: Using react-native-vector-icons (Recommended) */}
-                    {/* <Icon name="check" style={dynamicStyles.checkmarkIcon} /> */}
-        
-                    {/* Option 2: Using a simple text character (Fallback if no icon library) */}
-                    <Text style={styles.checkmarkIcon}>✓</Text>
-                    </View>
+                    <Text style={styles.checkmarkIcon}>{selectedExtras[service.id] ? '✓' : '+'}</Text>
+                  </View>
+                  </View>
+                  <View>
+                    <Text style={styles.serviceName}>{service.name}</Text>
+                    <Text style={styles.serviceDescription}>{service.description}</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={styles.serviceName}>{service.name}</Text>
-                  <Text style={styles.serviceDescription}>{service.description}</Text>
-                </View>
-              </View>
-              <Text style={styles.servicePrice}>{service.price} {service.currency}</Text>
-            </TouchableOpacity>
-          ))}
+                <Price price={service.price} />
+              </TouchableOpacity>
+            ))}
+          </View>
 
           {/* Service Details Section */}
           <ServiceDetailsList
@@ -189,14 +181,14 @@ const ServicesScreen = () => {
 
           {/* Payment Method Icons */}
           <View style={styles.paymentIconsContainer}>
-            <MaterialCommunityIcons name="credit-card-check-outline" size={25} color="#000" />
-            <MaterialCommunityIcons name="credit-card-check-outline" size={25} color="#000" />
-            <MaterialCommunityIcons name="credit-card-check-outline" size={25} color="#000" />
+            <MaterialCommunityIcons name="credit-card-check-outline" size={20} color={COLORS.textLight} />
+            <MaterialCommunityIcons name="cash" size={24} color={COLORS.textLight} />
+            <MaterialCommunityIcons name="bank-transfer" size={24} color={COLORS.textLight} />
           </View>
 
           {/* Terms Text */}
           <Text style={styles.termsText}>
-            By placing order you agree to our Terms
+            By placing order you agree to our <Text style={styles.linkText} onPress={() => Linking.openURL('https://example.com/terms')}>Terms</Text>
           </Text>
         </ScrollView>
 
@@ -220,13 +212,12 @@ const ServicesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8', // Light background color
+    backgroundColor: COLORS.background, // Light background color
   },
   keyboardAvoidingView: {
     flex: 1,
   },
   scrollViewContent: {
-    paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 20, // Ensure padding for content above the fixed button
   },
@@ -237,16 +228,27 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     alignItems: 'flex-start', // Align content to left
   },
+  sectionContainer: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    // shadowColor: COLORS.shadow,
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 5,
+    // elevation: 3, // For Android shadow
+  },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.primary,
-    marginBottom: 5,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 10,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F0F0F0',
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
@@ -263,22 +265,22 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#333',
+    color: COLORS.textLight
   },
   serviceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    marginBottom: 15,
+    padding: 10,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.11,
+    shadowRadius: 1.00,
+    elevation: 3, // For Android shadow
   },
   serviceLeft: {
     flexDirection: 'row',
@@ -287,24 +289,19 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   serviceName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: COLORS.text,
     paddingLeft: 10,
     paddingRight: 10
   },
   serviceDescription: {
     fontSize: 13,
-    color: '#8e8e93',
+    color: COLORS.textLight,
     marginTop: 2,
     paddingLeft: 10,
     paddingRight: 10,
-    width: '90%', // Limit width to prevent overflow
-  },
-  servicePrice: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    width: 'auto', // Limit width to prevent overflow
   },
   paymentIconsContainer: {
     flexDirection: 'row',
@@ -322,21 +319,20 @@ const styles = StyleSheet.create({
   placeOrderButtonContainer: {
     paddingHorizontal: 20,
     paddingBottom: Platform.OS === 'ios' ? 20 : 10, // Adjust for iOS home indicator
-    backgroundColor: '#f8f8f8',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e0e0e0',
+    backgroundColor: COLORS.background,
   },
   placeOrderButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 15,
+    borderRadius: 15, // More rounded corners
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 5, // Space above the button
   },
   placeOrderButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
   outerCheckboxContainer: {
     width: 23,
@@ -360,6 +356,10 @@ const styles = StyleSheet.create({
     color: COLORS.white, // White checkmark
     fontWeight: '800', // Make the checkmark bold for better visibility
   },
+  linkText: {
+    color: COLORS.primary,
+    // textDecorationLine: 'underline',
+  }
 });
 
 export default ServicesScreen;

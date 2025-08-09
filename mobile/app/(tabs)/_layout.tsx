@@ -19,6 +19,7 @@ import HouseIcon from '../../assets/images/icons/bc-house.svg';
 import FlyerIcon from '../../assets/images/icons/bc-flyer.svg';
 import UserIcon from '../../assets/images/icons/bc-user.svg';
 import PlusIcon from '../../assets/images/icons/bc-plus.svg';
+import InformationIcon from '../../assets/images/icons/bc-information.svg';
 import LogoIcon from '../../assets/images/icons/bc-logo-simple.svg';
 
 
@@ -110,7 +111,8 @@ const TabsLayout = () => {
                 About
               </Text>
             ),
-            tabBarIcon: ({ focused, color, size }) => <LogoIcon width={50} height={50} stroke={color} fill={color} color={color}/>
+            // tabBarIcon: ({ focused, color, size }) => <LogoIcon width={50} height={50} stroke={color} fill={color} color={color}/>
+            tabBarIcon: ({ focused, color, size }) => <InformationIcon width={size} height={size} fill={color}/>
           }}
         />
 
@@ -152,6 +154,10 @@ const TabsLayout = () => {
         />
         <Tabs.Screen
           name="confirm"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="acknowledge"
           options={{ href: null }}
         />
       </Tabs>

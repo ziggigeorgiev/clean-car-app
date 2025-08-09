@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Dimensions
 } from 'react-native';
 
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,8 @@ import { CleanCarAPI } from "../../services/CleanCarApi";
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
 import LoadingSpinner from "../../components/LoadingSpinner";
+
+const { width, height } = Dimensions.get('window');
 
 const AvailabilityScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -103,7 +106,7 @@ const AvailabilityScreen = () => {
         </View>
 
         {/* Select Date Section */}
-        <Text style={styles.sectionTitle}>Select Date</Text>
+        <Text style={[styles.sectionTitle, {marginBottom: 10, marginTop: 20}]}>Select Date</Text>
         <ScrollView style={styles.datePickerContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
           {dateKeys.map((dateKey, index) => {
             const dateObj = parseISO(dateKey);
@@ -149,7 +152,7 @@ const AvailabilityScreen = () => {
         </ScrollView>
 
         {/* Available Times Section */}
-        <Text style={styles.sectionTitle}>Available Times</Text>
+        <Text style={[styles.sectionTitle, {marginBottom: 10}]}>Available Times</Text>
         <View style={styles.timeSlotsContainer}>
           {selectedDate && availabilities[selectedDate]?.length > 0 ? (
             availabilities[selectedDate].map((availability: any) => {
@@ -211,7 +214,7 @@ const AvailabilityScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8', // Light background color
+    backgroundColor: COLORS.background, // Light background color
   },
   scrollViewContent: {
     paddingHorizontal: 20,
@@ -227,9 +230,8 @@ headerContainer: {
 },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '400',
-    color: COLORS.primary,
-    marginBottom: 5,
+    fontWeight: 'bold',
+    color: COLORS.text,
   },
   datePickerContainer: {
     flexDirection: 'row',
@@ -247,6 +249,7 @@ headerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10, // Spacing between pills
+    width: width / 6, // Fixed width for consistency
   },
   selectedDatePill: {
     backgroundColor: COLORS.primary,
@@ -309,8 +312,8 @@ headerContainer: {
   confirmButtonContainer: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#f8f8f8', // Match background
-    borderTopWidth: StyleSheet.hairlineWidth, // Subtle line
+    backgroundColor: COLORS.background, // Match background
+    // borderTopWidth: StyleSheet.hairlineWidth, // Subtle line
     borderTopColor: '#e0e0e0',
   },
   confirmButton: {
@@ -319,16 +322,16 @@ headerContainer: {
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 5, // Space above the button
   },
   confirmButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
   recentAvailabilityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
     paddingVertical: 5,
   },
   recentAvailabilityIcon: {

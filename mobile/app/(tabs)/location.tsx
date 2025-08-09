@@ -218,11 +218,10 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   };
 
   return (      
-    <View>
+    <View style={styles.safeArea}>
         {/* Header */}
-        <View style={styles.headerContainer}>
-            <StepIndocator totalSteps={3} currentStep={1} />
-        </View>
+        <StepIndocator totalSteps={3} currentStep={1} />
+        
 
         {/* Map Section */}
         <View style={styles.mapContainer}>
@@ -236,7 +235,7 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
             onRegionChange={(newRegion) => handleRegionChange(newRegion)}
             onRegionChangeComplete={(region) => handleRegionChangeComplete(region)}
             showsUserLocation={true} // Show user's current location
-            showsMyLocationButton={true} // Show the button to center on user's location
+            showsMyLocationButton={false} // Show the button to center on user's location
             mapPadding={{top:0, right:0, left:0, bottom:230}}
         >   
             {/* Central Marker */}
@@ -360,17 +359,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start', // Align content to left
   },
   mapContainer: {
+    flex: 1,
     width: width,
-    height: height - 80 - 30, // Adjust map height as needed, e.g., 45% of screen height
+    // height: height - 80 - 30, // Adjust map height as needed, e.g., 45% of screen height
     backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    marginBottom: 10,
     // No direct borderRadius for map, but you could try wrapping in a View with it
   },
   map: {
     ...StyleSheet.absoluteFillObject, // Map fills its container
+    flex: 1
   },
   fixedPinContainer: {
     position: 'absolute',
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   },
   bottomOverlay: {
     position: 'absolute', // Position above the map
-    bottom: 80 + 10, // Adjust to position above the map
+    bottom: 5, // Adjust to position above the map
     left: 5,
     right: 5,
     backgroundColor: '#fff',

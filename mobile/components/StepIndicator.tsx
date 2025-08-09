@@ -1,6 +1,10 @@
 // components/DotIndicator.tsx
+import { COLORS } from '@/constants/colors';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
+import BackIcon from '../assets/images/icons/bc-arrow-left.svg';
+import { router } from 'expo-router';
 
 interface StepIndicatorProps {
   totalSteps: number;
@@ -36,26 +40,61 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     />
   ));
 
-  return <View style={styles.container}>
-    {dots}
-    <Text style={styles.stepText}>Step {currentStep} of {totalSteps}</Text>
-  </View>;
+  return (
+    <View style={styles.container}>
+      <View style={styles.row}>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
+        <TouchableOpacity onPress={() => router.push('/location')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {/* <BackIcon width={20} height={20} fill={COLORS.text} /> */}
+          <Feather name="arrow-left" size={16} color={COLORS.textLight} />
+          <Text style={styles.back}>Back</Text>
+        </TouchableOpacity>
+        {/* </View> */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {dots}
+          <Text style={styles.stepText}>Step {currentStep} of {totalSteps}</Text>
+        </View>
+      </View>
+      
+      <View style={[styles.row, {justifyContent: 'center', marginTop: 10}]}>
+        <Text style={styles.title}>Select location</Text>
+      </View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    backgroundColor: COLORS.background,
+    // alignItems: 'flex-start', // Align content to left
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginRight: 10,
+  },
+  back: {
+    color: COLORS.textLight,
+    paddingLeft: 5,
+    fontSize: 14
   },
   stepText: {
-    marginLeft: 10,
+    marginLeft: 5,
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textLight,
   },
   dot: {
     // Dynamic styles applied inline
-    paddingRight: 20
+    paddingRight: 5
   },
 });
 

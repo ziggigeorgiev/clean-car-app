@@ -49,7 +49,11 @@
       "typedRoutes": true
     },
     "extra": {
-      "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs"
+      "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs",
+      "router": {},
+      "eas": {
+        "projectId": "93d88494-d1ac-4da0-b139-f46067bf7bbb"
+      }
     }
   }
 }
