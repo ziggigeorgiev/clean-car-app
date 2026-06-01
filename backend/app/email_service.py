@@ -51,7 +51,7 @@ def _format_berlin(dt: Optional[datetime]) -> str:
 def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] = None) -> bool:
     """Send an email to ``to`` and return True on success, False otherwise."""
     if not _is_configured():
-        logger.warning("SMTP not configured; skipping email to %s", to)
+        logger.warning("SMTP not configured (SMTP_HOST env var missing); skipping email to %s", to)
         return False
     if not to:
         logger.warning("Empty recipient; skipping email")
@@ -64,6 +64,11 @@ def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] =
     from_addr = os.getenv("SMTP_FROM", user or "no-reply@example.com")
     use_tls = os.getenv("SMTP_USE_TLS", "1") == "1"
     timeout = int(os.getenv("SMTP_TIMEOUT", "10"))
+
+    logger.info(
+        "Sending email host=%s port=%s use_tls=%s from=%s to=%s subject=%r",
+        host, port, use_tls, from_addr, to, subject,
+    )
 
     msg = EmailMessage()
     msg["From"] = from_addr

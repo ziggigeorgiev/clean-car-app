@@ -1,11 +1,16 @@
+import logging
 from datetime import date, timedelta
-from fastapi import FastAPI, Depends, HTTPException, Response, status
+from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Dict
 
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
 from app.email_service import send_booking_confirmation
+
+# Make sure our app/email_service logs are visible under uvicorn.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -74,14 +79,19 @@ async def read_order_by_id(phone_identifier: str, order_id: int, db: Session = D
     summary="Create a New Order",
     description="Creates a new order with specified plate number, phone, location, availability, and services."
 )
-async def create_new_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+async def create_new_order(
+    order: schemas.OrderCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     try:
         db_order = crud.create_order(db=db, order=order)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    # Best-effort booking confirmation email. Failures are swallowed inside
-    # send_booking_confirmation so they never affect the order response.
+    # Schedule the confirmation email AFTER the response is returned so the
+    # client never waits for SMTP. Failures inside the task are logged but
+    # never affect the order response.
     if order.email:
         try:
             total = sum((s.price or 0) for s in db_order.services)
@@ -90,7 +100,7 @@ async def create_new_order(order: schemas.OrderCreate, db: Session = Depends(get
                 if db_order.services and db_order.services[0].currency is not None
                 else "EUR"
             )
-            send_booking_confirmation(
+            email_args = dict(
                 to=order.email,
                 order_id=db_order.id,
                 plate_number=db_order.plate_number,
@@ -101,10 +111,12 @@ async def create_new_order(order: schemas.OrderCreate, db: Session = Depends(get
                 total_price=total if db_order.services else None,
                 currency=currency,
             )
+            logger.info("Queueing booking confirmation email for order %s to %s", db_order.id, order.email)
+            background_tasks.add_task(send_booking_confirmation, **email_args)
         except Exception:
-            # Never fail the request because email composition failed.
-            import logging
-            logging.getLogger(__name__).exception("Booking confirmation email failed for order %s", db_order.id)
+            logger.exception("Failed to queue confirmation email for order %s", db_order.id)
+    else:
+        logger.info("Order %s created with no email — skipping confirmation email", db_order.id)
 
     return db_order
 
