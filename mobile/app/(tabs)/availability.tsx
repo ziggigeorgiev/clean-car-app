@@ -11,9 +11,16 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 
 import { CleanCarAPI } from "../../services/CleanCarApi";
+import {
+  formatWeekday,
+  formatDayOfMonth,
+  formatMonthShort,
+  formatTime12h,
+  formatLongDateTime12h,
+} from "../../services/DateFormat";
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -83,9 +90,9 @@ const AvailabilityScreen = () => {
 
     // Persist the entire availability object (with id)
     console.log('Confirmed Availability:', selectedAvailability);
-    alert(
-      `Appointment confirmed for ${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy 'at' h:mm a")}`
-    );
+    // alert(
+    //   `Appointment confirmed for ${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy 'at' h:mm a")}`
+    // );
     
     router.push({ pathname: '/services', params: { 
         location: location, 
@@ -129,7 +136,7 @@ const AvailabilityScreen = () => {
                     isSelected && styles.selectedDatePillText,
                   ]}
                 >
-                  {format(dateObj, 'EEE')}
+                  {formatWeekday(dateObj)}
                 </Text>
                 <Text
                   style={[
@@ -137,7 +144,7 @@ const AvailabilityScreen = () => {
                     isSelected && styles.selectedDatePillText,
                   ]}
                 >
-                  {format(dateObj, 'd')}
+                  {formatDayOfMonth(dateObj)}
                 </Text>
                 <Text
                   style={[
@@ -145,7 +152,7 @@ const AvailabilityScreen = () => {
                     isSelected && styles.selectedDatePillText,
                   ]}
                 >
-                  {format(dateObj, 'MMM')}
+                  {formatMonthShort(dateObj)}
                 </Text>
               </TouchableOpacity>
             );
@@ -157,7 +164,7 @@ const AvailabilityScreen = () => {
         <View style={styles.timeSlotsContainer}>
           {selectedDate && availabilities[selectedDate]?.length > 0 ? (
             availabilities[selectedDate].map((availability: any) => {
-              const timeLabel = format(parseISO(availability.time), 'h:mm a');
+              const timeLabel = formatTime12h(availability.time);
               const isSelected = selectedAvailability?.id === availability.id;
               return (
                 <TouchableOpacity
@@ -192,7 +199,7 @@ const AvailabilityScreen = () => {
           <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAvailabilityIcon} />
           <Text style={styles.recentAvailabilityText}>
             {selectedAvailability
-              ? `${format(parseISO(selectedAvailability.time), "EEEE, MMM d, yyyy - h:mm a")}`
+              ? formatLongDateTime12h(selectedAvailability.time)
               : 'No recent availability selected.'}
           </Text>
         </View>

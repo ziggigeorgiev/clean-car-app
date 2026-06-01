@@ -9,7 +9,7 @@ import NoResultsFound from "../../components/NoResultsFound";
 import { CleanCarAPI } from "../../services/CleanCarApi";
 import { Device } from '../../services/Device';
 import { COLORS } from '../../constants/colors';
-
+import StepIndocator from '../../components/StepIndicator'; // Adjust path
 
 // You might consider react-native-vector-icons for the back arrow icon if you add one.
 // import Icon from 'react-native-vector-icons/Ionicons';
@@ -52,14 +52,11 @@ const OrderListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        {/* If you want to add a back button, uncomment the TouchableOpacity */}
-        {/* <TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-        </TouchableOpacity> */}
+      <StepIndocator title={"Orders"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+      {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>Orders</Text>
         <Text style={styles.orderCount}>({orders.length})</Text>
-      </View>
+      </View> */}
       <FlatList
         data={orders}
         keyExtractor={( item ) => item.id}

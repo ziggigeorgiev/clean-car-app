@@ -5,6 +5,7 @@ from typing import List, Dict
 
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
+from app.email_service import send_booking_confirmation
 
 app = FastAPI()
 
@@ -76,9 +77,36 @@ async def read_order_by_id(phone_identifier: str, order_id: int, db: Session = D
 async def create_new_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     try:
         db_order = crud.create_order(db=db, order=order)
-        return db_order
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    # Best-effort booking confirmation email. Failures are swallowed inside
+    # send_booking_confirmation so they never affect the order response.
+    if order.email:
+        try:
+            total = sum((s.price or 0) for s in db_order.services)
+            currency = (
+                db_order.services[0].currency.value
+                if db_order.services and db_order.services[0].currency is not None
+                else "EUR"
+            )
+            send_booking_confirmation(
+                to=order.email,
+                order_id=db_order.id,
+                plate_number=db_order.plate_number,
+                phone_number=db_order.phone_number,
+                address=db_order.location.address if db_order.location else "",
+                availability_time=db_order.availability.time if db_order.availability else None,
+                service_names=[s.name for s in db_order.services],
+                total_price=total if db_order.services else None,
+                currency=currency,
+            )
+        except Exception:
+            # Never fail the request because email composition failed.
+            import logging
+            logging.getLogger(__name__).exception("Booking confirmation email failed for order %s", db_order.id)
+
+    return db_order
 
 
 # Get Available Availabilities Endpoint
@@ -131,6 +159,53 @@ async def read_availability(availability_id: int, db: Session = Depends(get_db))
 async def create_availability_slot(availability: schemas.AvailabilityCreate, db: Session = Depends(get_db)):
     db_availability = crud.create_availability(db=db, availability=availability)
     return db_availability
+
+
+# Bulk Create Availabilities For a Day Endpoint
+@app.post(
+    "/api/availabilities/bulk_create_for_day",
+    response_model=List[schemas.Availability],
+    status_code=status.HTTP_201_CREATED,
+    summary="Bulk Create Availabilities For a Day",
+    description=(
+        "Generates availability slots for the given day from 08:00 to 17:00 "
+        "at 90-minute intervals. Each slot must end at or before 17:00. "
+        "Slots already present for that day are skipped, so the endpoint is "
+        "safe to call repeatedly. The interval and bounds can be overridden "
+        "via query parameters."
+    ),
+)
+async def bulk_create_availabilities_for_day(
+    day: date,
+    start_hour: int = 8,
+    end_hour: int = 17,
+    step_minutes: int = 90,
+    db: Session = Depends(get_db),
+):
+    """
+    - **day**: target date in `YYYY-MM-DD` format (query param).
+    - **start_hour** / **end_hour** / **step_minutes**: optional overrides.
+
+    Returns the list of newly created availability slots (empty list if all
+    slots for the day already exist).
+    """
+    if not (0 <= start_hour < end_hour <= 24):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Require 0 <= start_hour < end_hour <= 24",
+        )
+    if step_minutes <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="step_minutes must be positive",
+        )
+    return crud.bulk_create_availabilities_for_day(
+        db=db,
+        target_date=day,
+        start_hour=start_hour,
+        end_hour=end_hour,
+        step_minutes=step_minutes,
+    )
 
 # Get Active Services Endpoint
 @app.get(

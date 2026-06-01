@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from "../constants/colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
-import { format } from "date-fns";
+import { formatDateTime } from "../services/DateFormat";
 
 type AvailabilityDetailsProps = {
   time: string;
@@ -27,7 +27,7 @@ const AvailabilityDetails = ({
       <View style={styles.detailRow}>
         <MaterialCommunityIcons name="av-timer" size={20} color="#666" style={styles.icon} />
         <Text style={styles.detailText}>
-          {time ? format(time, "MMMM do, yyyy - H:mm") : '-'}
+          {formatDateTime(time)}
         </Text>
       </View>
     </View>

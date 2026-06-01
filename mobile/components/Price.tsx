@@ -28,10 +28,10 @@ const Price: React.FC<PriceProps> = ({ price, dollarStyle, centStyle }) => {
 
     return (
         <View style={styles.priceContainer}>
-            <Text style={[styles.dollarText, dollarStyle]}>{dollars}.</Text>
+            <Text style={[styles.dollarText, dollarStyle]}>{dollars}<Text>.</Text></Text>
             {cents && (
                 <Text style={[styles.centsText, centStyle]}>
-                {cents}-
+                {cents}<Text>-</Text>
                 </Text>
             )}
         </View>

@@ -50,14 +50,14 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     <View style={styles.container}>
       <View style={styles.row}>
         {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
-        {backRoute && (<TouchableOpacity onPress={() => router.push({ pathname: backRoute, params: backParams})} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {!!backRoute && (<TouchableOpacity onPress={() => router.push({ pathname: backRoute, params: backParams})} style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* <BackIcon width={20} height={20} fill={COLORS.text} /> */}
           <Feather name="arrow-left" size={16} color={COLORS.textLight} />
           <Text style={styles.back}>Back</Text>
         </TouchableOpacity>)}
         {!backRoute && (<View style={{ flex: 1 }} />)}
         {/* </View> */}
-        {totalSteps && (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {totalSteps > 0 && (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {dots}
           <Text style={styles.stepText}>Step {currentStep} of {totalSteps}</Text>
         </View>)}

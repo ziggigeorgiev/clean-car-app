@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../constants/colors";
 import Price from './Price';
 
-import { format } from "date-fns";
+import { formatDateTime } from "../services/DateFormat";
 
 
 interface Service {
@@ -63,7 +63,7 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
             {/* <Icon name="clock-o" size={16} color="#666" style={styles.icon} /> */}
             <Ionicons name='time-outline' size={16} color={COLORS.textLight} style={styles.icon} />
             <Text style={styles.dateText}>
-                {format(item.availability.time, "MMMM do, yyyy H:mma")}
+                {formatDateTime(item.availability.time)}
             </Text>
             </View>
             <View style={styles.bottomRow}>

@@ -107,6 +107,7 @@ class OrderBase(BaseModel):
     location: LocationCreate
     availability_id: int
     service_ids: List[int] = [] # For creating an order, provide service IDs
+    email: Optional[str] = None # Optional contact email for confirmation
 
 class OrderCreate(OrderBase):
     pass

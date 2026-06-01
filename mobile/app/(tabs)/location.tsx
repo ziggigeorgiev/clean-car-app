@@ -157,7 +157,7 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
       latitude: region.latitude,
       address: address
     }
-    Alert.alert('Location Confirmed!', JSON.stringify(selectedLocation))
+    // Alert.alert('Location Confirmed!', JSON.stringify(selectedLocation))
     router.push({ pathname: '/availability', params: { location: JSON.stringify(selectedLocation) } });
   };
 
@@ -220,7 +220,7 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   return (      
     <View style={styles.safeArea}>
         {/* Header */}
-        <StepIndocator title={"Select location"} backRoute={""} totalSteps={3} currentStep={1} />
+        <StepIndocator title={"Select location"} backRoute={""} backParams={{}} totalSteps={3} currentStep={1} />
         
         {/* Map Section */}
         <View style={styles.mapContainer}>
@@ -445,8 +445,8 @@ const styles = StyleSheet.create({
   bottomOverlay: {
     position: 'absolute', // Position above the map
     bottom: 0, // Adjust to position above the map
-    // left: 5,
-    // right: 5,
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
     // borderRadius: 15,
     shadowColor: '#000',
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     // top: height / 2 - 20, // Adjust to center the marker vertically
     // left: width / 2 - 20, // Adjust to center the marker horizontally
     marginLeft: 0,      // half of icon width (40px icon)
-    marginTop: -230 - 20, // icon height offset + map padding offset (230 / 2)
+    marginTop: -230 - 20 - 6, // icon height offset + map padding offset (230 / 2)
     justifyContent: 'center',
   },
   mapShadow: {

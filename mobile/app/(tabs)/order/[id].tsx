@@ -24,6 +24,7 @@ import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";
 import ProgressDetails from "@/components/ProgressDetails";
 import Details from "@/components/Details";
+import StepIndocator from "@/components/StepIndicator";
 
 interface ServiceItem {
   name: string;
@@ -123,7 +124,7 @@ const OrderDetailScreen: React.FC = () => {
   
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
+      <StepIndocator title={"Order details"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -148,9 +149,9 @@ const OrderDetailScreen: React.FC = () => {
         />
 
         <AddressDetails
-          address={order?.location.address ?? ""}
-          latitude={order?.location.latitude ?? 0}
-          longitude={order?.location.longitude ?? 0}
+          address={order?.location?.address ?? ""}
+          latitude={order?.location?.latitude ?? 0}
+          longitude={order?.location?.longitude ?? 0}
           sectionTitle="Location"
         />
         {/* Service Details Section */}
@@ -221,19 +222,12 @@ const styles = StyleSheet.create({
     paddingBottom: 0, // Add some padding at the bottom of the scroll view
   },
   statusContainer: {
-    padding: 10,
     backgroundColor: '#E0F2F7',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 3,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
   },
   statusText: {
     fontSize: 20,

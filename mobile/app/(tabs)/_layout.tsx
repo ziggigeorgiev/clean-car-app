@@ -157,7 +157,7 @@ const TabsLayout = () => {
           options={{ href: null }}
         />
         <Tabs.Screen
-          name="acknowledge"
+          name="acknowledge/[id]"
           options={{ href: null }}
         />
       </Tabs>

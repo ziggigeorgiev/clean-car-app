@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 import Details from "@/components/Details";
 import ContactDetails from "@/components/ContactDetails";
+import StepIndocator from '../../components/StepIndicator'; // Adjust path
 
 // Define the main App component
 const AboutScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StepIndocator title={"About"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Logo Section */}
         <View style={styles.logoContainer}>

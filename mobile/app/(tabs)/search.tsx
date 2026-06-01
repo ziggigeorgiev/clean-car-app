@@ -1,11 +1,12 @@
 // screens/SearchAddressScreen.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 import Icon from '@expo/vector-icons/Feather'; // For search icon
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { router, useLocalSearchParams } from "expo-router";
 import Constants from 'expo-constants'; // To access expoConfig for API key
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { COLORS } from '@/constants/colors'; // Assuming you have this
 
@@ -73,6 +74,8 @@ const { width } = Dimensions.get('window');
 // export default GooglePlacesInput;
 
 const SearchAddressScreen: React.FC = () => {
+    const ref = useRef();
+
     const params = useLocalSearchParams();
     const googleApiKey = Constants?.expoConfig?.extra?.googleMapsApiKey; // Access API key from extra config
     console.log("Google Maps API Key:", googleApiKey); // Debugging line to check if the key is loaded
@@ -88,13 +91,21 @@ const SearchAddressScreen: React.FC = () => {
         );
     }
 
+    const clearInput = () => {
+        ref.current?.setAddressText('');
+    };
+    
     return (
         <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
         >
         <View style={styles.container}>
+            <View style={[styles.titleHeader, {justifyContent: 'center', marginTop: 10}]}>
+                <Text style={styles.title}>Search location</Text>
+            </View>
             <GooglePlacesAutocomplete
+                ref={ref}
                 predefinedPlaces={[]} // Example predefined place
                 keyboardShouldPersistTaps="handled"
                 minLength={2}
@@ -122,32 +133,34 @@ const SearchAddressScreen: React.FC = () => {
                     components: 'country:de', // Restrict to Germany, for example
                 }}
                 textInputProps={{
-                    
                     InputComp: TextInput,
                     returnKeyType: 'search',
                     placeholder: 'Search location',
+                    clearButtonMode: 'never'
+
                 }}
                 fetchDetails={true} // To get latitude and longitude of the selected place
                 renderLeftButton={() => (
                     <View style={styles.leftButtonContainer}>
-                        <Icon name="search" size={16} color="#888" style={styles.searchIcon} />
+                        <Icon name="search" size={16} color={COLORS.textLight} style={styles.searchIcon} />
                     </View>
                 )}
-                // renderRightButton={() => (
-                //     <View style={styles.rightButtonContainer}>
-                //         <TouchableOpacity onPress={() => setText('')}>
-                //             <Text style={{ padding: 10 }}>✖️</Text>
-                //         </TouchableOpacity>
-                //     </View>
-                // )}
+                renderRightButton={() => (
+                    <View style={styles.rightButtonContainer}>
+                        <TouchableOpacity onPress={clearInput}>
+                            {/* <Text style={{ padding: 10 }}>✖️</Text> */}
+                            <Ionicons name="close-circle" size={20} color={COLORS.textLight} />
+                        </TouchableOpacity>
+                    </View>
+                )}
                 renderRow={(rowData) => (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingRight: 40, gap: 10 }}>
                     <MaterialCommunityIcons name="map-marker" size={20} color={COLORS.textLight} />
                     {/* <Image 
                         source={require('./path/to/your/custom-icon.png')} // Replace with your icon path
                         style={{ width: 20, height: 20, marginRight: 10 }}
                     /> */}
-                    <Text>{rowData.description} {rowData.types}</Text>
+                    <Text>{rowData.description}</Text>
                     </View>
                 )}
                 styles={{
@@ -179,11 +192,9 @@ const SearchAddressScreen: React.FC = () => {
                     },
                     predefinedPlacesDescription: {
                         color: COLORS.text,
-                        backgroundColor: "yellow",
                     },
                     listView: {
-                        backgroundColor: "blue",
-                        color: "green",
+                        backgroundColor: COLORS.background,
                         borderRadius: 10,
                         marginTop: 5,
                         shadowColor: '#000',
@@ -228,6 +239,18 @@ const styles = StyleSheet.create({
     },
     searchIcon: {
         marginRight: 0,
+    },
+    titleHeader: {
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingBottom: 20,
+        backgroundColor: COLORS.background,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginRight: 10,
     }
 });
 

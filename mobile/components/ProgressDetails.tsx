@@ -2,7 +2,7 @@ import { COLORS } from '@/constants/colors';
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Svg, { Path } from 'react-native-svg'; // Import Svg and Path
-import { format } from "date-fns";
+import { formatDateTime } from "../services/DateFormat";
 
 const ACTIVE_COLOR = '#5BA064'; // Color for the active segment
 const INACTIVE_COLOR = '#D3D3D3'; // Color for the inactive segments
@@ -106,7 +106,7 @@ const ProgressDetails = ({process_steps}: ProgressDetailsProps) => {
       <View style={styles.textContainer}>
         <Text style={styles.statusTitle}>{currentEntry?.name}</Text>
         <Text style={styles.deliveryInfo}>{currentEntry?.text}</Text>
-        <Text style={styles.timeRange}>{currentEntry?.updated_at ? format(currentEntry?.updated_at, "MMMM do, yyyy - H:mm") : '-'}</Text>
+        <Text style={styles.timeRange}>{formatDateTime(currentEntry?.updated_at)}</Text>
       </View>
     </View>
   );
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     padding: 20,
     // marginBottom: 10,
-    marginTop: 25,
+    // marginTop: 25,
     // shadowColor: '#000',
     // shadowOffset: { width: 0, height: 2 },
     // shadowOpacity: 0.05,

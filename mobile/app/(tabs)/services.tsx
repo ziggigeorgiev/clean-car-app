@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,13 +12,14 @@ import {
   Linking
 } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { CleanCarAPI } from "../../services/CleanCarApi";
-
+import { Device } from '../../services/Device';
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
 import ServiceDetailsList from '../../components/ServiceDetailsList';
 import { Transformations } from "../../services/Transformations";
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import Price from '../../components/Price';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
@@ -44,33 +45,69 @@ const ServicesScreen = () => {
 
   const [services, setServices] = useState<Service[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<{ [id: number]: boolean }>({});
+  const [showErrors, setShowErrors] = useState(false);
+
+  // Validation
+  const plateNumberTrimmed = plateNumber.trim();
+  const phoneNumberTrimmed = phoneNumber.trim();
+  const plateError = plateNumberTrimmed.length < 2 ? 'Registration number is required' : '';
+  const phoneError = !/^\+?[0-9 \-()]{7,}$/.test(phoneNumberTrimmed) ? 'Valid phone number is required' : '';
+  const isFormValid = !plateError && !phoneError;
 
   const { location, availability} = useLocalSearchParams();
     
   console.log("--------------------")
   console.log("location", location)
 
-  // Fetch services from API
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await CleanCarAPI.getServices();
-        setServices(data.filter((s: { is_active: any; }) => s.is_active));
+  // Loads the service catalog + prefills plate/phone from stored settings only.
+  // If nothing is stored in settings, the fields stay empty.
+  const loadFromSettings = useCallback(async (opts?: { resetExtras?: boolean }) => {
+    setLoading(true);
+    try {
+      const data = await CleanCarAPI.getServices();
+      const activeServices = data.filter((s: { is_active: any; }) => s.is_active);
+      setServices(activeServices);
 
-        // Preselect all extras as false
+      if (opts?.resetExtras !== false) {
         const extras = data.filter((s: { category: string; }) => s.category === 'Extra');
         setSelectedExtras(
           Object.fromEntries(extras.map((e: { id: any; }) => [e.id, false]))
         );
-      } catch (error) {
-        console.error(`Error fetching services:`, error);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchData();
+
+      // Prefill only from saved settings; otherwise leave empty.
+      const storedPhone = await Device.getPhoneNumber();
+      const storedPlate = await Device.getPlateNumber();
+      setPhoneNumber(storedPhone ?? '');
+      setPlateNumber(storedPlate ?? '');
+      setShowErrors(false);
+    } catch (error) {
+      console.error(`Error fetching services:`, error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // First mount: load catalog + settings.
+  useEffect(() => {
+    loadFromSettings();
+  }, [loadFromSettings]);
+
+  // Whenever the screen gains focus, check whether an order was just placed.
+  // If so, treat this as a brand-new booking flow: clear inputs and extras,
+  // and only prefill plate/phone if the user saved them in settings.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        const justPlaced = await Device.consumeOrderPlacedFlag();
+        if (justPlaced && !cancelled) {
+          await loadFromSettings({ resetExtras: true });
+        }
+      })();
+      return () => { cancelled = true; };
+    }, [loadFromSettings])
+  );
 
   // Split services
   const basicServices = services.filter(s => s.category === 'Basic');
@@ -96,20 +133,23 @@ const ServicesScreen = () => {
   }
 
   const handlePlaceOrder = () => {
+    if (!isFormValid) {
+      setShowErrors(true);
+      return;
+    }
     const services = totalSelectedServices().map(s => s.id)
-    alert(
-      `Services confirmed: ${services}`
-    );
     console.log("location", location)
-    router.push({ pathname: '/confirm', params: { 
-        location: location, 
+    router.push({ pathname: '/confirm', params: {
+        location: location,
         availability: availability,
         services: JSON.stringify(services),
-        plateNumber: plateNumber,
-        phoneNumber: phoneNumber
-      } 
+        plateNumber: plateNumberTrimmed,
+        phoneNumber: phoneNumberTrimmed
+      }
     });
   };
+
+  if (loading) return <LoadingSpinner message="Loading device and personal information..." />;
 
   return (
     <View style={styles.container}>
@@ -123,7 +163,7 @@ const ServicesScreen = () => {
           {/* Vehicle Details Section */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, {marginTop: 20}]}>Vehicle Details</Text>
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, showErrors && plateError ? styles.inputContainerError : null]}>
               <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
@@ -134,7 +174,8 @@ const ServicesScreen = () => {
                 autoCapitalize="characters"
               />
             </View>
-            <View style={styles.inputContainer}>
+            {showErrors && plateError ? <Text style={styles.errorText}>{plateError}</Text> : null}
+            <View style={[styles.inputContainer, showErrors && phoneError ? styles.inputContainerError : null]}>
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
@@ -145,6 +186,7 @@ const ServicesScreen = () => {
                 keyboardType="phone-pad"
               />
             </View>
+            {showErrors && phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
           </View>
 
           {/* Additional Services Section */}
@@ -159,8 +201,8 @@ const ServicesScreen = () => {
                 <View style={styles.serviceLeft}>
                   <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
                     <View style={[styles.innerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#28A745': '#90949C' }]}>
-                    <Text style={styles.checkmarkIcon}>{selectedExtras[service.id] ? '✓' : '+'}</Text>
-                  </View>
+                      <Text style={styles.checkmarkIcon}>{selectedExtras[service.id] ? '✓' : '+'}</Text>
+                    </View>
                   </View>
                   <View>
                     <Text style={styles.serviceName}>{service.name}</Text>
@@ -194,8 +236,10 @@ const ServicesScreen = () => {
         {/* Place Order Button (Fixed at Bottom) */}
         <View style={styles.placeOrderButtonContainer}>
           <TouchableOpacity
-            style={styles.placeOrderButton}
+            style={[styles.placeOrderButton, !isFormValid && styles.placeOrderButtonDisabled]}
             onPress={handlePlaceOrder}
+            disabled={!isFormValid}
+            activeOpacity={isFormValid ? 0.7 : 1}
           >
             <Text style={styles.placeOrderButtonText}>
               {/* Place Order • ${totalAmount} */}
@@ -332,6 +376,21 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  placeOrderButtonDisabled: {
+    backgroundColor: '#B0B0B0',
+    opacity: 0.6,
+  },
+  inputContainerError: {
+    borderWidth: 1,
+    borderColor: '#D9534F',
+  },
+  errorText: {
+    color: '#D9534F',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+    marginLeft: 4,
   },
   outerCheckboxContainer: {
     width: 23,

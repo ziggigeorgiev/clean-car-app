@@ -90,7 +90,8 @@ const ConfirmScreen: React.FC = () => {
     fetchData();
   }, []);
   
-  const confirm = async () => {  
+  const confirm = async () => {
+    const email = (await Device.getEmail()) || undefined;
     const order =  await CleanCarAPI.createOrder(
       {
         phone_identifier: await Device.getPhoneIdentifier(),
@@ -99,11 +100,15 @@ const ConfirmScreen: React.FC = () => {
         phone_number: phoneNumber,
         location: JSON.parse(location as string),
         availability_id: selectedAvailability?.id,
-        service_ids: JSON.parse(services as string)
+        service_ids: JSON.parse(services as string),
+        email,
       }
     );
     console.log("order", order)
-    router.push(`/order/${order?.id}`);
+    // Flag a fresh start so the next time the user enters the booking flow
+    // the services screen resets its inputs (only prefilling from settings).
+    await Device.markOrderPlaced();
+    router.push(`/acknowledge/${order?.id}`);
   };
 
   if (loading) return <LoadingSpinner message="Loading order details..." />;
