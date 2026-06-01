@@ -1,4 +1,5 @@
 import logging
+import sys
 from datetime import date, timedelta
 from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks
 from sqlalchemy.orm import Session
@@ -8,8 +9,17 @@ from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
 from app.email_service import send_booking_confirmation
 
-# Make sure our app/email_service logs are visible under uvicorn.
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+# Uvicorn configures the root logger AFTER our module loads, which can swallow
+# basicConfig(). Attach a dedicated stream handler to our app/email loggers so
+# their output reliably reaches stdout on Render.
+_handler = logging.StreamHandler(sys.stdout)
+_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+for _name in (__name__, "app.email_service"):
+    _l = logging.getLogger(_name)
+    _l.setLevel(logging.INFO)
+    if not any(isinstance(h, logging.StreamHandler) for h in _l.handlers):
+        _l.addHandler(_handler)
+    _l.propagate = False
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -92,6 +102,9 @@ async def create_new_order(
     # Schedule the confirmation email AFTER the response is returned so the
     # client never waits for SMTP. Failures inside the task are logged but
     # never affect the order response.
+    # NOTE: we also print() because uvicorn's log handler sometimes swallows
+    # third-party logger output on hosting providers.
+    print(f"[order_create] order={db_order.id} email={order.email!r}", flush=True)
     if order.email:
         try:
             total = sum((s.price or 0) for s in db_order.services)
@@ -112,11 +125,14 @@ async def create_new_order(
                 currency=currency,
             )
             logger.info("Queueing booking confirmation email for order %s to %s", db_order.id, order.email)
+            print(f"[order_create] queueing email for order {db_order.id}", flush=True)
             background_tasks.add_task(send_booking_confirmation, **email_args)
-        except Exception:
+        except Exception as e:
             logger.exception("Failed to queue confirmation email for order %s", db_order.id)
+            print(f"[order_create] ERROR queueing email: {e}", flush=True)
     else:
         logger.info("Order %s created with no email — skipping confirmation email", db_order.id)
+        print(f"[order_create] order={db_order.id} no email on payload", flush=True)
 
     return db_order
 

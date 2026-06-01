@@ -1,29 +1,31 @@
 # app/email_service.py
 """
-Lightweight SMTP-based email service.
+Lightweight email service with two backends:
 
-Configuration is read from environment variables so credentials never live in
-code:
+1. Resend HTTP API (preferred on hosts that block outbound SMTP, like Render
+   free/Starter plans). Requires:
+       RESEND_API_KEY    API key from https://resend.com/api-keys
+       RESEND_FROM       verified sender, e.g. "CleanCar <noreply@yourdomain>"
+                         (falls back to SMTP_FROM, then onboarding@resend.dev)
 
-    SMTP_HOST       e.g. smtp.gmail.com
-    SMTP_PORT       e.g. 587  (default 587 for STARTTLS)
-    SMTP_USER       login username (often the from address)
-    SMTP_PASSWORD   password or app password
-    SMTP_FROM       From: header, defaults to SMTP_USER
-    SMTP_USE_TLS    "1" (default) for STARTTLS on 587, "0" for SSL on 465
-    SMTP_TIMEOUT    seconds, default 10
+2. SMTP fallback. Requires:
+       SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM,
+       SMTP_USE_TLS (default "1"), SMTP_TIMEOUT (default "10")
 
-If SMTP_HOST is not configured, the service logs a warning and does nothing
-(useful for local development). Sending is best-effort: failures are caught
-and logged so order creation never fails because email failed.
+If neither RESEND_API_KEY nor SMTP_HOST is set, sending is skipped with a
+warning (useful for local dev). Sending is always best-effort: failures are
+caught and logged so order creation never fails because email failed.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import smtplib
 import ssl
+import urllib.error
+import urllib.request
 from datetime import datetime
 from email.message import EmailMessage
 from typing import Iterable, Optional
@@ -35,7 +37,7 @@ BERLIN_TZ = ZoneInfo("Europe/Berlin")
 
 
 def _is_configured() -> bool:
-    return bool(os.getenv("SMTP_HOST"))
+    return bool(os.getenv("RESEND_API_KEY") or os.getenv("SMTP_HOST"))
 
 
 def _format_berlin(dt: Optional[datetime]) -> str:
@@ -48,27 +50,49 @@ def _format_berlin(dt: Optional[datetime]) -> str:
     return local.strftime("%A, %B %d, %Y at %H:%M")
 
 
-def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] = None) -> bool:
-    """Send an email to ``to`` and return True on success, False otherwise."""
-    if not _is_configured():
-        logger.warning("SMTP not configured (SMTP_HOST env var missing); skipping email to %s", to)
-        return False
-    if not to:
-        logger.warning("Empty recipient; skipping email")
+def _send_via_resend(to: str, from_addr: str, subject: str, body_text: str, body_html: Optional[str]) -> bool:
+    """Send via Resend HTTP API. Returns True on success."""
+    api_key = os.environ["RESEND_API_KEY"]
+    payload = {
+        "from": from_addr,
+        "to": [to],
+        "subject": subject,
+        "text": body_text,
+    }
+    if body_html:
+        payload["html"] = body_html
+
+    req = urllib.request.Request(
+        url="https://api.resend.com/emails",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    print(f"[email] resend POST from={from_addr} to={to}", flush=True)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            status = resp.status
+            body = resp.read().decode("utf-8", errors="replace")
+        print(f"[email] resend status={status} body={body[:200]}", flush=True)
+        return 200 <= status < 300
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8", errors="replace") if e.fp else ""
+        logger.error("Resend HTTPError %s: %s", e.code, err_body)
+        print(f"[email] resend HTTPError {e.code}: {err_body[:300]}", flush=True)
         return False
 
+
+def _send_via_smtp(to: str, from_addr: str, subject: str, body_text: str, body_html: Optional[str]) -> bool:
+    """Send via SMTP (smtplib). Returns True on success."""
     host = os.environ["SMTP_HOST"]
     port = int(os.getenv("SMTP_PORT", "587"))
     user = os.getenv("SMTP_USER", "")
     password = os.getenv("SMTP_PASSWORD", "")
-    from_addr = os.getenv("SMTP_FROM", user or "no-reply@example.com")
     use_tls = os.getenv("SMTP_USE_TLS", "1") == "1"
     timeout = int(os.getenv("SMTP_TIMEOUT", "10"))
-
-    logger.info(
-        "Sending email host=%s port=%s use_tls=%s from=%s to=%s subject=%r",
-        host, port, use_tls, from_addr, to, subject,
-    )
 
     msg = EmailMessage()
     msg["From"] = from_addr
@@ -78,25 +102,69 @@ def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] =
     if body_html:
         msg.add_alternative(body_html, subtype="html")
 
+    print(
+        f"[email] smtp connecting host={host} port={port} use_tls={use_tls} from={from_addr} to={to}",
+        flush=True,
+    )
+    if use_tls:
+        with smtplib.SMTP(host, port, timeout=timeout) as smtp:
+            smtp.ehlo()
+            smtp.starttls(context=ssl.create_default_context())
+            smtp.ehlo()
+            if user:
+                smtp.login(user, password)
+            smtp.send_message(msg)
+    else:
+        with smtplib.SMTP_SSL(host, port, timeout=timeout, context=ssl.create_default_context()) as smtp:
+            if user:
+                smtp.login(user, password)
+            smtp.send_message(msg)
+    return True
+
+
+def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] = None) -> bool:
+    """Send an email to ``to`` and return True on success, False otherwise."""
+    use_resend = bool(os.getenv("RESEND_API_KEY"))
+    use_smtp = bool(os.getenv("SMTP_HOST"))
+    print(
+        f"[email] send_email start to={to!r} resend={use_resend} smtp={use_smtp}",
+        flush=True,
+    )
+    if not (use_resend or use_smtp):
+        logger.warning("Email not configured (no RESEND_API_KEY or SMTP_HOST); skipping email to %s", to)
+        print(f"[email] SKIPPED — neither RESEND_API_KEY nor SMTP_HOST is set", flush=True)
+        return False
+    if not to:
+        logger.warning("Empty recipient; skipping email")
+        print(f"[email] SKIPPED — empty recipient", flush=True)
+        return False
+
+    from_addr = (
+        os.getenv("RESEND_FROM")
+        or os.getenv("SMTP_FROM")
+        or os.getenv("SMTP_USER")
+        or "onboarding@resend.dev"
+    )
+
+    logger.info(
+        "Sending email backend=%s from=%s to=%s subject=%r",
+        "resend" if use_resend else "smtp", from_addr, to, subject,
+    )
+
     try:
-        if use_tls:
-            with smtplib.SMTP(host, port, timeout=timeout) as smtp:
-                smtp.ehlo()
-                smtp.starttls(context=ssl.create_default_context())
-                smtp.ehlo()
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
+        if use_resend:
+            ok = _send_via_resend(to, from_addr, subject, body_text, body_html)
         else:
-            # SSL on connect (typically port 465)
-            with smtplib.SMTP_SSL(host, port, timeout=timeout, context=ssl.create_default_context()) as smtp:
-                if user:
-                    smtp.login(user, password)
-                smtp.send_message(msg)
-        logger.info("Sent email to %s subject=%r", to, subject)
-        return True
+            ok = _send_via_smtp(to, from_addr, subject, body_text, body_html)
+        if ok:
+            logger.info("Sent email to %s subject=%r", to, subject)
+            print(f"[email] SENT to={to}", flush=True)
+        else:
+            print(f"[email] FAILED (see prior log) to={to}", flush=True)
+        return ok
     except Exception as e:  # noqa: BLE001 — best-effort, never raise
         logger.exception("Failed to send email to %s: %s", to, e)
+        print(f"[email] FAILED to={to} error={type(e).__name__}: {e}", flush=True)
         return False
 
 
