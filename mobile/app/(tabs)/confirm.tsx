@@ -1,4 +1,4 @@
-import { Key, useEffect, useState } from "react";
+import { Key, useCallback, useEffect, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -10,7 +10,7 @@ import {
   Platform,
   Linking
 } from 'react-native';
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
@@ -64,33 +64,50 @@ const ConfirmScreen: React.FC = () => {
   const [selectedAvailability, setSelectedAvailability] = useState();
   
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const dataServices = await CleanCarAPI.getServices();
-        const selectedServices = dataServices.filter((s: { id: any; }) => JSON.parse(services as string).includes(s.id))
-        const transformedSelectedServices = Transformations.transformServices(selectedServices || []);
-        setSelectedServices(transformedSelectedServices);
-        
-        const dataAvailability = await CleanCarAPI.getAvailability(JSON.parse(availability as string));
-        console.log("dataAvailability", dataAvailability)
-        setSelectedAvailability(dataAvailability);
-        // // Preselect all extras as false
-        // const extras = data.filter((s: { category: string; }) => s.category === 'Extra');
-        // setSelectedExtras(
-        //   Object.fromEntries(extras.map((e: { id: any; }) => [e.id, false]))
-        // );
-      } catch (error) {
-        console.error(`Error fetching services:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // Re-fetch on every focus and whenever the route params change, so the
+  // selected availability/services always reflect the CURRENT booking flow
+  // (not state cached from a previous order).
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      const fetchData = async () => {
+        setLoading(true);
+        // Clear stale state immediately to avoid using last order's slot.
+        setSelectedAvailability(undefined);
+        setSelectedServices([]);
+        try {
+          const dataServices = await CleanCarAPI.getServices();
+          if (cancelled) return;
+          const wantedIds = JSON.parse(services as string);
+          const selected = dataServices.filter((s: { id: any; }) => wantedIds.includes(s.id));
+          setSelectedServices(Transformations.transformServices(selected || []));
+
+          const dataAvailability = await CleanCarAPI.getAvailability(JSON.parse(availability as string));
+          if (cancelled) return;
+          console.log("dataAvailability", dataAvailability);
+          setSelectedAvailability(dataAvailability);
+        } catch (error) {
+          console.error(`Error fetching services:`, error);
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      };
+      fetchData();
+      return () => { cancelled = true; };
+    }, [availability, services])
+  );
   
   const confirm = async () => {
+    // Guard: don't submit until the latest availability has finished loading,
+    // and verify its id matches the URL param so we can't send a stale slot.
+    const expectedAvailabilityId = JSON.parse(availability as string);
+    if (!selectedAvailability || selectedAvailability.id !== expectedAvailabilityId) {
+      console.warn("Refusing to confirm: availability not ready or mismatched", {
+        expectedAvailabilityId,
+        loaded: selectedAvailability,
+      });
+      return;
+    }
     const email = (await Device.getEmail()) || undefined;
     const order =  await CleanCarAPI.createOrder(
       {
@@ -99,7 +116,7 @@ const ConfirmScreen: React.FC = () => {
         plate_number: plateNumber,
         phone_number: phoneNumber,
         location: JSON.parse(location as string),
-        availability_id: selectedAvailability?.id,
+        availability_id: selectedAvailability.id,
         service_ids: JSON.parse(services as string),
         email,
       }
