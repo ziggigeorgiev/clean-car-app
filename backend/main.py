@@ -1,4 +1,6 @@
 import logging
+import os
+import secrets
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -6,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload, selectinload
 from typing import List, Dict, Optional
@@ -46,6 +49,34 @@ def _format_when(value) -> str:
 
 
 templates.env.globals["format_when"] = _format_when
+
+
+# --- Cleaner auth (HTTP Basic) ------------------------------------------------
+# Credentials come from env vars so they're not committed to git:
+#   CLEANER_USERNAME, CLEANER_PASSWORD
+# If either is unset, the cleaner pages return 503 with a clear message rather
+# than being accessible without auth.
+_basic_auth = HTTPBasic()
+
+
+def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth)) -> str:
+    expected_user = os.getenv("CLEANER_USERNAME")
+    expected_pass = os.getenv("CLEANER_PASSWORD")
+    if not expected_user or not expected_pass:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Cleaner area is not configured. Set CLEANER_USERNAME and CLEANER_PASSWORD.",
+        )
+    # constant-time comparison to avoid timing attacks
+    user_ok = secrets.compare_digest(credentials.username.encode("utf-8"), expected_user.encode("utf-8"))
+    pass_ok = secrets.compare_digest(credentials.password.encode("utf-8"), expected_pass.encode("utf-8"))
+    if not (user_ok and pass_ok):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": 'Basic realm="CleanCar cleaner"'},
+        )
+    return credentials.username
 
 # Create database tables on startup (for development/testing)
 # For production, use Alembic for migrations
@@ -92,10 +123,10 @@ async def web_cancellation(request: Request):
 # ---------------------------------------------------------------------------
 # Web UI: cleaner dashboard
 # ---------------------------------------------------------------------------
-def _load_order_for_cleaner(db: Session, order_id: int) -> Optional[models.Order]:
+def _load_order_for_cleaner(db: Session, order_uuid: str) -> Optional[models.Order]:
     return (
         db.query(models.Order)
-        .filter(models.Order.id == order_id)
+        .filter(models.Order.uuid == order_uuid)
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
@@ -107,12 +138,16 @@ def _load_order_for_cleaner(db: Session, order_id: int) -> Optional[models.Order
 
 
 @app.get("/cleaner", response_class=HTMLResponse)
-async def cleaner_index():
+async def cleaner_index(_user: str = Depends(require_cleaner_auth)):
     return RedirectResponse(url="/cleaner/orders")
 
 
 @app.get("/cleaner/orders", response_class=HTMLResponse)
-async def cleaner_orders(request: Request, db: Session = Depends(get_db)):
+async def cleaner_orders(
+    request: Request,
+    db: Session = Depends(get_db),
+    _user: str = Depends(require_cleaner_auth),
+):
     orders = (
         db.query(models.Order)
         .filter(models.Order.status == models.OrderStatusEnum.OPEN)
@@ -129,15 +164,16 @@ async def cleaner_orders(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@app.get("/cleaner/orders/{order_id}", response_class=HTMLResponse)
+@app.get("/cleaner/orders/{order_uuid}", response_class=HTMLResponse)
 async def cleaner_order_detail(
     request: Request,
-    order_id: int,
+    order_uuid: str,
     ok: Optional[str] = None,
     err: Optional[str] = None,
     db: Session = Depends(get_db),
+    _user: str = Depends(require_cleaner_auth),
 ):
-    order = _load_order_for_cleaner(db, order_id)
+    order = _load_order_for_cleaner(db, order_uuid)
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     flash = None
@@ -151,24 +187,29 @@ async def cleaner_order_detail(
     )
 
 
-@app.post("/cleaner/orders/{order_id}/steps/{step_id}/status/{new_status}")
+@app.post("/cleaner/orders/{order_uuid}/steps/{step_id}/status/{new_status}")
 async def cleaner_update_step(
-    order_id: int,
+    order_uuid: str,
     step_id: int,
     new_status: schemas.ProcessStepStatusEnum,
     db: Session = Depends(get_db),
+    _user: str = Depends(require_cleaner_auth),
 ):
-    # Validate the step actually belongs to this order so URLs can't be forged
-    # to update steps from someone else's booking.
+    # Resolve the order via its uuid, then check the step belongs to it. This
+    # prevents URLs from being forged to update steps from someone else's order.
+    order = db.query(models.Order).filter(models.Order.uuid == order_uuid).first()
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+
     step = db.query(models.ProcessStep).filter(models.ProcessStep.id == step_id).first()
-    if step is None or step.order_id != order_id:
+    if step is None or step.order_id != order.id:
         return RedirectResponse(
-            url=f"/cleaner/orders/{order_id}?err=Step+not+found+on+this+order",
+            url=f"/cleaner/orders/{order_uuid}?err=Step+not+found+on+this+order",
             status_code=303,
         )
     crud.update_process_step_status(db=db, step_id=step_id, new_status=new_status)
     return RedirectResponse(
-        url=f"/cleaner/orders/{order_id}?ok=Step+'{step.name}'+updated+to+{new_status.value}",
+        url=f"/cleaner/orders/{order_uuid}?ok=Step+'{step.name}'+updated+to+{new_status.value}",
         status_code=303,
     )
 

@@ -153,7 +153,7 @@ const ConfirmScreen: React.FC = () => {
         <View style={styles.policyLinksContainer}>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://example.com/terms')}
+            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}
           >
             <Text style={styles.policyLinkText}>Terms & Conditions</Text>
             <Text style={styles.policyArrow}>›</Text>
@@ -161,7 +161,7 @@ const ConfirmScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://example.com/privacy')}
+            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/privacy')}
           >
             <Text style={styles.policyLinkText}>Privacy Policy</Text>
             <Text style={styles.policyArrow}>›</Text>
@@ -169,7 +169,7 @@ const ConfirmScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://example.com/cancellation')}
+            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/cancellation')}
           >
             <Text style={styles.policyLinkText}>Cancellation Policy</Text>
             <Text style={styles.policyArrow}>›</Text>

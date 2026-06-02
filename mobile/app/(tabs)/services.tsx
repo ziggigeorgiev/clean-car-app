@@ -229,7 +229,7 @@ const ServicesScreen = () => {
 
           {/* Terms Text */}
           <Text style={styles.termsText}>
-            By placing order you agree to our <Text style={styles.linkText} onPress={() => Linking.openURL('https://example.com/terms')}>Terms</Text>
+            By placing order you agree to our <Text style={styles.linkText} onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}>Terms</Text>
           </Text>
         </ScrollView>
 

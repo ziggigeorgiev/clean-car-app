@@ -1,4 +1,5 @@
 # app/models.py
+import uuid as _uuid
 from datetime import date, datetime
 from typing import List, Optional
 
@@ -9,6 +10,11 @@ from .database import Base # Ensure this import is correct
 
 # Enums can be useful for predefined choices, like currency
 import enum
+
+
+def _generate_uuid() -> str:
+    """Random UUIDv4 used as the public, non-enumerable identifier for orders."""
+    return str(_uuid.uuid4())
 
 class CurrencyEnum(enum.Enum):
     EUR = "EUR"
@@ -119,7 +125,11 @@ class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    
+    # Public, non-enumerable identifier used in URLs (e.g. /cleaner/orders/{uuid}).
+    uuid: Mapped[str] = mapped_column(
+        String(36), unique=True, index=True, nullable=False, default=_generate_uuid
+    )
+
     phone_identifier: Mapped[str] = mapped_column(String, index=True, nullable=False)
     plate_number: Mapped[str] = mapped_column(String, nullable=False)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)

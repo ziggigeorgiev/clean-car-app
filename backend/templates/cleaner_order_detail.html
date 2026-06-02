@@ -41,12 +41,12 @@
           </div>
           <div class="step-actions">
             {% if step.status != 'in_progress' and step.status != 'completed' %}
-              <form class="inline" method="post" action="/cleaner/orders/{{ order.id }}/steps/{{ step.id }}/status/in_progress">
+              <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/steps/{{ step.id }}/status/in_progress">
                 <button class="btn secondary" type="submit">Start</button>
               </form>
             {% endif %}
             {% if step.status != 'completed' %}
-              <form class="inline" method="post" action="/cleaner/orders/{{ order.id }}/steps/{{ step.id }}/status/completed">
+              <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/steps/{{ step.id }}/status/completed">
                 <button class="btn" type="submit">Mark complete</button>
               </form>
             {% else %}
