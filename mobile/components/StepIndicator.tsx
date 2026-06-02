@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import Feather from 'react-native-vector-icons/Feather';
 import BackIcon from '../assets/images/icons/bc-arrow-left.svg';
 import { router } from 'expo-router';
+import { useTranslation } from '@/services/i18n';
 
 interface StepIndicatorProps {
   title: string;
@@ -29,6 +30,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
   dotSize = 8,
   spacing = 5,
 }) => {
+  const { t } = useTranslation();
   const dots = Array.from({ length: totalSteps }).map((_, index) => (
     <View
       key={index}
@@ -53,13 +55,13 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
         {!!backRoute && (<TouchableOpacity onPress={() => router.push({ pathname: backRoute, params: backParams})} style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* <BackIcon width={20} height={20} fill={COLORS.text} /> */}
           <Feather name="arrow-left" size={16} color={COLORS.textLight} />
-          <Text style={styles.back}>Back</Text>
+          <Text style={styles.back}>{t('btn.back')}</Text>
         </TouchableOpacity>)}
         {!backRoute && (<View style={{ flex: 1 }} />)}
         {/* </View> */}
         {totalSteps > 0 && (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {dots}
-          <Text style={styles.stepText}>Step {currentStep} of {totalSteps}</Text>
+          <Text style={styles.stepText}>{t('step.of', { current: currentStep, total: totalSteps })}</Text>
         </View>)}
       </View>
       

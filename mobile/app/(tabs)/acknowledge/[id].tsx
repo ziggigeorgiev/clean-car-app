@@ -8,12 +8,13 @@ import StepIndocator from '@/components/StepIndicator';
 import * as Calendar from 'expo-calendar';
 import { CleanCarAPI } from '@/services/CleanCarApi';
 import { Device } from '@/services/Device';
+import { useTranslation } from '@/services/i18n';
 
 // Duration of a single booking slot (minutes). Keep in sync with backend bulk_create_for_day step_minutes.
 const BOOKING_DURATION_MINUTES = 90;
 
 const AcknowledgeScreen = () => {
-
+  const { t } = useTranslation();
 
   const { id: orderIdParam } = useLocalSearchParams();
   const orderId = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
@@ -79,11 +80,11 @@ const AcknowledgeScreen = () => {
     }
   };
 
-  if (loading) return <LoadingSpinner message="Loading booking confirmation" />;
+  if (loading) return <LoadingSpinner message={t('loading.booking_confirmation')} />;
 
   return (
     <View style={styles.container}>
-        <StepIndocator title={"Booking confirmation"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+        <StepIndocator title={t('screen.acknowledge')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
 
           <View style={[ styles.sectionContainer, styles.center ]}>
@@ -92,8 +93,8 @@ const AcknowledgeScreen = () => {
                 <Text style={styles.checkmarkIcon}>✓</Text>
               </View>
             </View>
-            <View style={[ styles.center, {marginBottom: 10} ]}><Text style={styles.confirm}>Booking confirmed!</Text></View>
-            <View style={[ styles.center, {marginBottom: 0} ]}><Text style={styles.info}>Your car cleaning service is scheduled</Text></View>
+            <View style={[ styles.center, {marginBottom: 10} ]}><Text style={styles.confirm}>{t('ack.confirmed')}</Text></View>
+            <View style={[ styles.center, {marginBottom: 0} ]}><Text style={styles.info}>{t('ack.scheduled')}</Text></View>
           </View>
         </ScrollView>
 
@@ -103,8 +104,7 @@ const AcknowledgeScreen = () => {
             onPress={() => { router.push(`/order/${orderId}`) }}
           >
             <Text style={styles.buttonText}>
-              {/* Place Order • ${totalAmount} */}
-              View Booking Details
+              {t('btn.view_booking_details')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -115,15 +115,14 @@ const AcknowledgeScreen = () => {
             onPress={createCalendarEvent}
           >
             <Text style={[styles.buttonText, {color: COLORS.primary}]}>
-              {/* Place Order • ${totalAmount} */}
-              Add to Calendar
+              {t('btn.add_to_calendar')}
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={[ styles.center, {marginBottom: 20, marginTop: 20, flexDirection: 'row' } ]}>
             <MaterialCommunityIcons name="phone" size={20} color={COLORS.textLight} style={{marginHorizontal: 5}} />
-            <Text style={styles.info}>Need help? Call us at 1-800-CLEEN</Text>
+            <Text style={styles.info}>{t('ack.help')}</Text>
         </View>
     </View>
   );

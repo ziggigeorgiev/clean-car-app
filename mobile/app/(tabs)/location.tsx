@@ -27,6 +27,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; 
 
 import StepIndocator from '../../components/StepIndicator'; // Adjust path
 import { COLORS } from '@/constants/colors';
+import { useTranslation } from '@/services/i18n';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -38,6 +39,7 @@ interface SelectLocationScreenProps {
 }
 
 const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
+  const { t } = useTranslation();
   const [address, setAddress] = useState<string>('');
   const [isMoving, setIsMoving] = useState(false);
 
@@ -225,7 +227,7 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
   return (      
     <View style={styles.safeArea}>
         {/* Header */}
-        <StepIndocator title={"Select location"} backRoute={""} backParams={{}} totalSteps={3} currentStep={1} />
+        <StepIndocator title={t('screen.location')} backRoute={""} backParams={{}} totalSteps={3} currentStep={1} />
         
         {/* Map Section */}
         <View style={styles.mapContainer}>
@@ -336,7 +338,7 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
 
           {/* Confirm Location Button */}
           <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
-            <Text style={styles.confirmButtonText}>Confirm Location</Text>
+            <Text style={styles.confirmButtonText}>{t('btn.confirm_location')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

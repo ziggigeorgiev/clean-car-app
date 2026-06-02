@@ -272,12 +272,27 @@ def create_service(db: Session, service: schemas.ServiceCreate) -> models.Servic
 def update_order_status(db: Session, order_id: int, new_status: schemas.OrderStatusEnum) -> Optional[models.Order]:
     """
     Flip the top-level status of an order (open/completed/cancelled).
+    When the new status is COMPLETED, every non-completed process step on the
+    order is also marked completed so the UI stays consistent.
     Returns the updated order, or None if not found.
     """
     db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if db_order is None:
         return None
+
     db_order.status = new_status
+
+    # Mark every step completed when the order is being completed.
+    if new_status == schemas.OrderStatusEnum.COMPLETED:
+        steps = (
+            db.query(models.ProcessStep)
+            .filter(models.ProcessStep.order_id == order_id)
+            .all()
+        )
+        for step in steps:
+            if getattr(step.status, "value", step.status) != "completed":
+                step.status = models.ProcessStepStatusEnum.COMPLETED
+
     db.commit()
     db.refresh(db_order)
     return db_order

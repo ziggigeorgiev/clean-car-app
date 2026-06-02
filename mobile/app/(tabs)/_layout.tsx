@@ -6,6 +6,7 @@ import { View, TouchableOpacity, StyleSheet, Image, Text } from 'react-native';
 import SafeScreen from "@/components/SafeScreen";
 
 import { COLORS } from "../../constants/colors";
+import { useTranslation } from "@/services/i18n";
 
 
 // const CustomMenuIcon = ({ focused, color, size }) => (
@@ -24,6 +25,7 @@ import LogoIcon from '../../assets/images/icons/bc-logo-simple.svg';
 
 
 const TabsLayout = () => {
+  const { t } = useTranslation();
   // This layout is used for the main tabs of the app
   return (
     // <SafeScreen>
@@ -45,12 +47,12 @@ const TabsLayout = () => {
           name="home"
           options={{
             tabBarLabel: ({ focused, color }) => (
-              <Text style={{ 
-                color, 
-                fontWeight: focused ? '600' : '400', 
-                fontSize: 12 
+              <Text style={{
+                color,
+                fontWeight: focused ? '600' : '400',
+                fontSize: 12
               }}>
-                Home
+                {t('tab.home')}
               </Text>
             ),
             tabBarIcon: ({ focused, color, size }) => <HouseIcon width={size} height={size} fill={color} />
@@ -61,12 +63,12 @@ const TabsLayout = () => {
           name="list-orders"
           options={{
             tabBarLabel: ({ focused, color }) => (
-              <Text style={{ 
-                color, 
-                fontWeight: focused ? '600' : '400', 
-                fontSize: 12 
+              <Text style={{
+                color,
+                fontWeight: focused ? '600' : '400',
+                fontSize: 12
               }}>
-                Orders
+                {t('tab.orders')}
               </Text>
             ),
             tabBarIcon: ({ focused, color, size }) => <FlyerIcon width={size} height={size} fill={color} />
@@ -103,12 +105,12 @@ const TabsLayout = () => {
           name="about"
           options={{
             tabBarLabel: ({ focused, color }) => (
-              <Text style={{ 
-                color, 
-                fontWeight: focused ? '600' : '400', 
-                fontSize: 12 
+              <Text style={{
+                color,
+                fontWeight: focused ? '600' : '400',
+                fontSize: 12
               }}>
-                About
+                {t('tab.about')}
               </Text>
             ),
             // tabBarIcon: ({ focused, color, size }) => <LogoIcon width={50} height={50} stroke={color} fill={color} color={color}/>
@@ -120,12 +122,12 @@ const TabsLayout = () => {
           name="settings"
           options={{
             tabBarLabel: ({ focused, color }) => (
-              <Text style={{ 
-                color, 
-                fontWeight: focused ? '600' : '400', 
-                fontSize: 12 
+              <Text style={{
+                color,
+                fontWeight: focused ? '600' : '400',
+                fontSize: 12
               }}>
-                Settings
+                {t('tab.settings')}
               </Text>
             ),
             tabBarIcon: ({ focused, color, size }) => <UserIcon width={size} height={size} fill={color} />

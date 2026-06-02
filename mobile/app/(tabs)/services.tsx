@@ -21,6 +21,7 @@ import ServiceDetailsList from '../../components/ServiceDetailsList';
 import { Transformations } from "../../services/Transformations";
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import Price from '../../components/Price';
+import { useTranslation } from '../../services/i18n';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
@@ -38,6 +39,7 @@ type Service = {
 };
 
 const ServicesScreen = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const [plateNumber, setPlateNumber] = useState('');
@@ -50,8 +52,8 @@ const ServicesScreen = () => {
   // Validation
   const plateNumberTrimmed = plateNumber.trim();
   const phoneNumberTrimmed = phoneNumber.trim();
-  const plateError = plateNumberTrimmed.length < 2 ? 'Registration number is required' : '';
-  const phoneError = !/^\+?[0-9 \-()]{7,}$/.test(phoneNumberTrimmed) ? 'Valid phone number is required' : '';
+  const plateError = plateNumberTrimmed.length < 2 ? t('services.error_plate') : '';
+  const phoneError = !/^\+?[0-9 \-()]{7,}$/.test(phoneNumberTrimmed) ? t('services.error_phone') : '';
   const isFormValid = !plateError && !phoneError;
 
   const { location, availability} = useLocalSearchParams();
@@ -146,7 +148,7 @@ const ServicesScreen = () => {
     });
   };
 
-  if (loading) return <LoadingSpinner message="Loading device and personal information..." />;
+  if (loading) return <LoadingSpinner message={t('loading.device_info')} />;
 
   return (
     <View style={styles.container}>
@@ -154,17 +156,17 @@ const ServicesScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <StepIndocator title={"Select services"} backRoute={"/availability"} backParams={{location: location}} totalSteps={3} currentStep={3} />
+        <StepIndocator title={t('screen.services')} backRoute={"/availability"} backParams={{location: location}} totalSteps={3} currentStep={3} />
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
 
           {/* Vehicle Details Section */}
           <View style={styles.sectionContainer}>
-            <Text style={[styles.sectionTitle, {marginTop: 20}]}>Vehicle Details</Text>
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('services.vehicle_details')}</Text>
             <View style={[styles.inputContainer, showErrors && plateError ? styles.inputContainerError : null]}>
               <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Registration Number"
+                placeholder={t('services.registration_number')}
                 placeholderTextColor="#8e8e93"
                 value={plateNumber}
                 onChangeText={setPlateNumber}
@@ -176,7 +178,7 @@ const ServicesScreen = () => {
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Phone Number"
+                placeholder={t('services.phone_number')}
                 placeholderTextColor="#8e8e93"
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
@@ -188,7 +190,7 @@ const ServicesScreen = () => {
 
           {/* Additional Services Section */}
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Additional Services</Text>
+            <Text style={styles.sectionTitle}>{t('services.additional')}</Text>
             {extraServices.map(service => (
               <TouchableOpacity
                 key={service.id}
@@ -214,7 +216,7 @@ const ServicesScreen = () => {
           {/* Service Details Section */}
           <ServiceDetailsList
             services={Transformations.transformServices(totalSelectedServices())}
-            sectionTitle="Services Provided" // Optional: customize the title
+            sectionTitle={t('services.provided')}
           />
 
           {/* Payment Method Icons */}
@@ -226,7 +228,7 @@ const ServicesScreen = () => {
 
           {/* Terms Text */}
           <Text style={styles.termsText}>
-            By placing order you agree to our <Text style={styles.linkText} onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}>Terms</Text>
+            {t('services.terms_prefix')}<Text style={styles.linkText} onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}>{t('services.terms_link')}</Text>
           </Text>
         </ScrollView>
 
@@ -239,8 +241,7 @@ const ServicesScreen = () => {
             activeOpacity={isFormValid ? 0.7 : 1}
           >
             <Text style={styles.placeOrderButtonText}>
-              {/* Place Order • ${totalAmount} */}
-              Place Order
+              {t('btn.place_order')}
             </Text>
           </TouchableOpacity>
         </View>

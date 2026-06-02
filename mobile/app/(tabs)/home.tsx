@@ -4,17 +4,19 @@ import { FontAwesome5, MaterialCommunityIcons, AntDesign, Feather } from '@expo/
 import MunichCard from '@/components/MunichCard';
 import { COLORS } from '@/constants/colors';
 import ServiceCard from '@/components/ServiceCard';
+import { useTranslation } from '@/services/i18n';
 
 const HomeScreen = () => {
+  const { t } = useTranslation();
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         {/* <FontAwesome5 name="car-wash" size={24} color="#007AFF" /> */}
-        <Text style={styles.headerTitle}>CleanCar Pro</Text>
+        <Text style={styles.headerTitle}>{t('home.title')}</Text>
       </View>
-      <Text style={styles.headerSubtitle}>Professionelle Autoreinigung vor Ort</Text>
-  
+      <Text style={styles.headerSubtitle}>{t('home.subtitle')}</Text>
+
       <MunichCard />
 
       {/* Hero Image */}
@@ -35,55 +37,53 @@ const HomeScreen = () => {
       </View> */}
 
       {/* Premium Car Care Services */}
-      <Text style={styles.sectionTitle}>Premium Car Care Services</Text>
-      <Text style={styles.sectionDescription}>
-        Professionelle Reinigung für Ihr Fahrzeug von erfahrenen Expertin in Ihren Zuhause oder im Büro
-      </Text>
+      <Text style={styles.sectionTitle}>{t('home.premium_title')}</Text>
+      <Text style={styles.sectionDescription}>{t('home.premium_desc')}</Text>
 
       {/* Service Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.serviceCardsContainer}>
         <ServiceCard
           iconName="water"
-          title="Exterior Wash"
-          description="Complete exterior cleaning solution"
-          includeText="Im Standardpaket enthalten"
+          title={t('home.exterior_title')}
+          description={t('home.exterior_desc')}
+          includeText={t('home.included')}
           includeIcon="checkcircleo"
           colors={['#3B82F6', '#22D3EE']}
         />
         <ServiceCard
           iconName="car-seat"
-          title="Interior Clean"
-          description="Deep cleaning and sanitization"
-          includeText="Zusätzlich buchbar"
+          title={t('home.interior_title')}
+          description={t('home.interior_desc')}
+          includeText={t('home.bookable')}
           includeIcon="pluscircleo"
           colors={['#A855F7', '#F472B6']}
         />
       </ScrollView>
 
-      {/* Unsere Vorteile (Our Advantages) */}
-      <Text style={styles.sectionTitle}>Unsere Vorteile</Text>
+      {/* Advantages */}
+      <Text style={styles.sectionTitle}>{t('home.advantages')}</Text>
 
       <View style={styles.advantageItem}>
         <Feather name="tool" size={20} color="#007AFF" />
         <View style={styles.advantageTextContainer}>
-          <Text style={styles.advantageTitle}>Professionelles Equipment</Text>
-          <Text style={styles.advantageDescription}>Modernste Reinigungsgeräte und Technologien</Text>
+          <Text style={styles.advantageTitle}>{t('home.equipment_title')}</Text>
+          <Text style={styles.advantageDescription}>{t('home.equipment_desc')}</Text>
         </View>
       </View>
 
       <View style={styles.advantageItem}>
         <Feather name="star" size={20} color="#007AFF" />
         <View style={styles.advantageTextContainer}>
-          <Text style={styles.advantageTitle}>Erfahrene Spezialisten</Text>
-          <Text style={styles.advantageDescription}>Ausgebildete Reinigungsprofis mit Expertise</Text>
+          <Text style={styles.advantageTitle}>{t('home.specialists_title')}</Text>
+          <Text style={styles.advantageDescription}>{t('home.specialists_desc')}</Text>
         </View>
       </View>
 
       <View style={styles.advantageItem}>
         <Feather name="shield" size={20} color="#007AFF" />
         <View style={styles.advantageTextContainer}>
-          <Text style={styles.advantageTitle}>Umweltfreundlich</Text>
-          <Text style={styles.advantageDescription}>Nachhaltige und schonende Reinigungsmittel</Text>
+          <Text style={styles.advantageTitle}>{t('home.eco_title')}</Text>
+          <Text style={styles.advantageDescription}>{t('home.eco_desc')}</Text>
         </View>
       </View>
 

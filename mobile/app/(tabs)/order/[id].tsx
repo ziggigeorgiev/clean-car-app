@@ -26,6 +26,7 @@ import AvailabilityDetails from "@/components/AvailabilityDetails";
 import ProgressDetails from "@/components/ProgressDetails";
 import Details from "@/components/Details";
 import StepIndocator from "@/components/StepIndicator";
+import { useTranslation } from "@/services/i18n";
 
 interface ServiceItem {
   name: string;
@@ -57,6 +58,7 @@ interface Order {
 }
 
 const OrderDetailScreen: React.FC = () => {
+  const { t } = useTranslation();
 
   const { id: orderIdParam } = useLocalSearchParams();
   const orderId = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
@@ -108,7 +110,7 @@ const OrderDetailScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  const expectations: string = "The cleaner arrives at the scheduled time, with an average cleaning duration of 25 minutes. A quality inspection is performed after cleaning, and payment is processed upon service completion.";
+  const expectations: string = t('section.expectations');
 
   const renderServiceItem = ({ name, price, type }: ServiceItem) => (
     <View key={name} style={styles.serviceItem}>
@@ -125,11 +127,11 @@ const OrderDetailScreen: React.FC = () => {
   );
 
 
-  if (loading && !refreshing) return <LoadingSpinner message="Loading order details..." />;
-  
+  if (loading && !refreshing) return <LoadingSpinner message={t('loading.order_details')} />;
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StepIndocator title={"Order details"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+      <StepIndocator title={t('screen.order_details')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -145,25 +147,25 @@ const OrderDetailScreen: React.FC = () => {
 
         <AvailabilityDetails
           time={order?.availability?.time ?? ""}
-          sectionTitle="Availability"
+          sectionTitle={t('section.availability')}
         />
         <ContactDetails
           phoneNumber={order?.phone_number ?? ""}
           plateNumber={order?.plate_number ?? ""}
-          sectionTitle="Contact info"
+          sectionTitle={t('section.contact_info')}
         />
 
         <AddressDetails
           address={order?.location?.address ?? ""}
           latitude={order?.location?.latitude ?? 0}
           longitude={order?.location?.longitude ?? 0}
-          sectionTitle="Location"
+          sectionTitle={t('section.location')}
         />
         {/* Service Details Section */}
         {/* <View style={styles.delimiter} /> */}
         <ServiceDetailsList
           services={services}
-          sectionTitle="Selected services" // Optional: customize the title
+          sectionTitle={t('services.selected')}
         />
 
         {/* Cleaning Process Section */}
@@ -182,8 +184,8 @@ const OrderDetailScreen: React.FC = () => {
           ))}
         </View> */}
         <Details
-          text={expectations} 
-          sectionTitle="What to expect?"
+          text={expectations}
+          sectionTitle={t('section.what_to_expect')}
         />
 
         {/* Policy Links Section */}
@@ -192,7 +194,7 @@ const OrderDetailScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}
           >
-            <Text style={styles.policyLinkText}>Terms & Conditions</Text>
+            <Text style={styles.policyLinkText}>{t('policy.terms')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
@@ -200,7 +202,7 @@ const OrderDetailScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/privacy')}
           >
-            <Text style={styles.policyLinkText}>Privacy Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.privacy')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
@@ -208,7 +210,7 @@ const OrderDetailScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/cancellation')}
           >
-            <Text style={styles.policyLinkText}>Cancellation Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.cancellation')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>

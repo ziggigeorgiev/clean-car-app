@@ -24,6 +24,7 @@ import ContactDetails from "@/components/ContactDetails";
 import AddressDetails from "@/components/AddressDetails";
 import AvailabilityDetails from "@/components/AvailabilityDetails";
 import StepIndocator from '../../components/StepIndicator';
+import { useTranslation } from '../../services/i18n';
 
 type Service = {
   id: number;
@@ -37,6 +38,7 @@ type Service = {
 };
 
 const ConfirmScreen: React.FC = () => {
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   
@@ -128,12 +130,12 @@ const ConfirmScreen: React.FC = () => {
     router.push(`/acknowledge/${order?.id}`);
   };
 
-  if (loading) return <LoadingSpinner message="Loading order details..." />;
+  if (loading) return <LoadingSpinner message={t('loading.order_details')} />;
   
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StepIndocator title={"Confirm booking"} backRoute={"/services"} backParams={{ 
-        location: location, 
+      <StepIndocator title={t('screen.confirm')} backRoute={"/services"} backParams={{
+        location: location,
         availability: availability
       }} totalSteps={0} currentStep={0} />
       <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
@@ -143,27 +145,27 @@ const ConfirmScreen: React.FC = () => {
 
         <AvailabilityDetails
           time={selectedAvailability?.time}
-          sectionTitle="Availability"
+          sectionTitle={t('section.availability')}
         />
 
         <ContactDetails
           phoneNumber={phoneNumber}
           plateNumber={plateNumber}
-          sectionTitle="Contact info"
+          sectionTitle={t('section.contact_info')}
         />
 
         <AddressDetails
           address={JSON.parse(location as string)?.address ?? ""}
           latitude={JSON.parse(location as string)?.latitude ?? 0}
           longitude={JSON.parse(location as string)?.longitude ?? 0}
-          sectionTitle="Location"
+          sectionTitle={t('section.location')}
         />
 
         {/* Service Details Section */}
         {/* <View style={styles.delimiter} /> */}
         <ServiceDetailsList
           services={selectedServices}
-          sectionTitle="Selected services" // Optional: customize the title
+          sectionTitle={t('services.selected')}
         />
 
         {/* Policy Links Section */}
@@ -172,7 +174,7 @@ const ConfirmScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}
           >
-            <Text style={styles.policyLinkText}>Terms & Conditions</Text>
+            <Text style={styles.policyLinkText}>{t('policy.terms')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
@@ -180,7 +182,7 @@ const ConfirmScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/privacy')}
           >
-            <Text style={styles.policyLinkText}>Privacy Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.privacy')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
@@ -188,7 +190,7 @@ const ConfirmScreen: React.FC = () => {
             style={styles.policyLink}
             onPress={() => Linking.openURL('https://clean-car-app.onrender.com/cancellation')}
           >
-            <Text style={styles.policyLinkText}>Cancellation Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.cancellation')}</Text>
             <Text style={styles.policyArrow}>›</Text>
             {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
@@ -199,7 +201,7 @@ const ConfirmScreen: React.FC = () => {
           style={styles.placeOrderButton}
           onPress={confirm}
         >
-          <Text style={styles.placeOrderButtonText}>Confirm</Text>
+          <Text style={styles.placeOrderButtonText}>{t('btn.confirm')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

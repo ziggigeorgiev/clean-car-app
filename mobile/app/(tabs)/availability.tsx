@@ -23,11 +23,13 @@ import {
 } from "../../services/DateFormat";
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
+import { useTranslation } from "../../services/i18n";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 const { width, height } = Dimensions.get('window');
 
 const AvailabilityScreen = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [availabilities, setAvailabilities] = useState<{ [date: string]: any[] }>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -89,7 +91,7 @@ const AvailabilityScreen = () => {
   const handleConfirmAvailability = () => {
     console.log("handleConfirmAvailability")
     if (!selectedAvailability) {
-      alert('Please select an available time.');
+      alert(t('avail.required'));
       return;
     }
 
@@ -106,20 +108,20 @@ const AvailabilityScreen = () => {
     });
   };
 
-  if (loading) return <LoadingSpinner message="Loading..." />;
+  if (loading) return <LoadingSpinner message={t('loading.generic')} />;
 
   // Prepare date pills from API keys
   const dateKeys = Object.keys(availabilities).sort();
 
   return (
     <View style={styles.container}>
-      <StepIndocator title={"Select availability"} backRoute={"/location"} backParams={{}} totalSteps={3} currentStep={2} />
+      <StepIndocator title={t('screen.availability')} backRoute={"/location"} backParams={{}} totalSteps={3} currentStep={2} />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {/* Header Section */}
-        
+
 
         {/* Select Date Section */}
-        <Text style={[styles.sectionTitle, {marginBottom: 10, marginTop: 20}]}>Select Date</Text>
+        <Text style={[styles.sectionTitle, {marginBottom: 10, marginTop: 20}]}>{t('avail.date')}</Text>
         <ScrollView style={styles.datePickerContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
           {dateKeys.map((dateKey, index) => {
             const dateObj = parseISO(dateKey);
@@ -165,7 +167,7 @@ const AvailabilityScreen = () => {
         </ScrollView>
 
         {/* Available Times Section */}
-        <Text style={[styles.sectionTitle, {marginBottom: 10}]}>Available Times</Text>
+        <Text style={[styles.sectionTitle, {marginBottom: 10}]}>{t('avail.times')}</Text>
         <View style={styles.timeSlotsContainer}>
           {selectedDate && availabilities[selectedDate]?.length > 0 ? (
             availabilities[selectedDate].map((availability: any) => {
@@ -193,19 +195,19 @@ const AvailabilityScreen = () => {
             })
           ) : (
             <Text style={{ color: '#888', fontStyle: 'italic' }}>
-              No available times for this date.
+              {t('empty.no_times')}
             </Text>
           )}
         </View>
 
         {/* Recent Availability Section */}
-        <Text style={styles.sectionTitle}>Recent Availability</Text>
+        <Text style={styles.sectionTitle}>{t('avail.recent')}</Text>
         <View style={styles.recentAvailabilityItem}>
           <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.recentAvailabilityIcon} />
           <Text style={styles.recentAvailabilityText}>
             {selectedAvailability
               ? formatLongDateTime12h(selectedAvailability.time)
-              : 'No recent availability selected.'}
+              : t('avail.none_selected')}
           </Text>
         </View>
       </ScrollView>
@@ -217,7 +219,7 @@ const AvailabilityScreen = () => {
           onPress={handleConfirmAvailability}
           disabled={!selectedAvailability}
         >
-          <Text style={styles.confirmButtonText}>Confirm Availability</Text>
+          <Text style={styles.confirmButtonText}>{t('btn.confirm_availability')}</Text>
         </TouchableOpacity>
       </View>
     </View>

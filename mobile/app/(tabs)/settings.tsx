@@ -14,6 +14,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { Device } from '../../services/Device';
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
+import { useTranslation, Locale } from '../../services/i18n';
 
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
@@ -32,6 +33,7 @@ type Service = {
 };
 
 const SettingsScreen = () => {
+  const { t, locale, setLocale } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -86,7 +88,7 @@ const SettingsScreen = () => {
     setSaved(true);
   };
   
-  if (loading) return <LoadingSpinner message="Loading device and personal information..." />;
+  if (loading) return <LoadingSpinner message={t('loading.device_info')} />;
 
   return (
     <View style={styles.container}>
@@ -94,27 +96,48 @@ const SettingsScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <StepIndocator title={"Settings"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+        <StepIndocator title={t('screen.settings')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
 
-          {saved && (<View style={styles.saved}><Text style={styles.savedText}>The modifications were saved successfully.</Text></View>)}
+          {saved && (<View style={styles.saved}><Text style={styles.savedText}>{t('settings.saved')}</Text></View>)}
 
           <View style={styles.sectionContainer}>
-            <Text style={[styles.sectionTitle, {marginTop: 20}]}>Device information</Text>
-            <View style={styles.deviceContainer}>
-              <View><Text>Device ID:</Text></View>
-              <View><Text>{phoneIdentifier}</Text></View>
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('settings.language')}</Text>
+            <View style={styles.langRow}>
+              {(['de', 'en'] as Locale[]).map((code) => {
+                const isActive = locale === code;
+                return (
+                  <TouchableOpacity
+                    key={code}
+                    onPress={() => setLocale(code)}
+                    style={[styles.langPill, isActive && styles.langPillActive]}
+                  >
+                    <Text style={[styles.langPillText, isActive && styles.langPillTextActive]}>
+                      {code === 'de' ? t('settings.lang_de') : t('settings.lang_en')}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-            <View><Text style={styles.info}>This information is used to track your activity in our system.</Text></View>
+            <Text style={styles.info}>{t('settings.language_help')}</Text>
           </View>
 
           <View style={styles.sectionContainer}>
-            <Text style={[styles.sectionTitle, {marginTop: 20}]}>Personal information</Text>
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('settings.device_info')}</Text>
+            <View style={styles.deviceContainer}>
+              <View><Text>{t('settings.device_id')}</Text></View>
+              <View><Text>{phoneIdentifier}</Text></View>
+            </View>
+            <View><Text style={styles.info}>{t('settings.device_info_help')}</Text></View>
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('settings.personal_info')}</Text>
             <View style={styles.inputContainer}>
               <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Registration Number"
+                placeholder={t('services.registration_number')}
                 placeholderTextColor="#8e8e93"
                 value={plateNumber}
                 onChangeText={setPlateNumber}
@@ -125,7 +148,7 @@ const SettingsScreen = () => {
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Phone Number"
+                placeholder={t('services.phone_number')}
                 placeholderTextColor="#8e8e93"
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
@@ -136,14 +159,14 @@ const SettingsScreen = () => {
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder={t('settings.email')}
                 placeholderTextColor="#8e8e93"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
               />
             </View>
-            <View><Text style={styles.info}>This information is used to prefill some of the inputs for faster booking complition. In case you provide email we are going to send you booking confirmation on the email.</Text></View>
+            <View><Text style={styles.info}>{t('settings.personal_help')}</Text></View>
           </View>
         </ScrollView>
 
@@ -156,8 +179,7 @@ const SettingsScreen = () => {
             activeOpacity={isDirty ? 0.7 : 1}
           >
             <Text style={styles.saveButtonText}>
-              {/* Place Order • ${totalAmount} */}
-              Save Settings
+              {t('btn.save_settings')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -344,7 +366,33 @@ const styles = StyleSheet.create({
   savedText: {
     fontSize: 14,
     color: COLORS.textLight
-  }
+  },
+  langRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+  },
+  langPill: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    backgroundColor: '#F0F0F0',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  langPillActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  langPillText: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  langPillTextActive: {
+    color: COLORS.white,
+    fontWeight: '600',
+  },
 });
 
 export default SettingsScreen;

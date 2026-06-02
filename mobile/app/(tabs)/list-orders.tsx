@@ -10,11 +10,13 @@ import { CleanCarAPI } from "../../services/CleanCarApi";
 import { Device } from '../../services/Device';
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator'; // Adjust path
+import { useTranslation } from '../../services/i18n';
 
 // You might consider react-native-vector-icons for the back arrow icon if you add one.
 // import Icon from 'react-native-vector-icons/Ionicons';
 
 const OrderListScreen: React.FC = () => {
+  const { t } = useTranslation();
 
   // Using useRouter from expo-router to handle navigation
   const router = useRouter();
@@ -48,11 +50,11 @@ const OrderListScreen: React.FC = () => {
     }, [])
   );
 
-  if (loading) return <LoadingSpinner message="Loading..." />;
+  if (loading) return <LoadingSpinner message={t('loading.generic')} />;
 
   return (
     <View style={styles.container}>
-      <StepIndocator title={"Orders"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+      <StepIndocator title={t('screen.orders')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
       {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>Orders</Text>
         <Text style={styles.orderCount}>({orders.length})</Text>
@@ -66,7 +68,7 @@ const OrderListScreen: React.FC = () => {
         initialNumToRender={5}
         maxToRenderPerBatch={10}
         windowSize={10}
-        ListEmptyComponent={<NoResultsFound message="We are unable to find any orders at this time." />}
+        ListEmptyComponent={<NoResultsFound message={t('empty.no_orders')} />}
       />
     </View>
   );
