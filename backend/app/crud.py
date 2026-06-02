@@ -268,11 +268,62 @@ def create_service(db: Session, service: schemas.ServiceCreate) -> models.Servic
     return db_service
 
 
+def update_order_status(db: Session, order_id: int, new_status: schemas.OrderStatusEnum) -> Optional[models.Order]:
+    """
+    Flip the top-level status of an order (open/completed/cancelled).
+    Returns the updated order, or None if not found.
+    """
+    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if db_order is None:
+        return None
+    db_order.status = new_status
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+
 def update_process_step_status(db: Session, step_id: int, new_status: schemas.ProcessStepStatusEnum) -> Optional[models.ProcessStep]:
     db_step = db.query(models.ProcessStep).filter(models.ProcessStep.id == step_id).first()
-    if db_step:
-        db_step.status = new_status
-        # db_step.updated_at = datetime.datetime.utcnow()  # Update the timestamp
-        db.commit()
-        db.refresh(db_step)
+    if db_step is None:
+        return None
+
+    # Normalize to the model's enum class so SQLAlchemy serializes consistently.
+    new_status_model = models.ProcessStepStatusEnum(new_status.value)
+    db_step.status = new_status_model
+    # db_step.updated_at = datetime.datetime.utcnow()  # Update the timestamp
+    db.commit()
+    db.refresh(db_step)
+
+    # If this update means every step on the order is now completed, auto-mark
+    # the parent order as completed too (saves the cleaner a second click).
+    if new_status_model == models.ProcessStepStatusEnum.COMPLETED:
+        order = (
+            db.query(models.Order)
+            .filter(models.Order.id == db_step.order_id)
+            .first()
+        )
+        if order is None:
+            print(f"[auto-complete] step {step_id} has no parent order?", flush=True)
+            return db_step
+
+        # Compare on raw string values to sidestep any enum-class drift.
+        all_steps = (
+            db.query(models.ProcessStep)
+            .filter(models.ProcessStep.order_id == order.id)
+            .all()
+        )
+        statuses = [getattr(s.status, "value", s.status) for s in all_steps]
+        all_done = bool(statuses) and all(v == "completed" for v in statuses)
+        order_status_value = getattr(order.status, "value", order.status)
+        print(
+            f"[auto-complete] order={order.id} step={step_id} order_status={order_status_value} "
+            f"step_statuses={statuses} all_done={all_done}",
+            flush=True,
+        )
+        if all_done and order_status_value == "open":
+            order.status = models.OrderStatusEnum.COMPLETED
+            db.commit()
+            db.refresh(order)
+            print(f"[auto-complete] order={order.id} → completed", flush=True)
+
     return db_step

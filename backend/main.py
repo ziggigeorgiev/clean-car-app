@@ -15,7 +15,7 @@ from typing import List, Dict, Optional
 
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
-from app.email_service import send_booking_confirmation
+from app.email_service import send_booking_confirmation, send_cleaner_notification
 
 # Uvicorn configures the root logger AFTER our module loads, which can swallow
 # basicConfig(). Attach a dedicated stream handler to our app/email loggers so
@@ -184,6 +184,23 @@ async def cleaner_order_detail(
     )
 
 
+@app.post("/cleaner/orders/{order_uuid}/status/{new_status}")
+async def cleaner_update_order_status(
+    order_uuid: str,
+    new_status: schemas.OrderStatusEnum,
+    db: Session = Depends(get_db),
+    _user: str = Depends(require_cleaner_auth),
+):
+    order = db.query(models.Order).filter(models.Order.uuid == order_uuid).first()
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+    crud.update_order_status(db=db, order_id=order.id, new_status=new_status)
+    return RedirectResponse(
+        url=f"/cleaner/orders/{order_uuid}?ok=Order+marked+{new_status.value}",
+        status_code=303,
+    )
+
+
 @app.post("/cleaner/orders/{order_uuid}/steps/{step_id}/status/{new_status}")
 async def cleaner_update_step(
     order_uuid: str,
@@ -283,40 +300,55 @@ async def create_new_order(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    # Schedule the confirmation email AFTER the response is returned so the
-    # client never waits for SMTP. Failures inside the task are logged but
-    # never affect the order response.
+    # Schedule emails AFTER the response is returned so the client never waits
+    # for SMTP/HTTP. Failures inside the tasks are logged but never affect the
+    # order response.
     # NOTE: we also print() because uvicorn's log handler sometimes swallows
     # third-party logger output on hosting providers.
     print(f"[order_create] order={db_order.id} email={order.email!r}", flush=True)
-    if order.email:
-        try:
-            total = sum((s.price or 0) for s in db_order.services)
-            currency = (
-                db_order.services[0].currency.value
-                if db_order.services and db_order.services[0].currency is not None
-                else "EUR"
-            )
-            email_args = dict(
-                to=order.email,
-                order_id=db_order.id,
-                plate_number=db_order.plate_number,
-                phone_number=db_order.phone_number,
-                address=db_order.location.address if db_order.location else "",
-                availability_time=db_order.availability.time if db_order.availability else None,
-                service_names=[s.name for s in db_order.services],
-                total_price=total if db_order.services else None,
-                currency=currency,
-            )
+
+    try:
+        total = sum((s.price or 0) for s in db_order.services)
+        currency = (
+            db_order.services[0].currency.value
+            if db_order.services and db_order.services[0].currency is not None
+            else "EUR"
+        )
+        common = dict(
+            order_id=db_order.id,
+            plate_number=db_order.plate_number,
+            phone_number=db_order.phone_number,
+            address=db_order.location.address if db_order.location else "",
+            availability_time=db_order.availability.time if db_order.availability else None,
+            service_names=[s.name for s in db_order.services],
+            total_price=total if db_order.services else None,
+            currency=currency,
+        )
+
+        # 1. Customer confirmation (only if they provided an email).
+        if order.email:
             logger.info("Queueing booking confirmation email for order %s to %s", db_order.id, order.email)
-            print(f"[order_create] queueing email for order {db_order.id}", flush=True)
-            background_tasks.add_task(send_booking_confirmation, **email_args)
-        except Exception as e:
-            logger.exception("Failed to queue confirmation email for order %s", db_order.id)
-            print(f"[order_create] ERROR queueing email: {e}", flush=True)
-    else:
-        logger.info("Order %s created with no email — skipping confirmation email", db_order.id)
-        print(f"[order_create] order={db_order.id} no email on payload", flush=True)
+            print(f"[order_create] queueing customer email for order {db_order.id}", flush=True)
+            background_tasks.add_task(
+                send_booking_confirmation,
+                to=order.email,
+                **common,
+            )
+        else:
+            print(f"[order_create] order={db_order.id} no customer email on payload", flush=True)
+
+        # 2. Internal cleaner notification (always sent).
+        logger.info("Queueing cleaner notification email for order %s", db_order.id)
+        print(f"[order_create] queueing cleaner email for order {db_order.id}", flush=True)
+        background_tasks.add_task(
+            send_cleaner_notification,
+            order_uuid=db_order.uuid,
+            customer_email=order.email,
+            **common,
+        )
+    except Exception as e:
+        logger.exception("Failed to queue emails for order %s", db_order.id)
+        print(f"[order_create] ERROR queueing emails: {e}", flush=True)
 
     return db_order
 

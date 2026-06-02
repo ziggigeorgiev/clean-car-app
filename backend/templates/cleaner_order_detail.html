@@ -12,7 +12,23 @@
   <div class="card">
     <div class="card-row"><div>Vehicle</div><div><strong>{{ order.plate_number }}</strong></div></div>
     <div class="card-row"><div>Phone</div><div><a href="tel:{{ order.phone_number }}">{{ order.phone_number }}</a></div></div>
-    <div class="card-row"><div>Status</div><div><span class="badge {{ order.status }}">{{ order.status }}</span></div></div>
+    <div class="card-row"><div>Status</div><div><span class="badge {{ order.status.value if order.status.value is defined else order.status }}">{{ order.status.value if order.status.value is defined else order.status }}</span></div></div>
+    <div class="step-actions" style="margin-top:12px;">
+      {% set st = order.status.value if order.status.value is defined else order.status %}
+      {% if st == 'open' %}
+        <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/completed">
+          <button class="btn" type="submit">Complete order</button>
+        </form>
+        <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/cancelled"
+              onsubmit="return confirm('Cancel this order?');">
+          <button class="btn secondary" type="submit" style="border-color:#D9534F;color:#D9534F;">Cancel order</button>
+        </form>
+      {% else %}
+        <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/open">
+          <button class="btn secondary" type="submit">Reopen order</button>
+        </form>
+      {% endif %}
+    </div>
   </div>
 
   <h2>Services</h2>
