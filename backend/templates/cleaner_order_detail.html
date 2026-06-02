@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.id }} — Cleaner{% endblock %}
+{% block content %}
+  <p><a href="/cleaner/orders">&larr; All orders</a></p>
+  <h1>Order #{{ order.id }}</h1>
+  <p class="muted">{{ format_when(order.availability.time if order.availability else None) }} · {{ order.location.address if order.location else '—' }}</p>
+
+  {% if flash %}
+    <div class="flash {{ flash.kind }}">{{ flash.message }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-row"><div>Vehicle</div><div><strong>{{ order.plate_number }}</strong></div></div>
+    <div class="card-row"><div>Phone</div><div><a href="tel:{{ order.phone_number }}">{{ order.phone_number }}</a></div></div>
+    <div class="card-row"><div>Status</div><div><span class="badge {{ order.status }}">{{ order.status }}</span></div></div>
+  </div>
+
+  <h2>Services</h2>
+  <div class="card">
+    <ul class="steps">
+      {% for s in order.services %}
+        <li>
+          <div class="step-title">{{ s.name }}</div>
+          <div class="step-text">{{ "%.2f"|format(s.price) }} {{ s.currency.value if s.currency.value is defined else s.currency }}</div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <h2>Process steps</h2>
+  <div class="card">
+    <ul class="steps">
+      {% for step in order.process_steps %}
+        <li>
+          <div class="card-row">
+            <div>
+              <div class="step-title">{{ step.name }}</div>
+              <div class="step-text">{{ step.text }}</div>
+            </div>
+            <span class="badge {{ step.status }}">{{ step.status }}</span>
+          </div>
+          <div class="step-actions">
+            {% if step.status != 'in_progress' and step.status != 'completed' %}
+              <form class="inline" method="post" action="/cleaner/orders/{{ order.id }}/steps/{{ step.id }}/status/in_progress">
+                <button class="btn secondary" type="submit">Start</button>
+              </form>
+            {% endif %}
+            {% if step.status != 'completed' %}
+              <form class="inline" method="post" action="/cleaner/orders/{{ order.id }}/steps/{{ step.id }}/status/completed">
+                <button class="btn" type="submit">Mark complete</button>
+              </form>
+            {% else %}
+              <button class="btn is-done" disabled>Completed</button>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

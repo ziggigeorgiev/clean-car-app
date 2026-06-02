@@ -1,9 +1,14 @@
 import logging
 import sys
-from datetime import date, timedelta
-from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks
-from sqlalchemy.orm import Session
-from typing import List, Dict
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session, joinedload, selectinload
+from typing import List, Dict, Optional
 
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
@@ -24,12 +29,153 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+# --- Web UI templates ---------------------------------------------------------
+TEMPLATES_DIR = Path(__file__).parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+BERLIN_TZ = ZoneInfo("Europe/Berlin")
+
+
+def _format_when(value) -> str:
+    """Render a datetime (assumed UTC if naive) in Europe/Berlin local time."""
+    if value is None:
+        return "—"
+    if isinstance(value, datetime):
+        dt = value if value.tzinfo else value.replace(tzinfo=ZoneInfo("UTC"))
+        return dt.astimezone(BERLIN_TZ).strftime("%A, %B %d, %Y at %H:%M")
+    return str(value)
+
+
+templates.env.globals["format_when"] = _format_when
+
 # Create database tables on startup (for development/testing)
 # For production, use Alembic for migrations
 # @app.on_event("startup")
 # def on_startup():
 #     models.Base.metadata.create_all(bind=engine)
 
+# ---------------------------------------------------------------------------
+# Web UI: policy pages
+# ---------------------------------------------------------------------------
+@app.get("/", response_class=HTMLResponse)
+async def web_root(request: Request):
+    """Tiny landing page so '/' isn't a 404."""
+    return templates.TemplateResponse(
+        "base.html",
+        {"request": request},
+    )
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def web_terms(request: Request):
+    return templates.TemplateResponse(
+        "terms.html",
+        {"request": request, "today": date.today().isoformat()},
+    )
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def web_privacy(request: Request):
+    return templates.TemplateResponse(
+        "privacy.html",
+        {"request": request, "today": date.today().isoformat()},
+    )
+
+
+@app.get("/cancellation", response_class=HTMLResponse)
+async def web_cancellation(request: Request):
+    return templates.TemplateResponse(
+        "cancellation.html",
+        {"request": request, "today": date.today().isoformat()},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Web UI: cleaner dashboard
+# ---------------------------------------------------------------------------
+def _load_order_for_cleaner(db: Session, order_id: int) -> Optional[models.Order]:
+    return (
+        db.query(models.Order)
+        .filter(models.Order.id == order_id)
+        .options(
+            joinedload(models.Order.location),
+            joinedload(models.Order.availability),
+            selectinload(models.Order.services),
+            selectinload(models.Order.process_steps),
+        )
+        .first()
+    )
+
+
+@app.get("/cleaner", response_class=HTMLResponse)
+async def cleaner_index():
+    return RedirectResponse(url="/cleaner/orders")
+
+
+@app.get("/cleaner/orders", response_class=HTMLResponse)
+async def cleaner_orders(request: Request, db: Session = Depends(get_db)):
+    orders = (
+        db.query(models.Order)
+        .filter(models.Order.status == models.OrderStatusEnum.OPEN)
+        .options(
+            joinedload(models.Order.location),
+            joinedload(models.Order.availability),
+        )
+        .order_by(models.Order.created_at.desc())
+        .all()
+    )
+    return templates.TemplateResponse(
+        "cleaner_orders.html",
+        {"request": request, "orders": orders},
+    )
+
+
+@app.get("/cleaner/orders/{order_id}", response_class=HTMLResponse)
+async def cleaner_order_detail(
+    request: Request,
+    order_id: int,
+    ok: Optional[str] = None,
+    err: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    order = _load_order_for_cleaner(db, order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+    flash = None
+    if ok:
+        flash = {"kind": "ok", "message": ok}
+    elif err:
+        flash = {"kind": "err", "message": err}
+    return templates.TemplateResponse(
+        "cleaner_order_detail.html",
+        {"request": request, "order": order, "flash": flash},
+    )
+
+
+@app.post("/cleaner/orders/{order_id}/steps/{step_id}/status/{new_status}")
+async def cleaner_update_step(
+    order_id: int,
+    step_id: int,
+    new_status: schemas.ProcessStepStatusEnum,
+    db: Session = Depends(get_db),
+):
+    # Validate the step actually belongs to this order so URLs can't be forged
+    # to update steps from someone else's booking.
+    step = db.query(models.ProcessStep).filter(models.ProcessStep.id == step_id).first()
+    if step is None or step.order_id != order_id:
+        return RedirectResponse(
+            url=f"/cleaner/orders/{order_id}?err=Step+not+found+on+this+order",
+            status_code=303,
+        )
+    crud.update_process_step_status(db=db, step_id=step_id, new_status=new_status)
+    return RedirectResponse(
+        url=f"/cleaner/orders/{order_id}?ok=Step+'{step.name}'+updated+to+{new_status.value}",
+        status_code=303,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Existing JSON API
+# ---------------------------------------------------------------------------
 @app.get( # Changed from @app.post to @app.get
     "/api/health",
     status_code=status.HTTP_204_NO_CONTENT, # Still returns 204 No Content

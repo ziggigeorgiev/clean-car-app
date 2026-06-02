@@ -1,7 +1,8 @@
-fastapi 
-uvicorn 
+fastapi
+uvicorn
 sqlalchemy[asyncio]
-psycopg2-binary 
+psycopg2-binary
 pydantic
 python-dotenv
 alembic
+jinja2
