@@ -1,6 +1,6 @@
 // screens/SelectLocationScreen.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
   SafeAreaView,
   StyleSheet,
@@ -57,10 +57,15 @@ const SelectLocationScreen: React.FC<SelectLocationScreenProps> = () => {
 
   const params = useLocalSearchParams(); // Get parameters from navigation
   
-  useEffect(() => {
-    console.log('use effect');
-    centerMap(); // Center map on user's location when component mounts
-  }, []);
+  // Every time the user taps the "+" tab we want to start a fresh location
+  // step — re-acquire GPS, re-center the map, and clear any stale address.
+  useFocusEffect(
+    useCallback(() => {
+      initialCenterDone.current = false;
+      setAddress('');
+      centerMap();
+    }, [centerMap])
+  );
 
   const centerMap = useCallback(async () => {
     const getCurrentPosition = async () => {

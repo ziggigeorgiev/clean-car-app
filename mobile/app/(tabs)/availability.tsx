@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from 'react';
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -37,31 +37,36 @@ const AvailabilityScreen = () => {
   console.log("--------------------")
   console.log("location", location)
 
-  // Fetch availabilities from API
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await CleanCarAPI.getAvailabilities();
-        setAvailabilities(data);
+  // Re-fetch availabilities from the API on every focus so freshly-taken
+  // slots disappear and newly-opened ones appear.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const data = await CleanCarAPI.getAvailabilities();
+          if (cancelled) return;
+          setAvailabilities(data);
 
-        // Pre-select the first date with availabilities
-        const datesWithAvail = Object.keys(data).filter(date => data[date]?.length > 0);
-        if (datesWithAvail.length > 0) {
-          setSelectedDate(datesWithAvail[0]);
-          setSelectedAvailability(data[datesWithAvail[0]][0]);
-        } else {
-          setSelectedDate(null);
-          setSelectedAvailability(null);
+          const datesWithAvail = Object.keys(data).filter(date => data[date]?.length > 0);
+          if (datesWithAvail.length > 0) {
+            setSelectedDate(datesWithAvail[0]);
+            setSelectedAvailability(data[datesWithAvail[0]][0]);
+          } else {
+            setSelectedDate(null);
+            setSelectedAvailability(null);
+          }
+        } catch (error) {
+          console.error(`Error fetching availabilities:`, error);
+        } finally {
+          if (!cancelled) setLoading(false);
         }
-      } catch (error) {
-        console.error(`Error fetching availabilities:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+      };
+      fetchData();
+      return () => { cancelled = true; };
+    }, [])
+  );
 
   // When selectedDate changes, pre-select first available time
   useEffect(() => {

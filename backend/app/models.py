@@ -133,6 +133,8 @@ class Order(Base):
     phone_identifier: Mapped[str] = mapped_column(String, index=True, nullable=False)
     plate_number: Mapped[str] = mapped_column(String, nullable=False)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
+    # Optional — only set if the customer saved an email in their Settings.
+    email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
     status: Mapped[OrderStatusEnum] = mapped_column(

@@ -80,6 +80,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
         phone_identifier=order.phone_identifier,
         plate_number=order.plate_number,
         phone_number=order.phone_number,
+        email=(order.email or None),  # store None when not provided
         location=db_location,
         availability=db_availability,
         services=db_services, # Assign the list of service objects

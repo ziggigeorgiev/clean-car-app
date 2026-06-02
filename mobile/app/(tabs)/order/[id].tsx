@@ -1,4 +1,5 @@
-import { Key, useEffect, useState } from "react";
+import React, { Key, useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from 'expo-router';
 import {
   SafeAreaView,
   Text,
@@ -92,9 +93,13 @@ const OrderDetailScreen: React.FC = () => {
     }
   };
   
-  useEffect(() => {
-    fetchData();
-  }, [orderId]);
+  // Re-fetch every time the screen is focused so the user always sees fresh
+  // process step / status data from the server.
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [orderId])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);

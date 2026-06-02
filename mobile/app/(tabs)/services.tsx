@@ -88,20 +88,17 @@ const ServicesScreen = () => {
     }
   }, []);
 
-  // First mount: load catalog + settings.
-  useEffect(() => {
-    loadFromSettings();
-  }, [loadFromSettings]);
-
-  // Whenever the screen gains focus, check whether an order was just placed.
-  // If so, treat this as a brand-new booking flow: clear inputs and extras,
-  // and only prefill plate/phone if the user saved them in settings.
+  // Re-fetch services catalog + reset inputs to settings on every focus.
+  // This guarantees no stale data leaks between bookings: each visit to the
+  // services step is a clean slate, only pre-filled from saved Settings.
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
       (async () => {
-        const justPlaced = await Device.consumeOrderPlacedFlag();
-        if (justPlaced && !cancelled) {
+        // Consume the post-booking flag if present (kept for symmetry, but the
+        // reset happens on every focus now regardless).
+        await Device.consumeOrderPlacedFlag();
+        if (!cancelled) {
           await loadFromSettings({ resetExtras: true });
         }
       })();
