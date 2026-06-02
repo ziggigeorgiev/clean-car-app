@@ -34,6 +34,11 @@ app = FastAPI()
 
 # --- Web UI templates ---------------------------------------------------------
 TEMPLATES_DIR = Path(__file__).parent / "templates"
+print(
+    f"[startup] templates dir={TEMPLATES_DIR} exists={TEMPLATES_DIR.exists()} "
+    f"contents={sorted(p.name for p in TEMPLATES_DIR.iterdir()) if TEMPLATES_DIR.exists() else 'N/A'}",
+    flush=True,
+)
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
 
@@ -90,33 +95,27 @@ def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth
 @app.get("/", response_class=HTMLResponse)
 async def web_root(request: Request):
     """Tiny landing page so '/' isn't a 404."""
-    return templates.TemplateResponse(
-        "base.html",
-        {"request": request},
-    )
+    return templates.TemplateResponse(request, "base.html", {})
 
 
 @app.get("/terms", response_class=HTMLResponse)
 async def web_terms(request: Request):
     return templates.TemplateResponse(
-        "terms.html",
-        {"request": request, "today": date.today().isoformat()},
+        request, "terms.html", {"today": date.today().isoformat()},
     )
 
 
 @app.get("/privacy", response_class=HTMLResponse)
 async def web_privacy(request: Request):
     return templates.TemplateResponse(
-        "privacy.html",
-        {"request": request, "today": date.today().isoformat()},
+        request, "privacy.html", {"today": date.today().isoformat()},
     )
 
 
 @app.get("/cancellation", response_class=HTMLResponse)
 async def web_cancellation(request: Request):
     return templates.TemplateResponse(
-        "cancellation.html",
-        {"request": request, "today": date.today().isoformat()},
+        request, "cancellation.html", {"today": date.today().isoformat()},
     )
 
 
@@ -159,8 +158,7 @@ async def cleaner_orders(
         .all()
     )
     return templates.TemplateResponse(
-        "cleaner_orders.html",
-        {"request": request, "orders": orders},
+        request, "cleaner_orders.html", {"orders": orders},
     )
 
 
@@ -182,8 +180,7 @@ async def cleaner_order_detail(
     elif err:
         flash = {"kind": "err", "message": err}
     return templates.TemplateResponse(
-        "cleaner_order_detail.html",
-        {"request": request, "order": order, "flash": flash},
+        request, "cleaner_order_detail.html", {"order": order, "flash": flash},
     )
 
 
