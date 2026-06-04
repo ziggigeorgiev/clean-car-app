@@ -176,42 +176,51 @@ const HomeScreen = () => {
         </View>
       )}
 
-      {/* Services */}
+      {/* Services — flat list separated by dividers, like the policy list */}
       <Text style={styles.sectionTitle}>{t('home.our_services')}</Text>
-      {services.map((service, idx) => (
-        <View key={service.id} style={styles.serviceCard}>
-          <View style={styles.serviceIconWrap}>
-            <MaterialCommunityIcons
-              name={
-                /interior|innen|seat/i.test(service.name)
-                  ? 'car-seat'
-                  : /detail|full|premium/i.test(service.name)
-                  ? 'shimmer'
-                  : 'car-wash'
-              }
-              size={28}
-              color={COLORS.primary}
+      <View style={styles.servicesContainer}>
+        {services.map((service, idx) => (
+          <View
+            key={service.id}
+            style={[
+              styles.serviceRow,
+              idx === services.length - 1 && styles.serviceRowLast,
+            ]}
+          >
+            <Text style={styles.serviceNumber}>{String(idx + 1).padStart(2, '0')}</Text>
+            <View style={styles.serviceIconWrap}>
+              <MaterialCommunityIcons
+                name={
+                  /interior|innen|seat/i.test(service.name)
+                    ? 'car-seat'
+                    : /detail|full|premium/i.test(service.name)
+                    ? 'shimmer'
+                    : 'car-wash'
+                }
+                size={20}
+                color={COLORS.white}
+              />
+            </View>
+            <View style={styles.serviceTextWrap}>
+              <Text style={styles.serviceName} numberOfLines={2}>
+                {service.name}
+              </Text>
+              {service.description ? (
+                <Text style={styles.serviceDesc} numberOfLines={1}>
+                  {service.description}
+                </Text>
+              ) : null}
+            </View>
+            <Price
+              price={service.price}
+              currency={service.currency}
+              dollarStyle={{ fontSize: 18, color: COLORS.text }}
+              centStyle={{ fontSize: 11, color: COLORS.text }}
+              currencyStyle={{ fontSize: 14, color: COLORS.text }}
             />
           </View>
-          <View style={styles.serviceTextWrap}>
-            <Text style={styles.serviceName} numberOfLines={2}>
-              {idx + 1}. {service.name}
-            </Text>
-            {service.description ? (
-              <Text style={styles.serviceDesc} numberOfLines={1}>
-                {service.description}
-              </Text>
-            ) : null}
-          </View>
-          <Price
-            price={service.price}
-            currency={service.currency}
-            dollarStyle={{ fontSize: 18, color: COLORS.text }}
-            centStyle={{ fontSize: 11, color: COLORS.text }}
-            currencyStyle={{ fontSize: 14, color: COLORS.text }}
-          />
-        </View>
-      ))}
+        ))}
+      </View>
       <View style={{ height: 16 }} />
     </ScrollView>
   );
@@ -398,31 +407,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textLight,
   },
-  serviceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  servicesContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginBottom: 10,
+    marginBottom: 24,
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.border,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOpacity: 0.04,
-        shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 6,
-      },
-      android: { elevation: 1 },
-    }),
+  },
+  serviceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  serviceRowLast: {
+    borderBottomWidth: 0,
+  },
+  serviceNumber: {
+    width: 28,
+    fontSize: 13,
+    color: COLORS.textLight,
+    letterSpacing: 1,
   },
   serviceIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: SOFT_BG,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -432,7 +446,7 @@ const styles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
     color: COLORS.text,
   },
   serviceDesc: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { COLORS } from "../constants/colors";
 import Price from './Price';
@@ -57,12 +57,12 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
             <View style={styles.detailRow}>
             {/* Use Icon component if installed, otherwise use emoji/text */}
             {/* <Icon name="map-marker" size={16} color="#666" style={styles.icon} /> */}
-            <Ionicons name='pin-outline' size={16} color={COLORS.textLight} style={styles.icon} />
+            <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.icon} />
             <Text style={styles.addressText}>{item.location.address}</Text>
             </View>
             <View style={styles.detailRow}>
             {/* <Icon name="clock-o" size={16} color="#666" style={styles.icon} /> */}
-            <Ionicons name='time-outline' size={16} color={COLORS.textLight} style={styles.icon} />
+            <MaterialCommunityIcons name="av-timer" size={20} color="#666" style={styles.icon} />
             <Text style={styles.dateText}>
                 {formatDateTime(item.availability.time)}
             </Text>

@@ -125,8 +125,8 @@ const translations = {
 
   // New home (hero / recent booking / service tiles)
   'home.hero_offer': {
-    en: 'Get a professional interior & exterior clean for just €60',
-    de: 'Professionelle Innen- & Außenreinigung für nur 60 €',
+    en: 'Book your professional interior car cleaning at your place now',
+    de: 'Buchen Sie jetzt Ihre professionelle Innenreinigung bei Ihnen vor Ort',
   },
   'home.book_now': { en: 'Book Now', de: 'Jetzt buchen' },
   'home.recent': { en: 'Recent Booking', de: 'Letzte Buchung' },
