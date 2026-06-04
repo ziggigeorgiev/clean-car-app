@@ -12,6 +12,7 @@ import { formatDateTime } from "../services/DateFormat";
 interface Service {
   price: number;
   currency: string;
+  name?: string;
 }
 
 interface OrderItem {
@@ -75,7 +76,8 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
             {/* <Text style={styles.priceText}>{totalPrice} {item.services[0].currency}</Text> */}
             <Price
               price={totalPrice}
-              dollarStyle={{ color: '#00000' }}
+              currency={item.services?.[0]?.currency}
+              dollarStyle={{ color: '#000000' }}
               centStyle={{ color: '#000000' }}
             />
             </View>

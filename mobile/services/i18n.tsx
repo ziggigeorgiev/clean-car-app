@@ -122,6 +122,20 @@ const translations = {
   'home.specialists_desc': { en: 'Trained cleaning professionals', de: 'Ausgebildete Reinigungsprofis mit Expertise' },
   'home.eco_title': { en: 'Environmentally friendly', de: 'Umweltfreundlich' },
   'home.eco_desc': { en: 'Sustainable and gentle cleaning products', de: 'Nachhaltige und schonende Reinigungsmittel' },
+
+  // New home (hero / recent booking / service tiles)
+  'home.hero_offer': {
+    en: 'Get a professional interior & exterior clean for just €60',
+    de: 'Professionelle Innen- & Außenreinigung für nur 60 €',
+  },
+  'home.book_now': { en: 'Book Now', de: 'Jetzt buchen' },
+  'home.recent': { en: 'Recent Booking', de: 'Letzte Buchung' },
+  'home.no_recent': { en: "You don't have any bookings yet.", de: 'Sie haben noch keine Buchungen.' },
+  'home.our_services': { en: 'Our Services', de: 'Unsere Leistungen' },
+  'home.your_last_booking': { en: 'Your last booking', de: 'Ihre letzte Buchung' },
+  'status.completed': { en: 'Completed', de: 'Abgeschlossen' },
+  'status.open': { en: 'Open', de: 'Offen' },
+  'status.cancelled': { en: 'Cancelled', de: 'Storniert' },
 } as const;
 
 type TranslationKey = keyof typeof translations;

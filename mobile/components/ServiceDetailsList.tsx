@@ -44,8 +44,10 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
           <Text style={[styles.serviceName, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.name}</Text>
           <Price
               price={service.price}
+              currency={service.currency}
               dollarStyle={service.type === 'primary' ? { fontSize: 14, fontWeight: '500', color: COLORS.text } : {fontSize: 13, fontWeight: '400', color: COLORS.textLight}}
               centStyle={service.type === 'primary' ? { fontSize: 9, fontWeight: '500', color: COLORS.text } : {fontSize: 8, fontWeight: '400', color: COLORS.textLight}}
+              currencyStyle={service.type === 'primary' ? { fontSize: 12, fontWeight: '500', color: COLORS.text } : {fontSize: 11, fontWeight: '400', color: COLORS.textLight}}
             />
           {/* <Text style={[styles.servicePrice, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.price} {service.currency}</Text> */}
         </View>
@@ -62,6 +64,7 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
         {/* <Text style={styles.totalPrice}>{total} {services[0]?.currency}</Text> */}
         <Price
             price={total}
+            currency={services[0]?.currency}
             dollarStyle={{}}
             centStyle={{}}
           />

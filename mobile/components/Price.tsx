@@ -6,34 +6,38 @@ import * as Font from 'expo-font';
 
 type PriceProps = {
     price: number;
+    currency?: string;
     dollarStyle?: object;
     centStyle?: object;
+    currencyStyle?: object;
 };
 
-const Price: React.FC<PriceProps> = ({ price, dollarStyle, centStyle }) => {
+const currencySymbol = (code?: string) => {
+    switch ((code || '').toUpperCase()) {
+        case 'EUR': return '€';
+        case 'USD': return '$';
+        case 'GBP': return '£';
+        default: return code || '';
+    }
+};
 
-    // useEffect(() => {
-    //     async function loadFonts() {
-    //         await Font.loadAsync({
-    //             'ComicNeue-Regular': require('../assets/fonts/ComicNeue-Regular.ttf'),
-    //             'ComicNeue-Bold': require('../assets/fonts/ComicNeue-Bold.ttf'),
-    //         });
-    //     }
-
-    //     loadFonts();
-    // }, []);
-    
-    const dollars = Math.floor(price); // Gets the integer part
-    const cents = Math.round((price % 1) * 100); // Gets the decimal part and converts to whole cents
+const Price: React.FC<PriceProps> = ({ price, currency, dollarStyle, centStyle, currencyStyle }) => {
+    const safePrice = Number.isFinite(price) ? price : 0;
+    const dollars = Math.floor(safePrice); // Gets the integer part
+    const cents = Math.round((safePrice % 1) * 100); // Gets the decimal part and converts to whole cents
+    const symbol = currencySymbol(currency);
 
     return (
         <View style={styles.priceContainer}>
+            {symbol ? (
+                <Text style={[styles.currencyText, dollarStyle, currencyStyle]}>{symbol}</Text>
+            ) : null}
             <Text style={[styles.dollarText, dollarStyle]}>{dollars}<Text>.</Text></Text>
-            {cents && (
+            {cents > 0 ? (
                 <Text style={[styles.centsText, centStyle]}>
-                {cents}<Text>-</Text>
+                    {cents}
                 </Text>
-            )}
+            ) : null}
         </View>
     );
 };
@@ -45,6 +49,12 @@ const styles = StyleSheet.create({
     position: 'relative',   // Crucial: This makes it the positioning context for absolute children
     
     // You might need to adjust width or other properties based on your layout
+  },
+  currencyText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginRight: 2,
   },
   dollarText: {
     fontSize: 24,

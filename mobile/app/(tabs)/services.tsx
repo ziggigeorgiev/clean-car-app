@@ -208,7 +208,7 @@ const ServicesScreen = () => {
                     <Text style={styles.serviceDescription}>{service.description}</Text>
                   </View>
                 </View>
-                <Price price={service.price} />
+                <Price price={service.price} currency={service.currency} />
               </TouchableOpacity>
             ))}
           </View>
