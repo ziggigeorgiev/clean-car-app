@@ -1,27 +1,12 @@
 import { Tabs, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import 'react-native-get-random-values'
-import { View, TouchableOpacity, StyleSheet, Image, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 
 import SafeScreen from "@/components/SafeScreen";
 
 import { COLORS } from "../../constants/colors";
 import { useTranslation } from "@/services/i18n";
-
-
-// const CustomMenuIcon = ({ focused, color, size }) => (
-//     <Image
-//       source={require('../assets/images/icons/bc-house.svg')} // {focused ? require(`../assets/images/icons/${icon}.svg`) : require(`../assets/images/icons/${icon}.svg`)}
-//       style={{ width: size, height: size, tintColor: color }}
-//     />
-//   );
-
-import HouseIcon from '../../assets/images/icons/bc-house.svg';
-import FlyerIcon from '../../assets/images/icons/bc-flyer.svg';
-import UserIcon from '../../assets/images/icons/bc-user.svg';
-import PlusIcon from '../../assets/images/icons/bc-plus.svg';
-import InformationIcon from '../../assets/images/icons/bc-information.svg';
-import LogoIcon from '../../assets/images/icons/bc-logo-simple.svg';
 
 
 const TabsLayout = () => {
@@ -55,7 +40,9 @@ const TabsLayout = () => {
                 {t('tab.home')}
               </Text>
             ),
-            tabBarIcon: ({ focused, color, size }) => <HouseIcon width={size} height={size} fill={color} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+            )
           }}
         />
 
@@ -71,7 +58,9 @@ const TabsLayout = () => {
                 {t('tab.orders')}
               </Text>
             ),
-            tabBarIcon: ({ focused, color, size }) => <FlyerIcon width={size} height={size} fill={color} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialCommunityIcons name={focused ? 'clipboard-list' : 'clipboard-list-outline'} size={size} color={color} />
+            )
           }}
         />
 
@@ -93,7 +82,7 @@ const TabsLayout = () => {
                 }}
               >
                 <View style={{ marginTop: 15 }}>
-                  <PlusIcon width={size} height={size} fill={COLORS.primary} />
+                  <MaterialCommunityIcons name="plus-circle" size={size + 12} color={COLORS.primary} />
                 </View>
               </TouchableOpacity>
             ),
@@ -113,8 +102,9 @@ const TabsLayout = () => {
                 {t('tab.about')}
               </Text>
             ),
-            // tabBarIcon: ({ focused, color, size }) => <LogoIcon width={50} height={50} stroke={color} fill={color} color={color}/>
-            tabBarIcon: ({ focused, color, size }) => <InformationIcon width={size} height={size} fill={color}/>
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialCommunityIcons name={focused ? 'information' : 'information-outline'} size={size} color={color} />
+            )
           }}
         />
 
@@ -130,7 +120,9 @@ const TabsLayout = () => {
                 {t('tab.settings')}
               </Text>
             ),
-            tabBarIcon: ({ focused, color, size }) => <UserIcon width={size} height={size} fill={color} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialCommunityIcons name={focused ? 'account' : 'account-outline'} size={size} color={color} />
+            )
           }}
         />
 
