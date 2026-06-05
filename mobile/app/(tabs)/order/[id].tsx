@@ -132,6 +132,7 @@ const OrderDetailScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StepIndocator title={t('screen.order_details')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+      <Text style={styles.swipeHint}>{t('swipe_to_refresh')}</Text>
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -227,6 +228,14 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingBottom: 0, // Add some padding at the bottom of the scroll view
+  },
+  swipeHint: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: COLORS.textLight,
+    paddingTop: 8,
+    paddingBottom: 6,
+    backgroundColor: COLORS.background,
   },
   statusContainer: {
     backgroundColor: '#E0F2F7',

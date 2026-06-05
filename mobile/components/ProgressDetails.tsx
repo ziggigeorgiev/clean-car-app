@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Svg, { Path } from 'react-native-svg'; // Import Svg and Path
 import { formatDateTime } from "../services/DateFormat";
+import { useTranslation } from "../services/i18n";
 
 const ACTIVE_COLOR = '#5BA064'; // Color for the active segment
 const INACTIVE_COLOR = '#D3D3D3'; // Color for the inactive segments
@@ -84,14 +85,16 @@ type ProgressDetailsProps = {
 };
 
 const ProgressDetails = ({process_steps}: ProgressDetailsProps) => {
+  const { tStep } = useTranslation();
+
   // 1. Number of completed items
   const completedItems = process_steps.filter(item => item.status === 'completed');
   const numberOfCompletedItems = completedItems.length;
 
-  // 2. The completed entry with the largest id
+  // 2. The completed entry with the largest id (fallback to a "booking received" state)
   let currentEntry: { name: string; text: string; updated_at?: string | Date; id?: number } = {
-    name: "Thanks for you order",
-    text: "We are preparing your order",
+    name: 'step.booking_confirmed.name',
+    text: 'step.booking_confirmed.text',
   };
 
   if (completedItems.length > 0) {
@@ -104,8 +107,8 @@ const ProgressDetails = ({process_steps}: ProgressDetailsProps) => {
     <View style={styles.container}>
       <DeliveryIcon step={numberOfCompletedItems} />
       <View style={styles.textContainer}>
-        <Text style={styles.statusTitle}>{currentEntry?.name}</Text>
-        <Text style={styles.deliveryInfo}>{currentEntry?.text}</Text>
+        <Text style={styles.statusTitle}>{tStep(currentEntry, 'name')}</Text>
+        <Text style={styles.deliveryInfo}>{tStep(currentEntry, 'text')}</Text>
         <Text style={styles.timeRange}>{formatDateTime(currentEntry?.updated_at)}</Text>
       </View>
     </View>

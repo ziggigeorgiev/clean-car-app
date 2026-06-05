@@ -160,6 +160,41 @@ const translations = {
 
   // Misc
   'total': { en: 'Total', de: 'Gesamt' },
+  'swipe_to_refresh': { en: 'Swipe up to refresh', de: 'Zum Aktualisieren nach oben wischen' },
+
+  // -------------------------------------------------------------------------
+  // Process steps. Store these key strings as the `name` / `text` columns on
+  // the `process_steps` rows (same pattern as services).
+  // -------------------------------------------------------------------------
+  'step.booking_confirmed.name': { en: 'Thanks for your order', de: 'Vielen Dank für Ihre Bestellung' },
+  'step.booking_confirmed.text': {
+    en: 'We are looking for an available cleaner',
+    de: 'Wir suchen einen verfügbaren Reiniger',
+  },
+
+  'step.cleaner_assigned.name': { en: 'Cleaner assigned', de: 'Reiniger zugewiesen' },
+  'step.cleaner_assigned.text': {
+    en: 'We will inform you when the cleaner is on the way',
+    de: 'Wir informieren Sie, sobald der Reiniger unterwegs ist',
+  },
+
+  'step.on_the_way.name': { en: 'On the way', de: 'Unterwegs' },
+  'step.on_the_way.text': {
+    en: 'The cleaner will call you when they arrive',
+    de: 'Der Reiniger ruft Sie an, sobald er ankommt',
+  },
+
+  'step.cleaning_in_progress.name': { en: 'Cleaning in progress', de: 'Reinigung läuft' },
+  'step.cleaning_in_progress.text': {
+    en: 'Almost done, please be patient',
+    de: 'Fast fertig, einen Moment bitte',
+  },
+
+  'step.completed.name': { en: 'Completed', de: 'Abgeschlossen' },
+  'step.completed.text': {
+    en: 'Thanks for your order, we hope you are satisfied',
+    de: 'Vielen Dank für Ihre Bestellung — wir hoffen, Sie sind zufrieden',
+  },
 } as const;
 
 type TranslationKey = keyof typeof translations;
@@ -173,17 +208,26 @@ export type TranslatableService = {
 };
 type ServiceField = 'name' | 'description';
 
+/** Minimal shape of a process step that the i18n helpers expect. */
+export type TranslatableStep = {
+  name?: string;
+  text?: string;
+};
+type StepField = 'name' | 'text';
+
 const I18nContext = createContext<{
   locale: Locale;
   setLocale: (l: Locale) => Promise<void>;
   t: (key: TranslationKey, params?: ParamMap) => string;
   tService: (service: TranslatableService, field?: ServiceField) => string;
+  tStep: (step: TranslatableStep, field?: StepField) => string;
   ready: boolean;
 }>({
   locale: DEFAULT_LOCALE,
   setLocale: async () => {},
   t: (k) => String(k),
   tService: (s, f = 'name') => (s ? s[f] ?? '' : ''),
+  tStep: (s, f = 'name') => (s ? s[f] ?? '' : ''),
   ready: false,
 });
 
@@ -213,8 +257,23 @@ export function translateService(
   service: TranslatableService | null | undefined,
   field: ServiceField = 'name',
 ): string {
-  if (!service) return '';
-  const raw = (service[field] ?? '') as string;
+  return translateRawKey(locale, service?.[field]);
+}
+
+/**
+ * Translate a process step's name or text. Same pattern as services: the DB
+ * column holds the translation key (e.g. `"step.on_the_way.name"`).
+ */
+export function translateStep(
+  locale: Locale,
+  step: TranslatableStep | null | undefined,
+  field: StepField = 'name',
+): string {
+  return translateRawKey(locale, step?.[field]);
+}
+
+/** Used by translateService/translateStep: the DB value IS the key. */
+function translateRawKey(locale: Locale, raw?: string | null): string {
   if (!raw) return '';
   if (raw in (translations as Record<string, unknown>)) {
     return translate(locale, raw as TranslationKey);
@@ -257,6 +316,8 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       t: (key: TranslationKey, params?: ParamMap) => translate(locale, key, params),
       tService: (service: TranslatableService, field: ServiceField = 'name') =>
         translateService(locale, service, field),
+      tStep: (step: TranslatableStep, field: StepField = 'name') =>
+        translateStep(locale, step, field),
       ready,
     }),
     [locale, setLocale, ready],

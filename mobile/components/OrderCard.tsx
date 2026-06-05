@@ -35,7 +35,7 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
   // Using useRouter from expo-router to handle navigation
   const router = useRouter();
 
-  const isCompleted = item.status === 'Completed';
+  const isCompleted = String(item.status || '').toLowerCase() === 'completed';
 
   const totalPrice = item.services.reduce((sum, service) => {
     return sum + service.price;

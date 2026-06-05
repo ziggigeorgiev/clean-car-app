@@ -185,9 +185,7 @@ const HomeScreen = () => {
           </View>
         </TouchableOpacity>
       ) : (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>{t('home.no_recent')}</Text>
-        </View>
+        <Text style={styles.emptyText}>{t('home.no_recent')}</Text>
       )}
 
       {/* Services — flat list separated by dividers, like the policy list */}
@@ -402,19 +400,10 @@ const styles = StyleSheet.create({
   cancelledText: {
     color: '#D9534F',
   },
-  emptyCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    paddingVertical: 18,
-    paddingHorizontal: 16,
-    marginBottom: 24,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
   emptyText: {
     fontSize: 14,
     color: COLORS.textLight,
+    marginBottom: 24,
   },
   servicesContainer: {
     backgroundColor: COLORS.white,

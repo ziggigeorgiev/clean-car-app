@@ -1,4 +1,4 @@
-import { Key, useCallback, useEffect, useState } from "react";
+import { Key, useCallback, useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -8,7 +8,9 @@ import {
   StatusBar,
   StyleSheet,
   Platform,
-  Linking
+  Linking,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -64,6 +66,10 @@ const ConfirmScreen: React.FC = () => {
 
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedAvailability, setSelectedAvailability] = useState();
+  // Submitting state: `submitting` controls the visual; `submittingRef`
+  // synchronously blocks a second tap before React re-renders.
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   
 
   // Re-fetch on every focus and whenever the route params change, so the
@@ -100,6 +106,9 @@ const ConfirmScreen: React.FC = () => {
   );
   
   const confirm = async () => {
+    // Synchronous guard so a fast double-tap can't queue a second request.
+    if (submittingRef.current) return;
+
     // Guard: don't submit until the latest availability has finished loading,
     // and verify its id matches the URL param so we can't send a stale slot.
     const expectedAvailabilityId = JSON.parse(availability as string);
@@ -110,24 +119,40 @@ const ConfirmScreen: React.FC = () => {
       });
       return;
     }
-    const email = (await Device.getEmail()) || undefined;
-    const order =  await CleanCarAPI.createOrder(
-      {
-        phone_identifier: await Device.getPhoneIdentifier(),
-        status: "open",
-        plate_number: plateNumber,
-        phone_number: phoneNumber,
-        location: JSON.parse(location as string),
-        availability_id: selectedAvailability.id,
-        service_ids: JSON.parse(services as string),
-        email,
-      }
-    );
-    console.log("order", order)
-    // Flag a fresh start so the next time the user enters the booking flow
-    // the services screen resets its inputs (only prefilling from settings).
-    await Device.markOrderPlaced();
-    router.push(`/acknowledge/${order?.id}`);
+
+    submittingRef.current = true;
+    setSubmitting(true);
+
+    try {
+      const email = (await Device.getEmail()) || undefined;
+      const order = await CleanCarAPI.createOrder(
+        {
+          phone_identifier: await Device.getPhoneIdentifier(),
+          status: "open",
+          plate_number: plateNumber,
+          phone_number: phoneNumber,
+          location: JSON.parse(location as string),
+          availability_id: selectedAvailability.id,
+          service_ids: JSON.parse(services as string),
+          email,
+        }
+      );
+      console.log("order", order);
+      // Flag a fresh start so the next time the user enters the booking flow
+      // the services screen resets its inputs (only prefilling from settings).
+      await Device.markOrderPlaced();
+      // Leave submitting=true on success so the button stays disabled while
+      // we navigate away — prevents a final stray tap during the transition.
+      router.push(`/acknowledge/${order?.id}`);
+    } catch (err: any) {
+      console.error("createOrder failed", err);
+      submittingRef.current = false;
+      setSubmitting(false);
+      Alert.alert(
+        t('btn.confirm'),
+        err?.message || 'Could not place the booking. Please try again.',
+      );
+    }
   };
 
   if (loading) return <LoadingSpinner message={t('loading.order_details')} />;
@@ -198,10 +223,16 @@ const ConfirmScreen: React.FC = () => {
       </ScrollView>
       <View style={styles.placeOrderButtonContainer}>
         <TouchableOpacity
-          style={styles.placeOrderButton}
+          style={[styles.placeOrderButton, submitting && styles.placeOrderButtonDisabled]}
           onPress={confirm}
+          disabled={submitting}
+          activeOpacity={submitting ? 1 : 0.7}
         >
-          <Text style={styles.placeOrderButtonText}>{t('btn.confirm')}</Text>
+          {submitting ? (
+            <ActivityIndicator color={COLORS.white} />
+          ) : (
+            <Text style={styles.placeOrderButtonText}>{t('btn.confirm')}</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -407,6 +438,9 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  placeOrderButtonDisabled: {
+    opacity: 0.6,
   },
 });
 

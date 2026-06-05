@@ -88,27 +88,13 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
     db.add(db_order)
     db.flush() # Flush to get the db_order.id before committing
 
+    # Store translation keys; the mobile app resolves them via i18n.
     process_steps = [
-        {
-            "name": "Booking confirmed",
-            "text": "We are looking for an availalble cleaner",
-        },
-        {
-            "name": "Cleaner assigned",
-            "text": "We will inform you when the cleaner is on the way",
-        },
-        {
-            "name": "On the way",
-            "text": "Cleaner is going to call you when he arrives",
-        },
-        {
-            "name": "Cleaning in progress",
-            "text": "Almost done, please be patient",
-        },
-        {
-            "name": "Completed",
-            "text": "Thanks for your order, we hope you are satisfied",
-        }
+        {"name": "step.booking_confirmed.name",   "text": "step.booking_confirmed.text"},
+        {"name": "step.cleaner_assigned.name",    "text": "step.cleaner_assigned.text"},
+        {"name": "step.on_the_way.name",          "text": "step.on_the_way.text"},
+        {"name": "step.cleaning_in_progress.name","text": "step.cleaning_in_progress.text"},
+        {"name": "step.completed.name",           "text": "step.completed.text"},
     ]
     for process_step in process_steps:
         db_process_step = models.ProcessStep(
