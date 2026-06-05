@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from "../constants/colors";
 import Price from './Price';
+import { useTranslation } from "../services/i18n";
 
 // Define the interface for a single service item
 export interface ServiceItem {
@@ -9,6 +10,8 @@ export interface ServiceItem {
   price: number;
   currency: string; // Assuming currency is a string like 'USD', 'EUR', etc.
   type: 'primary' | 'secondary'; // Added type for service item
+  serviceId?: number; // for secondary rows: id of the underlying DB service
+  categoryKey?: string; // for primary rows: 'basic' / 'extra' (used for i18n)
 }
 
 interface ServiceDetailsListProps {
@@ -21,27 +24,39 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
   services,
   sectionTitle = 'Basic cleaning', // Default title, can be overridden
 }) => {
+  const { t, tService } = useTranslation();
+
   const total = services
   .filter((service) => service.type === 'primary')
   .reduce((acc, service) => {
-    // Assuming price is a string like '$70.97', we need to convert it to a number
     return acc + service.price;
   }, 0);
+
+  const renderLabel = (service: ServiceItem) => {
+    if (service.type === 'secondary' && service.serviceId != null) {
+      // Translate using the underlying DB service id with DB-name fallback
+      return tService({ id: service.serviceId, name: service.name }, 'name');
+    }
+    if (service.type === 'primary' && service.categoryKey) {
+      // Translate the category aggregate label
+      const key = `category.${service.categoryKey}.name` as any;
+      const value = t(key);
+      // t() returns the key when no translation exists; fall back to original name
+      return value === key ? service.name : value;
+    }
+    return service.name;
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-        {/* You'd typically calculate and display the total here if 'Basic cleaning' implies a sum */}
-        {/* For now, it's just the section title on the left. */}
-        {/* Based on the image, "Basic cleaning" is itself a service with a price. */}
-        {/* Let's adjust the rendering to reflect that. */}
       </View>
 
       {/* Render each service item */}
       {services.map((service, index) => (
         <View key={index} style={service.type === 'primary' ? styles.serviceItemPrimary: styles.serviceItemSecondary}>
-          <Text style={[styles.serviceName, service.type === 'primary' ? styles.primary : styles.secondary]}>{service.name}</Text>
+          <Text style={[styles.serviceName, service.type === 'primary' ? styles.primary : styles.secondary]}>{renderLabel(service)}</Text>
           <Price
               price={service.price}
               currency={service.currency}
@@ -59,7 +74,7 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
       */}
       <View style={styles.totalLine} />
       <View style={styles.totalRow}>
-        <Text style={styles.totalLabel}>Total</Text>
+        <Text style={styles.totalLabel}>{t('total')}</Text>
         {/* This would be a calculated sum in a real app */}
         {/* <Text style={styles.totalPrice}>{total} {services[0]?.currency}</Text> */}
         <Price

@@ -15,8 +15,8 @@ const translations = {
   // Tab bar
   'tab.home': { en: 'Home', de: 'Start' },
   'tab.orders': { en: 'Orders', de: 'Aufträge' },
-  'tab.about': { en: 'About', de: 'Über uns' },
-  'tab.settings': { en: 'Settings', de: 'Einstellungen' },
+  'tab.about': { en: 'About', de: 'Über App' },
+  'tab.settings': { en: 'Settings', de: 'Konto' },
 
   // Step indicator / screen titles
   'screen.location': { en: 'Select location', de: 'Standort auswählen' },
@@ -136,20 +136,54 @@ const translations = {
   'status.completed': { en: 'Completed', de: 'Abgeschlossen' },
   'status.open': { en: 'Open', de: 'Offen' },
   'status.cancelled': { en: 'Cancelled', de: 'Storniert' },
+
+  // -------------------------------------------------------------------------
+  // Services. The `name` and `description` columns in the DB store the
+  // translation key (e.g. `exterior.name`, `interior.description`). To add
+  // a new service, insert a key here matching whatever you stored in the DB.
+  // -------------------------------------------------------------------------
+  'exterior.name': { en: 'Exterior wash', de: 'Außenwäsche' },
+  'exterior.description': { en: 'Full exterior body wash and rinse', de: 'Komplette Außenwäsche der Karosserie' },
+
+  'interior.name': { en: 'Interior cleaning', de: 'Innenreinigung' },
+  'interior.description': { en: 'Vacuum, dust and wipe-down of the interior', de: 'Staubsaugen, Entstauben und Abwischen des Innenraums' },
+
+  'baby_chair.name': { en: 'Baby seat cleaning', de: 'Kindersitzreinigung' },
+  'baby_chair.description': { en: 'Deep cleaning of child / baby seats', de: 'Tiefenreinigung von Kinder- und Babysitzen' },
+
+  'wax.name': { en: 'Wax & polish', de: 'Wachs & Politur' },
+  'wax.description': { en: 'Protective wax coat and hand polish', de: 'Schützende Wachsschicht und Handpolitur' },
+
+  // Category aggregate labels shown above the per-service list.
+  'category.basic.name': { en: 'Basic cleaning', de: 'Standardreinigung' },
+  'category.extra.name': { en: 'Extra services', de: 'Zusatzleistungen' },
+
+  // Misc
+  'total': { en: 'Total', de: 'Gesamt' },
 } as const;
 
 type TranslationKey = keyof typeof translations;
 type ParamMap = Record<string, string | number>;
 
+/** Minimal shape of a service that the i18n helpers expect. */
+export type TranslatableService = {
+  id: number;
+  name?: string;
+  description?: string;
+};
+type ServiceField = 'name' | 'description';
+
 const I18nContext = createContext<{
   locale: Locale;
   setLocale: (l: Locale) => Promise<void>;
   t: (key: TranslationKey, params?: ParamMap) => string;
+  tService: (service: TranslatableService, field?: ServiceField) => string;
   ready: boolean;
 }>({
   locale: DEFAULT_LOCALE,
   setLocale: async () => {},
   t: (k) => String(k),
+  tService: (s, f = 'name') => (s ? s[f] ?? '' : ''),
   ready: false,
 });
 
@@ -163,6 +197,29 @@ export function translate(locale: Locale, key: TranslationKey, params?: ParamMap
   if (!entry) return String(key);
   const value = entry[locale] ?? entry.en ?? String(key);
   return format(value, params);
+}
+
+/**
+ * Translate a service's name or description.
+ *
+ * The DB columns `name` / `description` contain translation keys
+ * (e.g. `"exterior.name"`, `"interior.description"`). This helper looks up
+ * the value of that key in the translations table; if the value isn't itself
+ * a known key (legacy rows, or a typo), it's returned as-is so the UI never
+ * shows blanks.
+ */
+export function translateService(
+  locale: Locale,
+  service: TranslatableService | null | undefined,
+  field: ServiceField = 'name',
+): string {
+  if (!service) return '';
+  const raw = (service[field] ?? '') as string;
+  if (!raw) return '';
+  if (raw in (translations as Record<string, unknown>)) {
+    return translate(locale, raw as TranslationKey);
+  }
+  return raw;
 }
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -198,6 +255,8 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       locale,
       setLocale,
       t: (key: TranslationKey, params?: ParamMap) => translate(locale, key, params),
+      tService: (service: TranslatableService, field: ServiceField = 'name') =>
+        translateService(locale, service, field),
       ready,
     }),
     [locale, setLocale, ready],

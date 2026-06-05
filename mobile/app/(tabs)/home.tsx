@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { COLORS } from '@/constants/colors';
 import { CleanCarAPI } from '@/services/CleanCarApi';
@@ -37,7 +38,7 @@ type Order = {
 };
 
 const HomeScreen = () => {
-  const { t } = useTranslation();
+  const { t, tService } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
 
@@ -128,7 +129,20 @@ const HomeScreen = () => {
           style={styles.heroImage}
           resizeMode="cover"
         />
-        <View style={styles.heroOverlay} />
+        {/* Horizontal gradient: strong tint on the left (under the text),
+            fading to transparent on the right (so the photo shows through). */}
+        <LinearGradient
+          colors={[
+            'rgba(255,255,255,1)',
+            'rgba(255,255,255,0.95)',
+            'rgba(255,255,255,0.7)',
+            'rgba(255,255,255,0)',
+          ]}
+          locations={[0, 0.55, 0.8, 1]}
+          start={{ x: 0, y: 0.35 }}
+          end={{ x: 1, y: 0.35 }}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.heroContent}>
           <Text style={styles.heroText}>{t('home.hero_offer')}</Text>
           <TouchableOpacity style={styles.heroButton} onPress={startBooking} activeOpacity={0.85}>
@@ -157,9 +171,9 @@ const HomeScreen = () => {
           <View style={styles.recentDivider} />
           <View style={styles.recentRow}>
             <Text style={styles.recentLabel}>
-              {(lastOrder.services || []).map((s) => s.name).join(', ') ||
-                lastOrder.plate_number ||
-                ''}
+              {(lastOrder.services || [])
+                .map((s: any) => tService(s, 'name'))
+                .join(', ') || lastOrder.plate_number || ''}
             </Text>
             <Price
               price={computeOrderTotal(lastOrder)}
@@ -203,11 +217,11 @@ const HomeScreen = () => {
             </View>
             <View style={styles.serviceTextWrap}>
               <Text style={styles.serviceName} numberOfLines={2}>
-                {service.name}
+                {tService(service, 'name')}
               </Text>
-              {service.description ? (
+              {tService(service, 'description') ? (
                 <Text style={styles.serviceDesc} numberOfLines={1}>
-                  {service.description}
+                  {tService(service, 'description')}
                 </Text>
               ) : null}
             </View>
@@ -281,11 +295,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-  },
-  // Soft gradient-like overlay so the text remains readable over the photo.
-  heroOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(219, 241, 242, 0.55)',
   },
   heroContent: {
     padding: 20,

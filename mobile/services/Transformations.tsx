@@ -32,13 +32,21 @@ export const Transformations = {
         return acc;
     }, {});
 
-    // Step 2: Build the new structured list
-    const transformedList: { name: string; price: number; currency: string; type: 'primary' | 'secondary'; }[] = [];
+    // Step 2: Build the new structured list. Carries `serviceId` for
+    // secondary rows and `categoryKey` for the aggregate primary row so the
+    // renderer can resolve the right i18n key.
+    const transformedList: {
+      name: string;
+      price: number;
+      currency: string;
+      type: 'primary' | 'secondary';
+      serviceId?: number;
+      categoryKey?: string;
+    }[] = [];
 
     // Iterate over the categories in the order they appear in the original list
-    // To maintain original order of categories, we can get unique categories first
     const uniqueCategories = [...new Set(sortedServices.map(s => s.category))];
-    
+
     const categoryName: Record<string, string> = {
         "Basic": "Basic cleaning",
         "Extra": "Extra services",
@@ -51,18 +59,20 @@ export const Transformations = {
         // Add the "primary" category entry
         transformedList.push({
             name: categoryName[category] || category,
-            price: parseFloat(categoryData.totalPrice.toFixed(2)), // Format to 2 decimal places
+            price: parseFloat(categoryData.totalPrice.toFixed(2)),
             currency: categoryData.currency,
             type: "primary",
+            categoryKey: (category || '').toLowerCase(),
         });
 
         // Add "secondary" entries for each service in the category
-        categoryData.items.forEach((service: { name: any; price: any; currency: any; }) => {
+        categoryData.items.forEach((service: { id?: number; name: any; price: any; currency: any; }) => {
             transformedList.push({
                 name: service.name,
                 price: service.price,
                 currency: service.currency,
                 type: "secondary",
+                serviceId: service.id,
             });
         });
     });

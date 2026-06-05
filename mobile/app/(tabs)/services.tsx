@@ -39,7 +39,7 @@ type Service = {
 };
 
 const ServicesScreen = () => {
-  const { t } = useTranslation();
+  const { t, tService } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const [plateNumber, setPlateNumber] = useState('');
@@ -204,8 +204,8 @@ const ServicesScreen = () => {
                     </View>
                   </View>
                   <View>
-                    <Text style={styles.serviceName}>{service.name}</Text>
-                    <Text style={styles.serviceDescription}>{service.description}</Text>
+                    <Text style={styles.serviceName}>{tService(service, 'name')}</Text>
+                    <Text style={styles.serviceDescription}>{tService(service, 'description')}</Text>
                   </View>
                 </View>
                 <Price price={service.price} currency={service.currency} />
