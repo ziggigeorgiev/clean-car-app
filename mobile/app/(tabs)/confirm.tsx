@@ -40,7 +40,7 @@ type Service = {
 };
 
 const ConfirmScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   
@@ -78,6 +78,10 @@ const ConfirmScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
+      // Reset the submitting flag — otherwise the confirm button keeps its
+      // spinner state from the previous booking when the user starts a new one.
+      submittingRef.current = false;
+      setSubmitting(false);
       const fetchData = async () => {
         setLoading(true);
         // Clear stale state immediately to avoid using last order's slot.
@@ -135,6 +139,7 @@ const ConfirmScreen: React.FC = () => {
           availability_id: selectedAvailability.id,
           service_ids: JSON.parse(services as string),
           email,
+          locale,
         }
       );
       console.log("order", order);

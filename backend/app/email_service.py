@@ -32,6 +32,8 @@ from email.message import EmailMessage
 from typing import Iterable, Optional
 from zoneinfo import ZoneInfo
 
+from .translations import translate as _tr, normalize_locale, DEFAULT_LOCALE
+
 logger = logging.getLogger(__name__)
 
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
@@ -217,10 +219,12 @@ def send_booking_confirmation(
     service_names: Iterable[str],
     total_price: Optional[float] = None,
     currency: str = "EUR",
+    locale: str = DEFAULT_LOCALE,
 ) -> bool:
     """Build and send a booking confirmation email."""
+    loc = normalize_locale(locale)
     when = _format_berlin(availability_time)
-    services_list = [s for s in service_names if s]
+    services_list = [_tr(s, loc) for s in service_names if s]
     services_text = "\n".join(f"  • {s}" for s in services_list) or "  • —"
     services_html = "".join(f"<li>{s}</li>" for s in services_list) or "<li>—</li>"
 
@@ -283,14 +287,16 @@ def send_cleaner_notification(
     total_price: Optional[float] = None,
     currency: str = "EUR",
     to: Optional[str] = None,
+    locale: str = DEFAULT_LOCALE,
 ) -> bool:
     """
     Notify the cleaning team about a new booking. Includes a deep link to the
     cleaner page for this order and a one-click "Add to Google Calendar" button.
     """
     recipient = to or CLEANER_NOTIFY_EMAIL
+    loc = normalize_locale(locale)
     when_label = _format_berlin(availability_time)
-    services_list = [s for s in service_names if s]
+    services_list = [_tr(s, loc) for s in service_names if s]
     services_text = "\n".join(f"  • {s}" for s in services_list) or "  • —"
     services_html = "".join(f"<li>{s}</li>" for s in services_list) or "<li>—</li>"
 

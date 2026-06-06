@@ -108,6 +108,7 @@ class OrderBase(BaseModel):
     availability_id: int
     service_ids: List[int] = [] # For creating an order, provide service IDs
     email: Optional[str] = None # Optional contact email for confirmation
+    locale: Optional[str] = None # Customer's app language (e.g. "de", "en") — used to localize emails
 
 class OrderCreate(OrderBase):
     pass

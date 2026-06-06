@@ -35,7 +35,9 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
   // Using useRouter from expo-router to handle navigation
   const router = useRouter();
 
-  const isCompleted = String(item.status || '').toLowerCase() === 'completed';
+  const statusKey = String(item.status || '').toLowerCase();
+  const isCompleted = statusKey === 'completed';
+  const isCancelled = statusKey === 'cancelled';
 
   const totalPrice = item.services.reduce((sum, service) => {
     return sum + service.price;
@@ -68,8 +70,26 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
             </Text>
             </View>
             <View style={styles.bottomRow}>
-            <View style={[styles.statusBadge, isCompleted ? styles.completedBadge : styles.openBadge]}>
-                <Text style={[styles.statusText, isCompleted ? styles.completedText : styles.openText]}>
+            <View
+              style={[
+                styles.statusBadge,
+                isCompleted
+                  ? styles.completedBadge
+                  : isCancelled
+                  ? styles.cancelledBadge
+                  : styles.openBadge,
+              ]}
+            >
+                <Text
+                  style={[
+                    styles.statusText,
+                    isCompleted
+                      ? styles.completedText
+                      : isCancelled
+                      ? styles.cancelledText
+                      : styles.openText,
+                  ]}
+                >
                 {item.status}
                 </Text>
             </View>
@@ -161,6 +181,9 @@ const styles = StyleSheet.create({
     completedBadge: {
         backgroundColor: '#E6FFE6', // Light green
     },
+    cancelledBadge: {
+        backgroundColor: '#FBE9EA', // Light red — matches the home screen
+    },
     statusText: {
         fontSize: 13,
         fontWeight: '600',
@@ -170,6 +193,9 @@ const styles = StyleSheet.create({
     },
     completedText: {
         color: '#28A745', // Green
+    },
+    cancelledText: {
+        color: '#D9534F', // Same red as the home screen badge
     },
     priceText: {
         fontSize: 18,

@@ -323,6 +323,7 @@ async def create_new_order(
             service_names=[s.name for s in db_order.services],
             total_price=total if db_order.services else None,
             currency=currency,
+            locale=order.locale or "de",
         )
 
         # 1. Customer confirmation (only if they provided an email).
