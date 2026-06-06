@@ -323,8 +323,8 @@ async def create_new_order(
             service_names=[s.name for s in db_order.services],
             total_price=total if db_order.services else None,
             currency=currency,
-            locale=order.locale or "de",
         )
+        customer_locale = order.locale or "de"
 
         # 1. Customer confirmation (only if they provided an email).
         if order.email:
@@ -333,18 +333,21 @@ async def create_new_order(
             background_tasks.add_task(
                 send_booking_confirmation,
                 to=order.email,
+                locale=customer_locale,
                 **common,
             )
         else:
             print(f"[order_create] order={db_order.id} no customer email on payload", flush=True)
 
-        # 2. Internal cleaner notification (always sent).
+        # 2. Internal cleaner notification — always in German regardless of
+        #    what the customer chose, since the cleaning team operates in DE.
         logger.info("Queueing cleaner notification email for order %s", db_order.id)
         print(f"[order_create] queueing cleaner email for order {db_order.id}", flush=True)
         background_tasks.add_task(
             send_cleaner_notification,
             order_uuid=db_order.uuid,
             customer_email=order.email,
+            locale="de",
             **common,
         )
     except Exception as e:
