@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Cancellation Policy — CleanCar{% endblock %}
+{% block title %}{{ t('web.policy.cancellation.title') }}{% endblock %}
 {% block content %}
-  <h1>Cancellation Policy</h1>
-  <p class="muted">Last updated: {{ today }}</p>
+  <h1>{{ t('web.policy.cancellation.heading') }}</h1>
+  <p class="muted">{{ t('web.last_updated') }} {{ today }}</p>
 
   <h2>1. Free cancellation window</h2>
   <p>You may cancel any booking free of charge up to <strong>2 hours</strong> before its scheduled start time.</p>

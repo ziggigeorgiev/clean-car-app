@@ -117,8 +117,23 @@
   </style>
 </head>
 <body>
-  <header>
-    <a class="brand" href="/">CleanCar</a>
+  <header style="display:flex; justify-content:space-between; align-items:center;">
+    <a class="brand" href="/">{{ t('web.brand') if t else 'CleanCar' }}</a>
+    {% if t %}
+      <div class="lang-switch" style="display:flex; gap:6px; font-size:13px;">
+        {% set _path = request.url.path %}
+        <a href="{{ _path }}?lang=de"
+           style="text-decoration:none; padding:4px 10px; border-radius:6px;
+                  background:{% if locale == 'de' %}var(--primary){% else %}#EEF3F3{% endif %};
+                  color:{% if locale == 'de' %}#fff{% else %}var(--text-light){% endif %};
+                  font-weight:600;">DE</a>
+        <a href="{{ _path }}?lang=en"
+           style="text-decoration:none; padding:4px 10px; border-radius:6px;
+                  background:{% if locale == 'en' %}var(--primary){% else %}#EEF3F3{% endif %};
+                  color:{% if locale == 'en' %}#fff{% else %}var(--text-light){% endif %};
+                  font-weight:600;">EN</a>
+      </div>
+    {% endif %}
   </header>
   <main>
     {% block content %}{% endblock %}

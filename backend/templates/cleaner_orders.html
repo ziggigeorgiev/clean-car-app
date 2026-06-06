@@ -1,22 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Cleaner — Orders{% endblock %}
+{% block title %}{{ t('web.cleaner.title') }}{% endblock %}
 {% block content %}
-  <h1>Open orders</h1>
-  <p class="muted">Pick an order to view its steps and mark progress.</p>
+  <h1>{{ t('web.cleaner.heading') }}</h1>
+  <p class="muted">{{ t('web.cleaner.subheading') }}</p>
 
   {% if not orders %}
-    <div class="empty">No open orders right now. Take a break ☕</div>
+    <div class="empty">{{ t('web.cleaner.empty') }}</div>
   {% endif %}
 
   {% for order in orders %}
     <a class="card" href="/cleaner/orders/{{ order.uuid }}" style="display:block; text-decoration:none; color:inherit;">
       <div class="card-row">
         <div>
-          <div class="step-title">Order #{{ order.id }} — {{ order.plate_number }}</div>
+          <div class="step-title">{{ t('web.cleaner.order_prefix') }} #{{ order.id }} — {{ order.plate_number }}</div>
           <div class="step-text">{{ order.location.address if order.location else '—' }}</div>
           <div class="step-text">{{ format_when(order.availability.time if order.availability else None) }}</div>
         </div>
-        <span class="badge {{ order.status }}">{{ order.status }}</span>
+        {% set st = order.status.value if order.status.value is defined else order.status %}
+        <span class="badge {{ st }}">{{ t('web.status.' ~ st) }}</span>
       </div>
     </a>
   {% endfor %}

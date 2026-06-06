@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks, Request
+from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks, Request, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
@@ -16,6 +16,7 @@ from typing import List, Dict, Optional
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
 from app.email_service import send_booking_confirmation, send_cleaner_notification
+from app.translations import translate as _tr, normalize_locale as _normalize_locale
 
 # Uvicorn configures the root logger AFTER our module loads, which can swallow
 # basicConfig(). Attach a dedicated stream handler to our app/email loggers so
@@ -56,6 +57,45 @@ def _format_when(value) -> str:
 templates.env.globals["format_when"] = _format_when
 
 
+# --- Web UI locale ----------------------------------------------------------
+WEB_LOCALE_COOKIE = "web_locale"
+_VALID_WEB_LOCALES = {"de", "en"}
+
+
+def web_locale(
+    lang: Optional[str] = None,
+    web_locale: Optional[str] = Cookie(default=None),
+) -> str:
+    """Resolve the request's locale from `?lang=` first, then the cookie, default DE."""
+    if lang and lang.lower() in _VALID_WEB_LOCALES:
+        return lang.lower()
+    if web_locale and web_locale.lower() in _VALID_WEB_LOCALES:
+        return web_locale.lower()
+    return "de"
+
+
+def render_web(
+    request: Request,
+    template: str,
+    locale: str,
+    context: Optional[Dict] = None,
+) -> Response:
+    """Render a Jinja template with a `t()` helper bound to ``locale``."""
+    ctx = dict(context or {})
+    ctx["locale"] = locale
+    ctx["t"] = lambda key, **params: _tr(key, locale, **params)
+    response = templates.TemplateResponse(request, template, ctx)
+    # Persist the choice so the user doesn't have to keep `?lang=` in the URL.
+    response.set_cookie(
+        WEB_LOCALE_COOKIE,
+        locale,
+        max_age=60 * 60 * 24 * 365,
+        httponly=False,
+        samesite="lax",
+    )
+    return response
+
+
 # --- Cleaner auth (HTTP Basic) ------------------------------------------------
 # Credentials come from env vars so they're not committed to git:
 #   CLEANER_USERNAME, CLEANER_PASSWORD
@@ -93,30 +133,24 @@ def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth
 # Web UI: policy pages
 # ---------------------------------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-async def web_root(request: Request):
+async def web_root(request: Request, locale: str = Depends(web_locale)):
     """Tiny landing page so '/' isn't a 404."""
-    return templates.TemplateResponse(request, "base.html", {})
+    return render_web(request, "base.html", locale, {})
 
 
 @app.get("/terms", response_class=HTMLResponse)
-async def web_terms(request: Request):
-    return templates.TemplateResponse(
-        request, "terms.html", {"today": date.today().isoformat()},
-    )
+async def web_terms(request: Request, locale: str = Depends(web_locale)):
+    return render_web(request, "terms.html", locale, {"today": date.today().isoformat()})
 
 
 @app.get("/privacy", response_class=HTMLResponse)
-async def web_privacy(request: Request):
-    return templates.TemplateResponse(
-        request, "privacy.html", {"today": date.today().isoformat()},
-    )
+async def web_privacy(request: Request, locale: str = Depends(web_locale)):
+    return render_web(request, "privacy.html", locale, {"today": date.today().isoformat()})
 
 
 @app.get("/cancellation", response_class=HTMLResponse)
-async def web_cancellation(request: Request):
-    return templates.TemplateResponse(
-        request, "cancellation.html", {"today": date.today().isoformat()},
-    )
+async def web_cancellation(request: Request, locale: str = Depends(web_locale)):
+    return render_web(request, "cancellation.html", locale, {"today": date.today().isoformat()})
 
 
 # ---------------------------------------------------------------------------
@@ -145,6 +179,7 @@ async def cleaner_index(_user: str = Depends(require_cleaner_auth)):
 async def cleaner_orders(
     request: Request,
     db: Session = Depends(get_db),
+    locale: str = Depends(web_locale),
     _user: str = Depends(require_cleaner_auth),
 ):
     orders = (
@@ -157,9 +192,7 @@ async def cleaner_orders(
         .order_by(models.Order.created_at.desc())
         .all()
     )
-    return templates.TemplateResponse(
-        request, "cleaner_orders.html", {"orders": orders},
-    )
+    return render_web(request, "cleaner_orders.html", locale, {"orders": orders})
 
 
 @app.get("/cleaner/orders/{order_uuid}", response_class=HTMLResponse)
@@ -169,6 +202,7 @@ async def cleaner_order_detail(
     ok: Optional[str] = None,
     err: Optional[str] = None,
     db: Session = Depends(get_db),
+    locale: str = Depends(web_locale),
     _user: str = Depends(require_cleaner_auth),
 ):
     order = _load_order_for_cleaner(db, order_uuid)
@@ -179,8 +213,8 @@ async def cleaner_order_detail(
         flash = {"kind": "ok", "message": ok}
     elif err:
         flash = {"kind": "err", "message": err}
-    return templates.TemplateResponse(
-        request, "cleaner_order_detail.html", {"order": order, "flash": flash},
+    return render_web(
+        request, "cleaner_order_detail.html", locale, {"order": order, "flash": flash},
     )
 
 

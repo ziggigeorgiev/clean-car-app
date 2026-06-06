@@ -1,72 +1,73 @@
 {% extends "base.html" %}
-{% block title %}Order #{{ order.id }} — Cleaner{% endblock %}
+{% block title %}{{ t('web.cleaner.order_prefix') }} #{{ order.id }} — Cleaner{% endblock %}
 {% block content %}
-  <p><a href="/cleaner/orders">&larr; All orders</a></p>
-  <h1>Order #{{ order.id }}</h1>
+  <p><a href="/cleaner/orders">{{ t('web.cleaner.back_to_list') }}</a></p>
+  <h1>{{ t('web.cleaner.order_prefix') }} #{{ order.id }}</h1>
   <p class="muted">{{ format_when(order.availability.time if order.availability else None) }} · {{ order.location.address if order.location else '—' }}</p>
 
   {% if flash %}
     <div class="flash {{ flash.kind }}">{{ flash.message }}</div>
   {% endif %}
 
+  {% set st = order.status.value if order.status.value is defined else order.status %}
   <div class="card">
-    <div class="card-row"><div>Vehicle</div><div><strong>{{ order.plate_number }}</strong></div></div>
-    <div class="card-row"><div>Phone</div><div><a href="tel:{{ order.phone_number }}">{{ order.phone_number }}</a></div></div>
-    <div class="card-row"><div>Status</div><div><span class="badge {{ order.status.value if order.status.value is defined else order.status }}">{{ order.status.value if order.status.value is defined else order.status }}</span></div></div>
+    <div class="card-row"><div>{{ t('web.cleaner.vehicle') }}</div><div><strong>{{ order.plate_number }}</strong></div></div>
+    <div class="card-row"><div>{{ t('web.cleaner.phone') }}</div><div><a href="tel:{{ order.phone_number }}">{{ order.phone_number }}</a></div></div>
+    <div class="card-row"><div>{{ t('web.cleaner.status') }}</div><div><span class="badge {{ st }}">{{ t('web.status.' ~ st) }}</span></div></div>
     <div class="step-actions" style="margin-top:12px;">
-      {% set st = order.status.value if order.status.value is defined else order.status %}
       {% if st == 'open' %}
         <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/completed">
-          <button class="btn" type="submit">Complete order</button>
+          <button class="btn" type="submit">{{ t('web.cleaner.complete_order') }}</button>
         </form>
         <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/cancelled"
-              onsubmit="return confirm('Cancel this order?');">
-          <button class="btn secondary" type="submit" style="border-color:#D9534F;color:#D9534F;">Cancel order</button>
+              onsubmit="return confirm('{{ t('web.cleaner.cancel_confirm') }}');">
+          <button class="btn secondary" type="submit" style="border-color:#D9534F;color:#D9534F;">{{ t('web.cleaner.cancel_order') }}</button>
         </form>
       {% else %}
         <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/status/open">
-          <button class="btn secondary" type="submit">Reopen order</button>
+          <button class="btn secondary" type="submit">{{ t('web.cleaner.reopen_order') }}</button>
         </form>
       {% endif %}
     </div>
   </div>
 
-  <h2>Services</h2>
+  <h2>{{ t('web.cleaner.services') }}</h2>
   <div class="card">
     <ul class="steps">
       {% for s in order.services %}
         <li>
-          <div class="step-title">{{ s.name }}</div>
+          <div class="step-title">{{ t(s.name) }}</div>
           <div class="step-text">{{ "%.2f"|format(s.price) }} {{ s.currency.value if s.currency.value is defined else s.currency }}</div>
         </li>
       {% endfor %}
     </ul>
   </div>
 
-  <h2>Process steps</h2>
+  <h2>{{ t('web.cleaner.process_steps') }}</h2>
   <div class="card">
     <ul class="steps">
       {% for step in order.process_steps %}
+        {% set step_st = step.status.value if step.status.value is defined else step.status %}
         <li>
           <div class="card-row">
             <div>
-              <div class="step-title">{{ step.name }}</div>
-              <div class="step-text">{{ step.text }}</div>
+              <div class="step-title">{{ t(step.name) }}</div>
+              <div class="step-text">{{ t(step.text) }}</div>
             </div>
-            <span class="badge {{ step.status }}">{{ step.status }}</span>
+            <span class="badge {{ step_st }}">{{ t('web.status.' ~ step_st) }}</span>
           </div>
           <div class="step-actions">
-            {% if step.status != 'in_progress' and step.status != 'completed' %}
+            {% if step_st != 'in_progress' and step_st != 'completed' %}
               <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/steps/{{ step.id }}/status/in_progress">
-                <button class="btn secondary" type="submit">Start</button>
+                <button class="btn secondary" type="submit">{{ t('web.cleaner.start') }}</button>
               </form>
             {% endif %}
-            {% if step.status != 'completed' %}
+            {% if step_st != 'completed' %}
               <form class="inline" method="post" action="/cleaner/orders/{{ order.uuid }}/steps/{{ step.id }}/status/completed">
-                <button class="btn" type="submit">Mark complete</button>
+                <button class="btn" type="submit">{{ t('web.cleaner.mark_complete') }}</button>
               </form>
             {% else %}
-              <button class="btn is-done" disabled>Completed</button>
+              <button class="btn is-done" disabled>{{ t('web.cleaner.completed_btn') }}</button>
             {% endif %}
           </div>
         </li>
