@@ -51,21 +51,59 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "step.completed.name":       {"en": "Completed",             "de": "Abgeschlossen"},
     "step.completed.text":       {"en": "Thanks for your order, we hope you are satisfied",
                                   "de": "Vielen Dank für Ihre Bestellung — wir hoffen, Sie sind zufrieden"},
+
+    # ----- customer booking confirmation email ------------------------------
+    "email.customer.subject":     {"en": "Booking confirmed — Order #{order_id}",
+                                   "de": "Buchung bestätigt — Auftrag #{order_id}"},
+    "email.customer.greeting":    {"en": "Hi,",                         "de": "Hallo,"},
+    "email.customer.intro":       {"en": "Thanks for your booking! Here are your details:",
+                                   "de": "Vielen Dank für Ihre Buchung! Hier sind Ihre Details:"},
+    "email.customer.outro":       {"en": "We will be in touch shortly to confirm your cleaner.",
+                                   "de": "Wir melden uns in Kürze, um Ihren Reiniger zu bestätigen."},
+    "email.customer.heading":     {"en": "Booking confirmed",          "de": "Buchung bestätigt"},
+    "email.customer.signature":   {"en": "— CleanCar",                  "de": "— CleanCar"},
+
+    # ----- cleaner notification email ---------------------------------------
+    "email.cleaner.subject":      {"en": "[CleanCar] New booking — Order #{order_id} @ {when}",
+                                   "de": "[CleanCar] Neue Buchung — Auftrag #{order_id} @ {when}"},
+    "email.cleaner.heading":      {"en": "New booking — Order #{order_id}",
+                                   "de": "Neue Buchung — Auftrag #{order_id}"},
+    "email.cleaner.intro":        {"en": "New booking for CleanCar:",
+                                   "de": "Neue Buchung für CleanCar:"},
+    "email.cleaner.cta_open":     {"en": "Open booking",                "de": "Buchung öffnen"},
+    "email.cleaner.cta_calendar": {"en": "Add to Google Calendar",      "de": "Zu Google Kalender hinzufügen"},
+    "email.cleaner.footer":       {"en": "CleanCar internal notification.",
+                                   "de": "Interne Benachrichtigung von CleanCar."},
+
+    # ----- shared field labels ----------------------------------------------
+    "email.field.order":    {"en": "Order",     "de": "Auftrag"},
+    "email.field.when":     {"en": "When",      "de": "Termin"},
+    "email.field.where":    {"en": "Where",     "de": "Ort"},
+    "email.field.vehicle":  {"en": "Vehicle",   "de": "Fahrzeug"},
+    "email.field.phone":    {"en": "Phone",     "de": "Telefon"},
+    "email.field.email":    {"en": "Email",     "de": "E-Mail"},
+    "email.field.services": {"en": "Services",  "de": "Leistungen"},
+    "email.field.total":    {"en": "Total",     "de": "Gesamt"},
+    "email.field.tz_suffix":{"en": "(Europe/Berlin)", "de": "(Europa/Berlin)"},
 }
 
 
-def translate(raw: str | None, locale: Locale = DEFAULT_LOCALE) -> str:
+def translate(raw: str | None, locale: Locale = DEFAULT_LOCALE, **params) -> str:
     """
     Translate a single key. If ``raw`` isn't itself a known key (e.g. a legacy
     row or a typo) it is returned verbatim — same safe-fallback behaviour as
-    the mobile app.
+    the mobile app. ``params`` are interpolated into ``{name}`` placeholders.
     """
     if not raw:
         return ""
     entry = _TRANSLATIONS.get(raw)
-    if not entry:
-        return raw
-    return entry.get(locale) or entry.get("en") or raw
+    value = entry.get(locale) or entry.get("en") or raw if entry else raw
+    if params:
+        try:
+            return value.format(**params)
+        except (KeyError, IndexError):
+            return value
+    return value
 
 
 def normalize_locale(locale: str | None) -> Locale:
