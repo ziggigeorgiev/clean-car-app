@@ -203,7 +203,6 @@ async def cleaner_order_detail(
     err: Optional[str] = None,
     db: Session = Depends(get_db),
     locale: str = Depends(web_locale),
-    _user: str = Depends(require_cleaner_auth),
 ):
     order = _load_order_for_cleaner(db, order_uuid)
     if order is None:
@@ -223,7 +222,6 @@ async def cleaner_update_order_status(
     order_uuid: str,
     new_status: schemas.OrderStatusEnum,
     db: Session = Depends(get_db),
-    _user: str = Depends(require_cleaner_auth),
 ):
     order = db.query(models.Order).filter(models.Order.uuid == order_uuid).first()
     if order is None:
@@ -241,7 +239,6 @@ async def cleaner_update_step(
     step_id: int,
     new_status: schemas.ProcessStepStatusEnum,
     db: Session = Depends(get_db),
-    _user: str = Depends(require_cleaner_auth),
 ):
     # Resolve the order via its uuid, then check the step belongs to it. This
     # prevents URLs from being forged to update steps from someone else's order.
