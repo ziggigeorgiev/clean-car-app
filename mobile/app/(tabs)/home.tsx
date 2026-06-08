@@ -18,6 +18,7 @@ import { Device } from '@/services/Device';
 import { useTranslation } from '@/services/i18n';
 import { formatDateTime } from '@/services/DateFormat';
 import Price from '@/components/Price';
+import { getServiceIcon } from '@/services/serviceIcons';
 
 type Service = {
   id: number;
@@ -206,25 +207,23 @@ const HomeScreen = () => {
             ]}
           >
             <Text style={styles.serviceNumber}>{String(idx + 1).padStart(2, '0')}</Text>
-            <View style={styles.serviceIconWrap}>
-              <MaterialCommunityIcons
-                name={
-                  /interior|innen|seat/i.test(service.name)
-                    ? 'car-seat'
-                    : /detail|full|premium/i.test(service.name)
-                    ? 'shimmer'
-                    : 'car-wash'
-                }
-                size={20}
-                color={COLORS.white}
+            {getServiceIcon(service.name) ? (
+              <Image
+                source={getServiceIcon(service.name)!}
+                style={styles.serviceIconImg}
+                resizeMode="contain"
               />
-            </View>
+            ) : (
+              <View style={styles.serviceIconWrap}>
+                <MaterialCommunityIcons name="car-wash" size={22} color={COLORS.white} />
+              </View>
+            )}
             <View style={styles.serviceTextWrap}>
-              <Text style={styles.serviceName} numberOfLines={2}>
+              <Text style={styles.serviceName}>
                 {tService(service, 'name')}
               </Text>
               {tService(service, 'description') ? (
-                <Text style={styles.serviceDesc} numberOfLines={1}>
+                <Text style={styles.serviceDesc}>
                   {tService(service, 'description')}
                 </Text>
               ) : null}
@@ -442,13 +441,20 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   serviceIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    overflow: 'hidden',
+  },
+  serviceIconImg: {
+    width: 36,
+    height: 36,
+    marginRight: 12,
+    borderRadius: 18,
   },
   serviceTextWrap: {
     flex: 1,

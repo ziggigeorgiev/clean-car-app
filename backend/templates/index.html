@@ -120,8 +120,8 @@
       font-size: 13px;
     }
     .services-list .ico {
-      width: 40px; height: 40px;
-      border-radius: 20px;
+      width: 36px; height: 36px;
+      border-radius: 18px;
       background: var(--primary);
       color: #fff;
       display: inline-flex;
@@ -129,6 +129,16 @@
       justify-content: center;
       font-weight: 700;
       font-size: 16px;
+      overflow: hidden;
+    }
+    .services-list .ico.has-img {
+      background: transparent;
+    }
+    .services-list .ico img {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 18px;
     }
     .services-list .name { font-weight: 700; color: var(--text); }
     .services-list .desc { color: var(--text-light); font-size: 13px; margin-top: 2px; }
@@ -204,14 +214,33 @@
     <h2 style="margin:0 0 6px;">{{ t('web.index.services_heading') }}</h2>
     <p class="muted">{{ t('web.index.services_sub') }}</p>
     <div class="services-list">
+      {% set service_icons = {
+        'interior_vacuum.name':      '01_interior_vacuum.png',
+        'dashboard_wipe.name':       '02_dashboard_trim_wipe_down.png',
+        'seat_wash.name':            '03_seat_wash_fabric.png',
+        'carpet_shampoo.name':       '04_carpet_shampoo.png',
+        'leather_conditioning.name': '05_leather_conditioning.png',
+        'window_cleaning.name':      '06_window_cleaning_interior.png',
+        'baby_seat.name':            '07_baby_seat_cleaning.png',
+        'pet_hair.name':             '08_pet_hair_removal.png',
+        'trunk_cleaning.name':       '09_kofferraum_reinigung.png',
+        'headliner_cleaning.name':   '10_decken_reinigung.png',
+      } %}
       {% for s in services %}
         {% set currency_value = s.currency.value if s.currency.value is defined else s.currency %}
         {% set sym = '€' if currency_value == 'EUR' else ('$' if currency_value == 'USD' else ('£' if currency_value == 'GBP' else currency_value)) %}
         {% set dollars = s.price | int %}
         {% set cents = ((s.price - dollars) * 100) | round | int %}
+        {% set icon_file = service_icons.get(s.name) %}
         <div class="row">
           <div class="num">{{ '%02d' % loop.index }}</div>
-          <div class="ico">{{ loop.index }}</div>
+          <div class="ico {% if icon_file %}has-img{% endif %}">
+            {% if icon_file %}
+              <img src="/static/icons/{{ icon_file }}" alt="" />
+            {% else %}
+              {{ loop.index }}
+            {% endif %}
+          </div>
           <div class="text">
             <div class="name">{{ t(s.name) }}</div>
             {% if s.description %}<div class="desc">{{ t(s.description) }}</div>{% endif %}

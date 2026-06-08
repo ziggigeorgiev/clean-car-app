@@ -22,6 +22,8 @@ import { Transformations } from "../../services/Transformations";
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import Price from '../../components/Price';
 import { useTranslation } from '../../services/i18n';
+import { getServiceIcon } from '../../services/serviceIcons';
+import { Image } from 'react-native';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
@@ -389,6 +391,12 @@ const styles = StyleSheet.create({
     marginTop: -10,
     marginBottom: 10,
     marginLeft: 4,
+  },
+  extraServiceIcon: {
+    width: 32,
+    height: 32,
+    marginHorizontal: 10,
+    borderRadius: 16,
   },
   outerCheckboxContainer: {
     width: 23,
