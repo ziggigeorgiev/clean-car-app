@@ -10,6 +10,9 @@ export type Locale = 'de' | 'en';
 export const DEFAULT_LOCALE: Locale = 'de';
 const STORAGE_KEY = 'app_locale';
 
+// Re-exported for convenience by AppLoading (and anyone else who needs the
+// raw translate function without React context).
+
 // Add new keys here. Missing keys fall back to the English string.
 const translations = {
   // Tab bar
@@ -44,6 +47,7 @@ const translations = {
   'loading.order_details': { en: 'Loading order details...', de: 'Auftragsdetails werden geladen ...' },
   'loading.booking_confirmation': { en: 'Loading booking confirmation', de: 'Buchungsbestätigung wird geladen' },
   'empty.no_orders': { en: 'We are unable to find any orders at this time.', de: 'Aktuell sind keine Aufträge vorhanden.' },
+  'empty.no_orders_title': { en: 'No orders found', de: 'Keine Aufträge gefunden' },
   'empty.no_times': { en: 'No available times for this date.', de: 'Für dieses Datum sind keine Termine verfügbar.' },
 
   // Acknowledge
@@ -123,6 +127,12 @@ const translations = {
   'home.eco_title': { en: 'Environmentally friendly', de: 'Umweltfreundlich' },
   'home.eco_desc': { en: 'Sustainable and gentle cleaning products', de: 'Nachhaltige und schonende Reinigungsmittel' },
 
+  // App splash / loading screen
+  'app.copyright': {
+    en: '© 2026 CarGrime · All rights reserved.',
+    de: '© 2026 CarGrime · Alle Rechte vorbehalten.',
+  },
+
   // New home (hero / recent booking / service tiles)
   'home.hero_offer': {
     en: 'Book your professional interior car cleaning at your place now',
@@ -153,6 +163,68 @@ const translations = {
 
   'wax.name': { en: 'Wax & polish', de: 'Wachs & Politur' },
   'wax.description': { en: 'Protective wax coat and hand polish', de: 'Schützende Wachsschicht und Handpolitur' },
+
+  // ----- new interior cleaning catalog (Basic) ----------------------------
+  'interior_vacuum.name': { en: 'Interior vacuum', de: 'Innenstaubsauger' },
+  'interior_vacuum.description': {
+    en: 'Carpets, mats, seats and trunk thoroughly vacuumed.',
+    de: 'Teppiche, Matten, Sitze und Kofferraum gründlich gesaugt.',
+  },
+
+  'dashboard_wipe.name': { en: 'Dashboard & trim wipe-down', de: 'Armaturenbrett & Zierleisten' },
+  'dashboard_wipe.description': {
+    en: 'All hard surfaces wiped and dust-free.',
+    de: 'Alle harten Oberflächen gereinigt und staubfrei.',
+  },
+
+  'seat_wash.name': { en: 'Seat wash (fabric)', de: 'Sitzwäsche (Stoff)' },
+  'seat_wash.description': {
+    en: 'Deep-cleans cloth seats; removes spills and odors.',
+    de: 'Tiefenreinigung von Stoffsitzen; entfernt Flecken und Gerüche.',
+  },
+
+  'carpet_shampoo.name': { en: 'Carpet shampoo', de: 'Teppichshampoonierung' },
+  'carpet_shampoo.description': {
+    en: 'Wet extraction for stains and ground-in dirt.',
+    de: 'Nassextraktion für Flecken und festsitzenden Schmutz.',
+  },
+
+  'leather_conditioning.name': { en: 'Leather conditioning', de: 'Lederpflege' },
+  'leather_conditioning.description': {
+    en: 'Cleans and nourishes leather seats to prevent cracking.',
+    de: 'Reinigt und pflegt Ledersitze, um Risse zu vermeiden.',
+  },
+
+  // ----- new interior cleaning catalog (Extras) ---------------------------
+  'window_cleaning.name': { en: 'Window cleaning (interior)', de: 'Fensterreinigung (innen)' },
+  'window_cleaning.description': {
+    en: 'Streak-free clean on the inside of all windows.',
+    de: 'Streifenfreie Reinigung der Innenseite aller Scheiben.',
+  },
+
+  'baby_seat.name': { en: 'Baby seat cleaning', de: 'Kindersitzreinigung' },
+  'baby_seat.description': {
+    en: 'Deep clean of child / baby seats, including straps.',
+    de: 'Tiefenreinigung von Kinder- und Babysitzen, inkl. Gurte.',
+  },
+
+  'pet_hair.name': { en: 'Pet hair removal', de: 'Tierhaarentfernung' },
+  'pet_hair.description': {
+    en: 'Specialized brushes for stubborn pet hair on fabrics.',
+    de: 'Spezielle Bürsten gegen hartnäckige Tierhaare auf Stoffen.',
+  },
+
+  'trunk_cleaning.name': { en: 'Trunk cleaning', de: 'Kofferraum-Reinigung' },
+  'trunk_cleaning.description': {
+    en: 'Deep vacuum and wipe-down of the entire trunk, including spare-tire well and side panels.',
+    de: 'Gründliches Saugen und Wischen des gesamten Kofferraums, inkl. Reserveradmulde und Seitenverkleidungen.',
+  },
+
+  'headliner_cleaning.name': { en: 'Headliner cleaning', de: 'Decken-Reinigung' },
+  'headliner_cleaning.description': {
+    en: 'Spot-cleans the roof fabric — stains, smoke residue and dust.',
+    de: 'Punktreinigung des Dachhimmels — Flecken, Rauchrückstände und Staub.',
+  },
 
   // Category aggregate labels shown above the per-service list.
   'category.basic.name': { en: 'Basic cleaning', de: 'Standardreinigung' },

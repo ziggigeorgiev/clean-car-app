@@ -6,13 +6,13 @@
   <title>{% block title %}CleanCar{% endblock %}</title>
   <style>
     :root {
-      --primary: #0EA5A4;
-      --primary-dark: #0E7490;
-      --text: #0F2C2C;
-      --text-light: #5A7A7A;
-      --bg: #F7FAFA;
+      --primary: #2C4D9F;
+      --primary-dark: #1F3877;
+      --text: #1A2238;
+      --text-light: #6B7280;
+      --bg: #F5F7FB;
       --card: #ffffff;
-      --border: #E4ECEC;
+      --border: #E3E8F1;
       --success: #28A745;
       --success-bg: #E6F6EA;
       --danger: #D9534F;
@@ -31,13 +31,20 @@
       padding: 14px 20px;
     }
     header .brand {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--primary);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+    }
+    header .brand img.brand-icon {
+      height: 30px;
+      width: auto;
+      display: block;
+    }
+    header .brand img.brand-wordmark {
+      height: 35px;
+      width: auto;
+      display: block;
     }
     main {
       max-width: 720px;
@@ -114,11 +121,42 @@
     .flash.ok { background: var(--success-bg); color: var(--success); }
     .flash.err { background: #F8D7DA; color: var(--danger); }
     a { color: var(--primary); }
+    footer.site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--card);
+      margin-top: 40px;
+      padding: 18px 20px;
+    }
+    footer.site-footer .inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    footer.site-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    footer.site-footer a:hover { text-decoration: underline; }
+    footer.site-footer .copyright {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
   <header style="display:flex; justify-content:space-between; align-items:center;">
-    <a class="brand" href="/">{{ t('web.brand') if t else 'CleanCar' }}</a>
+    <a class="brand" href="/" aria-label="{{ t('web.brand') if t else 'CleanCar' }}">
+      <img class="brand-icon" src="/static/cleen-logo.png" alt="" />
+      <img class="brand-wordmark" src="/static/grime-logo.png" alt="{{ t('web.brand') if t else 'CleanCar' }}" />
+    </a>
     {% if t %}
       <div class="lang-switch" style="display:flex; gap:6px; font-size:13px;">
         {% set _path = request.url.path %}
@@ -138,5 +176,17 @@
   <main>
     {% block content %}{% endblock %}
   </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <a href="/terms">{{ t('web.policy.terms.heading') if t else 'Terms & Conditions' }}</a>
+      <span style="opacity:.5;">·</span>
+      <a href="/privacy">{{ t('web.policy.privacy.heading') if t else 'Privacy Policy' }}</a>
+      <span style="opacity:.5;">·</span>
+      <a href="/cancellation">{{ t('web.policy.cancellation.heading') if t else 'Cancellation Policy' }}</a>
+    </div>
+    <div class="copyright">
+      {{ t('web.footer.copyright') if t else '© 2026 CarGrime · Alle Rechte vorbehalten.' }}
+    </div>
+  </footer>
 </body>
 </html>

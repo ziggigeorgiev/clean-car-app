@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 from fastapi import FastAPI, Depends, HTTPException, Response, status, BackgroundTasks, Request, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload, selectinload
 from typing import List, Dict, Optional
@@ -33,7 +34,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# --- Web UI templates ---------------------------------------------------------
+# --- Web UI templates + static assets ---------------------------------------
+STATIC_DIR = Path(__file__).parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 print(
     f"[startup] templates dir={TEMPLATES_DIR} exists={TEMPLATES_DIR.exists()} "
@@ -133,9 +138,29 @@ def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth
 # Web UI: policy pages
 # ---------------------------------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
-async def web_root(request: Request, locale: str = Depends(web_locale)):
-    """Tiny landing page so '/' isn't a 404."""
-    return render_web(request, "base.html", locale, {})
+async def web_root(
+    request: Request,
+    locale: str = Depends(web_locale),
+    db: Session = Depends(get_db),
+):
+    """Public marketing landing page — services overview + app download."""
+    services = (
+        db.query(models.Service)
+        .filter(models.Service.is_active.is_(True))
+        .order_by(models.Service.id)
+        .all()
+    )
+    return render_web(
+        request,
+        "index.html",
+        locale,
+        {
+            "services": services,
+            # TODO: replace with real App Store / Play Store URLs once published.
+            "ios_url": "https://apps.apple.com/app/cleancar",
+            "android_url": "https://play.google.com/store/apps/details?id=de.cleancar.app",
+        },
+    )
 
 
 @app.get("/terms", response_class=HTMLResponse)

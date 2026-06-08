@@ -29,6 +29,50 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "wax.description":          {"en": "Protective wax coat and hand polish",
                                  "de": "Schützende Wachsschicht und Handpolitur"},
 
+    # ----- new interior cleaning catalog (Basic) -------------------------
+    "interior_vacuum.name":         {"en": "Interior vacuum",   "de": "Innenstaubsauger"},
+    "interior_vacuum.description":  {"en": "Carpets, mats, seats and trunk thoroughly vacuumed.",
+                                     "de": "Teppiche, Matten, Sitze und Kofferraum gründlich gesaugt."},
+
+    "dashboard_wipe.name":          {"en": "Dashboard & trim wipe-down",
+                                     "de": "Armaturenbrett & Zierleisten"},
+    "dashboard_wipe.description":   {"en": "All hard surfaces wiped and dust-free.",
+                                     "de": "Alle harten Oberflächen gereinigt und staubfrei."},
+
+    "seat_wash.name":               {"en": "Seat wash (fabric)", "de": "Sitzwäsche (Stoff)"},
+    "seat_wash.description":        {"en": "Deep-cleans cloth seats; removes spills and odors.",
+                                     "de": "Tiefenreinigung von Stoffsitzen; entfernt Flecken und Gerüche."},
+
+    "carpet_shampoo.name":          {"en": "Carpet shampoo",    "de": "Teppichshampoonierung"},
+    "carpet_shampoo.description":   {"en": "Wet extraction for stains and ground-in dirt.",
+                                     "de": "Nassextraktion für Flecken und festsitzenden Schmutz."},
+
+    "leather_conditioning.name":         {"en": "Leather conditioning", "de": "Lederpflege"},
+    "leather_conditioning.description":  {"en": "Cleans and nourishes leather seats to prevent cracking.",
+                                          "de": "Reinigt und pflegt Ledersitze, um Risse zu vermeiden."},
+
+    # ----- new interior cleaning catalog (Extras) ------------------------
+    "window_cleaning.name":         {"en": "Window cleaning (interior)",
+                                     "de": "Fensterreinigung (innen)"},
+    "window_cleaning.description":  {"en": "Streak-free clean on the inside of all windows.",
+                                     "de": "Streifenfreie Reinigung der Innenseite aller Scheiben."},
+
+    "baby_seat.name":               {"en": "Baby seat cleaning", "de": "Kindersitzreinigung"},
+    "baby_seat.description":        {"en": "Deep clean of child / baby seats, including straps.",
+                                     "de": "Tiefenreinigung von Kinder- und Babysitzen, inkl. Gurte."},
+
+    "pet_hair.name":                {"en": "Pet hair removal",  "de": "Tierhaarentfernung"},
+    "pet_hair.description":         {"en": "Specialized brushes for stubborn pet hair on fabrics.",
+                                     "de": "Spezielle Bürsten gegen hartnäckige Tierhaare auf Stoffen."},
+
+    "trunk_cleaning.name":          {"en": "Trunk cleaning",    "de": "Kofferraum-Reinigung"},
+    "trunk_cleaning.description":   {"en": "Deep vacuum and wipe-down of the entire trunk, including spare-tire well and side panels.",
+                                     "de": "Gründliches Saugen und Wischen des gesamten Kofferraums, inkl. Reserveradmulde und Seitenverkleidungen."},
+
+    "headliner_cleaning.name":      {"en": "Headliner cleaning", "de": "Decken-Reinigung"},
+    "headliner_cleaning.description": {"en": "Spot-cleans the roof fabric — stains, smoke residue and dust.",
+                                       "de": "Punktreinigung des Dachhimmels — Flecken, Rauchrückstände und Staub."},
+
     # ----- process steps ----------------------------------------------------
     "step.booking_confirmed.name": {"en": "Thanks for your order",
                                     "de": "Vielen Dank für Ihre Bestellung"},
@@ -142,6 +186,30 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     # stays in the existing templates for now, but the page chrome translates.)
     "web.policy.questions":         {"en": "Questions? Reach us at",
                                      "de": "Fragen? Erreichen Sie uns unter"},
+
+    # public index
+    "web.index.title":              {"en": "CleanCar — Professional on-site car cleaning",
+                                     "de": "CleanCar — Professionelle Autoreinigung vor Ort"},
+    "web.index.hero_headline":      {"en": "Book your professional car cleaning at your place",
+                                     "de": "Buchen Sie Ihre professionelle Autoreinigung bei Ihnen vor Ort"},
+    "web.index.hero_sub":           {"en": "Trained cleaners, premium equipment, eco-friendly products. Download the app and book in seconds.",
+                                     "de": "Geschulte Reiniger, Premium-Ausstattung, umweltfreundliche Produkte. Laden Sie die App herunter und buchen Sie in Sekunden."},
+    "web.index.download_heading":   {"en": "Get the app",
+                                     "de": "App herunterladen"},
+    "web.index.download_sub":       {"en": "Scan the QR with your phone or tap a badge below.",
+                                     "de": "Scannen Sie den QR-Code mit Ihrem Handy oder tippen Sie auf eine der Schaltflächen."},
+    "web.index.qr_ios":             {"en": "Scan for iOS",
+                                     "de": "QR für iOS scannen"},
+    "web.index.qr_android":         {"en": "Scan for Android",
+                                     "de": "QR für Android scannen"},
+    "web.index.services_heading":   {"en": "Our services",
+                                     "de": "Unsere Leistungen"},
+    "web.index.services_sub":       {"en": "Pick the basics or add-on extras. Transparent prices, no surprises.",
+                                     "de": "Wählen Sie das Standardpaket oder fügen Sie Extras hinzu. Transparente Preise, keine Überraschungen."},
+    "web.index.footer_legal":       {"en": "Legal",
+                                     "de": "Rechtliches"},
+    "web.footer.copyright":         {"en": "© 2026 CarGrime · All rights reserved.",
+                                     "de": "© 2026 CarGrime · Alle Rechte vorbehalten."},
 }
 
 

@@ -1,17 +1,31 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { COLORS } from "../constants/colors";
-import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "../services/i18n";
 
-export default function NoResultsFound({ message = "Loading..."}) {
+type Props = {
+  title?: string;
+  message?: string;
+};
+
+export default function NoResultsFound({ title, message }: Props) {
+  const { t } = useTranslation();
   return (
     <View style={styles.emptyState}>
-      <Image
-        source={require('../assets/images/cleen-logo.png')} 
-        style={styles.itemImage}
-      />
-      <Text style={styles.emptyTitle}>No orders found</Text>
+      <View style={styles.logoStack}>
+        <Image
+          source={require('../assets/images/cleen-logo.png')}
+          style={styles.cleenLogo}
+          resizeMode="contain"
+        />
+        <Image
+          source={require('../assets/images/grime-logo.png')}
+          style={styles.grimeLogo}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.emptyTitle}>{title ?? t('empty.no_orders_title')}</Text>
       <Text style={styles.emptyDescription}>
-        {message}
+        {message ?? t('empty.no_orders')}
       </Text>
     </View>
   );
@@ -24,25 +38,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 64,
   },
+  logoStack: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cleenLogo: {
+    width: 110,
+    height: 110,
+  },
+  grimeLogo: {
+    width: 130,
+    height: 38,
+    marginTop: 4,
+  },
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: COLORS.text,
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 12,
+    marginBottom: 6,
   },
   emptyDescription: {
     fontSize: 14,
     color: COLORS.textLight,
     textAlign: "center",
     lineHeight: 20,
-  },
-  itemImage: {
-    width: 160,
-    height: 100,
-    borderRadius: 0,
-    backgroundColor: COLORS.primary,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 32,
   },
 });

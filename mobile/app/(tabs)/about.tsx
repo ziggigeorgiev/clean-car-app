@@ -22,10 +22,14 @@ const AboutScreen = () => {
       <ScrollView contentContainerStyle={styles.container}>
         {/* Logo Section */}
         <View style={styles.logoContainer}>
-          {/* Placeholder for the logo image */}
           <Image
             source={require('../../assets/images/cleen-logo.png')}
-            style={styles.logo}
+            style={styles.cleenLogo}
+            resizeMode="contain"
+          />
+          <Image
+            source={require('../../assets/images/grime-logo.png')}
+            style={styles.grimeLogo}
             resizeMode="contain"
           />
           <Text style={styles.versionText}>Version 1.0.0</Text>
@@ -91,10 +95,15 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     marginTop: 20,
   },
-  logo: {
-    width: 200,
-    height: 70,
-    marginBottom: 5,
+  cleenLogo: {
+    width: 140,
+    height: 140,
+  },
+  grimeLogo: {
+    width: 150,
+    height: 44,
+    marginTop: 4,
+    marginBottom: 6,
   },
   versionText: {
     fontSize: 12,

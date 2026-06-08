@@ -118,7 +118,13 @@ const HomeScreen = () => {
             style={styles.brandLogo}
             resizeMode="contain"
           />
-          <Text style={styles.brandText}>{t('home.title')}</Text>
+          <Image
+            source={require('@/assets/images/grime-logo.png')}
+            style={styles.brandWordmark}
+            resizeMode="contain"
+          />
+          {/* Hidden screen-reader friendly fallback */}
+          <Text accessibilityLabel={t('home.title')} style={{ width: 0, height: 0 }} />
         </View>
       </View>
 
@@ -260,11 +266,16 @@ const styles = StyleSheet.create({
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 0,
   },
   brandLogo: {
     width: 44,
     height: 32,
+  },
+  brandWordmark: {
+    height: 35,
+    width: 140,
+    marginLeft: -28,
   },
   brandText: {
     fontSize: 22,
