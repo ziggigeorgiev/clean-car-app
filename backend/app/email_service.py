@@ -43,7 +43,7 @@ BERLIN_TZ = ZoneInfo("Europe/Berlin")
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://clean-car-app.onrender.com").rstrip("/")
 
 # Where cleaner notifications go.
-CLEANER_NOTIFY_EMAIL = os.getenv("CLEANER_NOTIFY_EMAIL", "info@cleen.de")
+CLEANER_NOTIFY_EMAIL = os.getenv("CLEANER_NOTIFY_EMAIL", "info@cargrime.de")
 
 # Duration of a booking slot (must match BOOKING_DURATION_MINUTES on the
 # mobile side; used to compute calendar event end times).
