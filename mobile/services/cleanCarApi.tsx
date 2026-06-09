@@ -1,7 +1,9 @@
 // Backend base URL — driven by .env (EXPO_PUBLIC_API_BASE_URL).
-// Falls back to the production Render URL so a missing env doesn't break runtime.
-const BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://cargrime.de/';
+// Falls back to the production URL so a missing env doesn't break runtime.
+// Strip any trailing slash so `${BASE_URL}/api/...` never produces a double slash.
+const BASE_URL = (
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://cargrime.de'
+).replace(/\/+$/, '');
 
 export type ProcessStepStatus = 'not_started' | 'in_progress' | 'completed' | 'failed';
 export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
