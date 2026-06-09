@@ -15,6 +15,13 @@ import ContactDetails from "@/components/ContactDetails";
 import StepIndocator from '../../components/StepIndicator';
 import { useTranslation } from "../../services/i18n";
 import { WebUrls } from "../../services/webUrls";
+import Constants from 'expo-constants';
+
+// Pulled from app.json's `expo.version` at build time so we have one source of truth.
+const APP_VERSION =
+  Constants.expoConfig?.version ??
+  (Constants.manifest as any)?.version ??
+  '0.0.0';
 
 const AboutScreen = () => {
   const { t } = useTranslation();
@@ -35,7 +42,7 @@ const AboutScreen = () => {
             style={styles.grimeLogo}
             resizeMode="contain"
           />
-          <Text style={styles.versionText}>{t('about.version')} 1.0.0</Text>
+          <Text style={styles.versionText}>{t('about.version')} {APP_VERSION}</Text>
         </View>
 
         {/* About Us Section */}
