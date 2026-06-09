@@ -4,21 +4,59 @@
   <h1>{{ t('web.policy.cancellation.heading') }}</h1>
   <p class="muted">{{ t('web.last_updated') }} {{ today }}</p>
 
+{% if locale == 'de' %}
+
+  <h2>1. Kostenfreies Stornofenster</h2>
+  <p>Sie können jede Buchung bis <strong>2 Stunden</strong> vor dem vereinbarten Beginn kostenfrei stornieren.</p>
+
+  <h2>2. Späte Stornierungen</h2>
+  <p>Bei Stornierungen innerhalb von 2 Stunden vor Beginn fällt eine Gebühr in Höhe von <strong>50&nbsp;% des Gesamtbetrags</strong> an. Sie deckt die reservierte Zeit und die Anfahrt des Reinigers ab.</p>
+
+  <h2>3. Nichterscheinen des Kunden</h2>
+  <p>Erscheint der Reiniger am vereinbarten Ort und die Reinigung kann nicht durchgeführt werden (Fahrzeug nicht da, kein Zugang etc.), wird der volle Buchungspreis berechnet.</p>
+
+  <h2>4. Verspätung des Kunden</h2>
+  <p>Wir gewähren <strong>15 Minuten</strong> Karenz nach dem vereinbarten Beginn. Erscheinen Sie oder geben Sie das Fahrzeug nach diesem Zeitraum nicht frei, gilt der Termin als Nichterscheinen (siehe Abschnitt 3).</p>
+
+  <h2>5. Reinigung aus Gründen des Kunden nicht möglich (ohne rechtzeitige Mitteilung)</h2>
+  <p>Kann die Reinigung aus Gründen, die der Buchende zu vertreten hat, nicht durchgeführt werden – z. B. kein Zugang zum Fahrzeug, Fahrzeug verschlossen, Fahrzeug umgeparkt, fehlende Schlüsselübergabe trotz Notwendigkeit, unsicherer Standort, Anwesenheit von Haustieren/Kindern im Fahrzeug, mangelnde Bereitschaft für eine extreme Verschmutzung etc. – und wurde der Reiniger darüber <strong>nicht rechtzeitig</strong> (in der Regel mindestens 2 Stunden vor Beginn) informiert, wird eine Gebühr in Höhe von <strong>50&nbsp;% des Gesamtbetrags</strong> berechnet. Sie deckt die reservierte Zeit und die Anfahrt des Reinigers ab.</p>
+
+  <h2>6. Stornierungen durch uns</h2>
+  <p>Müssen wir Ihre Buchung absagen – etwa wegen extremer Wetterlagen (Sturm, Frost, Hagel, sintflutartiger Regen), eines Fahrzeug- oder Ausrüstungsproblems oder weil kein Reiniger verfügbar ist – fallen für Sie keine Kosten an. Wir bieten Ihnen einen neuen Termin sowie, sofern möglich, einen Rabatt auf Ihre nächste Buchung an.</p>
+  <p>Aus Sicherheitsgründen kann auch der Reiniger vor Ort von einer Reinigung absehen oder den Termin verschieben (z. B. ungeeignete Wetterbedingungen, unsicherer Parkplatz). In diesem Fall fällt ebenfalls keine Gebühr an.</p>
+
+  <h2>7. So stornieren Sie</h2>
+  <p>Öffnen Sie die Buchung in der App und nutzen Sie die Stornofunktion, oder schreiben Sie uns an <a href="mailto:support@cleencar.example">support@cleencar.example</a>.</p>
+
+  <h2>8. Rückerstattungen</h2>
+  <p>Rückerstattungen für bereits gezahlte Buchungen werden binnen 5 Werktagen auf das ursprüngliche Zahlungsmittel erstattet.</p>
+
+{% else %}
+
   <h2>1. Free cancellation window</h2>
   <p>You may cancel any booking free of charge up to <strong>2 hours</strong> before its scheduled start time.</p>
 
   <h2>2. Late cancellations</h2>
   <p>If you cancel within 2 hours of the start time, a fee of <strong>50% of the booking total</strong> applies. This covers reserved slot time and the cleaner's travel.</p>
 
-  <h2>3. No-shows</h2>
+  <h2>3. Customer no-shows</h2>
   <p>If the cleaner arrives at the agreed location but cannot start the service (vehicle unavailable, no access, etc.), the full booking price will be charged.</p>
 
-  <h2>4. We cancel</h2>
-  <p>If we have to cancel your booking — e.g. extreme weather, vehicle/equipment issue, or unavailable cleaner — you pay nothing. We will offer to reschedule and, where possible, provide a discount on your next booking.</p>
+  <h2>4. Customer late arrival</h2>
+  <p>We allow a <strong>15-minute</strong> grace period after the agreed start time. If you do not appear or release the vehicle within that window, the appointment is treated as a no-show (see Section 3).</p>
 
-  <h2>5. How to cancel</h2>
+  <h2>5. Service cannot be performed due to customer-side reasons (no prior notice)</h2>
+  <p>If the cleaning cannot be carried out for reasons attributable to the customer — e.g. no access to the vehicle, the vehicle is locked, the vehicle has been moved, keys are not handed over when needed, the parking spot is unsafe, pets or children remain in the vehicle, the customer refuses an extra-dirty surcharge etc. — and the cleaner has <strong>not been informed in time</strong> (at least 2 hours before the scheduled start), a fee of <strong>50% of the booking total</strong> will be charged. This covers the reserved slot and the cleaner's travel.</p>
+
+  <h2>6. Cancellations by us</h2>
+  <p>If we have to cancel your booking — e.g. extreme weather (storm, freezing temperatures, hail, heavy rain), a vehicle or equipment issue, or no available cleaner — you pay nothing. We will offer a reschedule and, where possible, a discount on your next booking.</p>
+  <p>For safety reasons the cleaner on site may also decline or reschedule a cleaning (e.g. unsafe weather, unsafe parking). No fee applies in that case either.</p>
+
+  <h2>7. How to cancel</h2>
   <p>Open the booking in the app and use the cancel option, or contact us at <a href="mailto:support@cleencar.example">support@cleencar.example</a>.</p>
 
-  <h2>6. Refunds</h2>
+  <h2>8. Refunds</h2>
   <p>Refunds for already-paid bookings are processed to the original payment method within 5 business days.</p>
+
+{% endif %}
 {% endblock %}

@@ -4,6 +4,41 @@
   <h1>{{ t('web.policy.privacy.heading') }}</h1>
   <p class="muted">{{ t('web.last_updated') }} {{ today }}</p>
 
+{% if locale == 'de' %}
+
+  <h2>1. Welche Daten wir erheben</h2>
+  <p>Zur Erbringung unseres Service erheben wir: das von Ihnen eingegebene amtliche Kennzeichen, Ihre Telefonnummer, den Standort, an dem die Reinigung durchgeführt werden soll, eine anonyme Geräte-ID sowie – optional – Ihre E-Mail-Adresse, sofern Sie diese in den Einstellungen hinterlegen.</p>
+
+  <h2>2. Wie wir Ihre Daten verwenden</h2>
+  <p>Wir verwenden Ihre Daten, um den Termin zu planen und durchzuführen, Sie zu Ihrem Auftrag zu kontaktieren, Ihnen ggf. eine Buchungsbestätigung per E-Mail zu senden sowie den Service zu betreiben und weiterzuentwickeln.</p>
+
+  <h2>3. Weitergabe</h2>
+  <p>Wir geben Daten weiter an: (a) den für Ihre Buchung zuständigen Reiniger, beschränkt auf das, was für die Durchführung erforderlich ist; (b) eingesetzte Auftragsverarbeiter (Datenbank-Hosting, E-Mail-Versand), die in unserem Auftrag handeln. Ein Verkauf personenbezogener Daten findet nicht statt.</p>
+
+  <h2>4. Foto- &amp; Videoaufnahmen</h2>
+  <p>Zur Qualitätssicherung und zur Bearbeitung etwaiger Beanstandungen kann der Reiniger <strong>Vorher-/Nachher-Aufnahmen</strong> des Fahrzeugs anfertigen (außen und innen). Diese Aufnahmen werden bis zu <strong>12 Monate</strong> aufbewahrt und dann gelöscht. Sie können dem Anfertigen solcher Aufnahmen vor Beginn der Reinigung widersprechen; in Streitfällen kann dies die Klärung erschweren. Wir machen keine Detailaufnahmen persönlicher Gegenstände.</p>
+
+  <h2>5. Persönliche Gegenstände, die während der Reinigung sichtbar werden</h2>
+  <p>Der Reiniger kann während der Arbeit persönliche Gegenstände im Fahrzeug sehen. Handschuhfach, Mittelkonsole oder Kofferraum werden nur dann geöffnet, wenn dies für die ausgewählte Leistung notwendig ist oder Sie ausdrücklich darum bitten. Gegenstände werden nicht durchsucht oder fotografiert.</p>
+
+  <h2>6. Aufbewahrungsdauer</h2>
+  <p>Auftragsdaten werden bis zu 24 Monate aufbewahrt, um Rückerstattungen, Streitfälle und buchhalterische Anforderungen abdecken zu können. Sie können jederzeit per Mail unten die Löschung beantragen; bestimmte Daten unterliegen gesetzlichen Aufbewahrungspflichten.</p>
+
+  <h2>7. Ihre Rechte</h2>
+  <p>Nach der DSGVO haben Sie das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit sowie Widerspruch. Wenden Sie sich dazu an <a href="mailto:privacy@cleencar.example">privacy@cleencar.example</a>. Sie haben außerdem das Recht, sich bei einer zuständigen Aufsichtsbehörde zu beschweren.</p>
+
+  <h2>8. Sicherheit</h2>
+  <p>Wir nutzen Transportverschlüsselung (HTTPS) und übliche Zugriffsbeschränkungen auf unsere Datenbank. Vollständige Sicherheit kann jedoch kein System garantieren – melden Sie sich umgehend, wenn Sie einen Sicherheitsvorfall vermuten.</p>
+
+  <h2>9. Cookies &amp; lokale Speicherung</h2>
+  <p>Die App speichert kleine Datenmengen lokal auf Ihrem Gerät (Kennzeichen, Telefonnummer, E-Mail-Adresse), damit Formulare vorausgefüllt werden können. Diese Daten verlassen Ihr Gerät nur, wenn Sie damit eine Buchung vornehmen.</p>
+  <p>Auf der Website verwenden wir ein Cookie, um Ihre Sprachauswahl (DE/EN) zu speichern. Dieses ist technisch erforderlich und enthält keine personenbezogenen Daten.</p>
+
+  <h2>10. Kontakt</h2>
+  <p>Datenschutzanfragen: <a href="mailto:privacy@cleencar.example">privacy@cleencar.example</a>.</p>
+
+{% else %}
+
   <h2>1. What we collect</h2>
   <p>To provide the Service we collect: the vehicle registration number you enter, your phone number, the location you book the cleaning at, an anonymous device identifier, and (optionally) your email address if you save one in Settings.</p>
 
@@ -13,18 +48,27 @@
   <h2>3. Sharing</h2>
   <p>We share data with: (a) the cleaner assigned to your booking, limited to what they need to perform the service; (b) infrastructure providers (database hosting, email delivery) acting on our behalf. We do not sell your personal data.</p>
 
-  <h2>4. Retention</h2>
-  <p>Order records are retained for up to 24 months to support refunds, disputes and accounting. You can request deletion at any time using the contact email below; some data may be retained where required by law.</p>
+  <h2>4. Photo &amp; video evidence</h2>
+  <p>For quality assurance and dispute resolution, the cleaner may take <strong>before/after photographs</strong> of the vehicle (exterior and interior). These images are retained for up to <strong>12 months</strong> and then deleted. You may object to photographs being taken before the cleaning starts; in case of a later dispute this may make resolution harder. We do not take close-up photos of personal items.</p>
 
-  <h2>5. Your rights</h2>
-  <p>Under the EU GDPR you have rights to access, correct, delete, restrict, port, or object to processing of your personal data. To exercise any of these rights contact <a href="mailto:privacy@cleencar.example">privacy@cleencar.example</a>.</p>
+  <h2>5. Personal items visible during the service</h2>
+  <p>The cleaner may incidentally see personal items inside the vehicle. The glove box, center console, and trunk are not opened unless this is necessary for the selected service or you explicitly ask. Items are not inspected or photographed.</p>
 
-  <h2>6. Security</h2>
+  <h2>6. Retention</h2>
+  <p>Order records are retained for up to 24 months to support refunds, disputes and accounting. You can request deletion at any time using the contact below; some data may be retained where required by law.</p>
+
+  <h2>7. Your rights</h2>
+  <p>Under the EU GDPR you have rights to access, correct, delete, restrict, port, or object to processing of your personal data. To exercise any of these rights contact <a href="mailto:privacy@cleencar.example">privacy@cleencar.example</a>. You also have the right to complain to a competent supervisory authority.</p>
+
+  <h2>8. Security</h2>
   <p>We use encryption in transit (HTTPS) and standard access controls on our database. No system is perfectly secure; please contact us immediately if you suspect a security issue.</p>
 
-  <h2>7. Cookies / local storage</h2>
+  <h2>9. Cookies / local storage</h2>
   <p>Our mobile app stores small amounts of data on your device (your saved plate, phone, email) so the app can pre-fill forms. This data never leaves your device unless you place a booking that uses it.</p>
+  <p>On the website we use one cookie to remember your language choice (DE/EN). It is strictly necessary and contains no personal data.</p>
 
-  <h2>8. Contact</h2>
+  <h2>10. Contact</h2>
   <p>For privacy-related questions: <a href="mailto:privacy@cleencar.example">privacy@cleencar.example</a>.</p>
+
+{% endif %}
 {% endblock %}

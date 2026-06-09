@@ -1,13 +1,11 @@
 import React from 'react';
-import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { COLORS } from "../constants/colors";
 import Price from './Price';
-
 import { formatDateTime } from "../services/DateFormat";
-
+import { useTranslation } from "../services/i18n";
 
 interface Service {
   price: number;
@@ -18,12 +16,9 @@ interface Service {
 interface OrderItem {
   id: string | number;
   status: string;
-  location: {
-    address: string;
-  };
-  availability: {
-    time: Date | string;
-  };
+  plate_number?: string;
+  location?: { address: string };
+  availability?: { time: Date | string };
   services: Service[];
 }
 
@@ -31,177 +26,161 @@ interface OrderItemCardProps {
   item: OrderItem;
 }
 
+// Renders a single order row using the same card layout as the home
+// screen's "Recent Booking" card: date+status on top, services list +
+// price total below a divider.
 const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
-  // Using useRouter from expo-router to handle navigation
   const router = useRouter();
+  const { t, tService } = useTranslation();
 
   const statusKey = String(item.status || '').toLowerCase();
   const isCompleted = statusKey === 'completed';
   const isCancelled = statusKey === 'cancelled';
 
-  const totalPrice = item.services.reduce((sum, service) => {
-    return sum + service.price;
-  }, 0);
+  const totalPrice = (item.services || []).reduce(
+    (sum, s) => sum + (s.price || 0),
+    0,
+  );
+  const currency = item.services?.[0]?.currency || 'EUR';
+  const serviceLabel =
+    (item.services || []).map((s) => tService(s as any, 'name')).join(', ') ||
+    item.plate_number ||
+    '';
 
   return (
     <TouchableOpacity
-        onPress={() => router.push(`/order/${item.id}`)}
+      onPress={() => router.push(`/order/${item.id}`)}
+      style={styles.card}
+      activeOpacity={0.85}
     >
-        <View style={styles.card}>
-        <View style={styles.imageContainer}>
-            <Image
-            source={require('../assets/images/cleen-logo.png')} 
-            style={styles.itemImage}
-            />
-        </View>
-
-        <View style={styles.detailsContainer}>
-            <View style={styles.detailRow}>
-            {/* Use Icon component if installed, otherwise use emoji/text */}
-            {/* <Icon name="map-marker" size={16} color="#666" style={styles.icon} /> */}
-            <MaterialCommunityIcons name="map-marker-outline" size={20} color="#666" style={styles.icon} />
-            <Text style={styles.addressText}>{item.location.address}</Text>
-            </View>
-            <View style={styles.detailRow}>
-            {/* <Icon name="clock-o" size={16} color="#666" style={styles.icon} /> */}
-            <MaterialCommunityIcons name="av-timer" size={20} color="#666" style={styles.icon} />
-            <Text style={styles.dateText}>
-                {formatDateTime(item.availability.time)}
+      <View style={styles.row}>
+        <View style={styles.topInfo}>
+          <Text style={styles.dateText}>{formatDateTime(item.availability?.time)}</Text>
+          {item.location?.address ? (
+            <Text style={styles.addressText} numberOfLines={2}>
+              {item.location.address}
             </Text>
-            </View>
-            <View style={styles.bottomRow}>
-            <View
-              style={[
-                styles.statusBadge,
-                isCompleted
-                  ? styles.completedBadge
-                  : isCancelled
-                  ? styles.cancelledBadge
-                  : styles.openBadge,
-              ]}
-            >
-                <Text
-                  style={[
-                    styles.statusText,
-                    isCompleted
-                      ? styles.completedText
-                      : isCancelled
-                      ? styles.cancelledText
-                      : styles.openText,
-                  ]}
-                >
-                {item.status}
-                </Text>
-            </View>
-            {/* <Text style={styles.priceText}>{totalPrice} {item.services[0].currency}</Text> */}
-            <Price
-              price={totalPrice}
-              currency={item.services?.[0]?.currency}
-              dollarStyle={{ color: '#000000' }}
-              centStyle={{ color: '#000000' }}
-            />
-            </View>
+          ) : null}
         </View>
+        <View
+          style={[
+            styles.statusBadge,
+            isCompleted
+              ? styles.completedBadge
+              : isCancelled
+              ? styles.cancelledBadge
+              : styles.openBadge,
+          ]}
+        >
+          <Text
+            style={[
+              styles.statusText,
+              isCompleted
+                ? styles.completedText
+                : isCancelled
+                ? styles.cancelledText
+                : styles.openText,
+            ]}
+          >
+            {item.status}
+          </Text>
         </View>
+      </View>
+      <View style={styles.divider} />
+      <View style={styles.row}>
+        <Text style={styles.label}>{serviceLabel}</Text>
+        <Price
+          price={totalPrice}
+          currency={currency}
+          dollarStyle={{ fontSize: 18, color: COLORS.text }}
+          centStyle={{ fontSize: 11, color: COLORS.text }}
+          currencyStyle={{ fontSize: 14, color: COLORS.text }}
+        />
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLORS.white,
-        borderRadius: 10,
-        marginHorizontal: 20,
-        marginBottom: 15,
-        padding: 10,
-        borderColor: COLORS.border,
-        borderWidth: 1,
-        shadowColor: COLORS.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.11,
-        shadowRadius: 1.00,
-        elevation: 3, // For Android shadow
-    },
-    imageContainer: {
-        width: 50, // Fixed width for image container
-        height: 35, // Fixed height for image container
-        borderRadius: 0, // Half of width/height for circular image
-        overflow: 'hidden',
-        marginRight: 15,
-        backgroundColor: COLORS.background, // Placeholder background
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    itemImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
-    },
-    detailsContainer: {
-        flex: 1,
-        justifyContent: 'space-between',
-    },
-    detailRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 5,
-    },
-    icon: {
-        fontSize: 16, // Adjust font size for emoji/text icons
-        color: COLORS.text,
-        marginRight: 8,
-    },
-    addressText: {
-        fontSize: 14,
-        color: COLORS.text,
-        fontWeight: '600',
-        flexShrink: 1, // Allows text to wrap
-    },
-    dateText: {
-        fontSize: 13,
-        color: COLORS.textLight,
-        flexShrink: 1, // Allows text to wrap
-    },
-    bottomRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    statusBadge: {
-        paddingVertical: 5,
-        paddingHorizontal: 12,
-        borderRadius: 5,
-    },
-    openBadge: {
-        backgroundColor: '#C8DEFC', // '#E0F2F7', // Light blue
-    },
-    completedBadge: {
-        backgroundColor: '#E6FFE6', // Light green
-    },
-    cancelledBadge: {
-        backgroundColor: '#FBE9EA', // Light red — matches the home screen
-    },
-    statusText: {
-        fontSize: 13,
-        fontWeight: '600',
-    },
-    openText: {
-        color: COLORS.primary// '#007AFF', // Blue
-    },
-    completedText: {
-        color: '#28A745', // Green
-    },
-    cancelledText: {
-        color: '#D9534F', // Same red as the home screen badge
-    },
-    priceText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: COLORS.primary,
-    },
+  card: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginHorizontal: 20,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.04,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 6,
+      },
+      android: { elevation: 1 },
+    }),
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+  topInfo: {
+    flex: 1,
+  },
+  dateText: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  addressText: {
+    marginTop: 2,
+    fontSize: 13,
+    color: COLORS.textLight,
+  },
+  label: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.textLight,
+  },
+  value: {
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 10,
+  },
+  statusBadge: {
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  openBadge: {
+    backgroundColor: '#C8DEFC',
+  },
+  completedBadge: {
+    backgroundColor: '#E6FFE6',
+  },
+  cancelledBadge: {
+    backgroundColor: '#FBE9EA',
+  },
+  statusText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  openText: {
+    color: COLORS.primary,
+  },
+  completedText: {
+    color: '#28A745',
+  },
+  cancelledText: {
+    color: '#D9534F',
+  },
 });
 
 export default OrderItemCard;
