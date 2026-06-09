@@ -32,7 +32,8 @@ for _name in (__name__, "app.email_service"):
     _l.propagate = False
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+# Disable the public default docs routes — we expose authenticated ones below.
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 # --- Web UI templates + static assets ---------------------------------------
 STATIC_DIR = Path(__file__).parent / "static"
@@ -109,6 +110,30 @@ def render_web(
 _basic_auth = HTTPBasic()
 
 
+def require_docs_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth)) -> str:
+    """
+    HTTP Basic protection for the OpenAPI docs (/docs, /redoc, /openapi.json).
+    Credentials come from env vars `DOCS_USERNAME` / `DOCS_PASSWORD`. If either
+    is unset, the docs return 503 rather than being silently exposed.
+    """
+    expected_user = os.getenv("DOCS_USERNAME")
+    expected_pass = os.getenv("DOCS_PASSWORD")
+    if not expected_user or not expected_pass:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="API docs are not configured. Set DOCS_USERNAME and DOCS_PASSWORD.",
+        )
+    user_ok = secrets.compare_digest(credentials.username.encode("utf-8"), expected_user.encode("utf-8"))
+    pass_ok = secrets.compare_digest(credentials.password.encode("utf-8"), expected_pass.encode("utf-8"))
+    if not (user_ok and pass_ok):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": 'Basic realm="CleanCar docs"'},
+        )
+    return credentials.username
+
+
 def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth)) -> str:
     expected_user = os.getenv("CLEANER_USERNAME")
     expected_pass = os.getenv("CLEANER_PASSWORD")
@@ -133,6 +158,28 @@ def require_cleaner_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth
 # @app.on_event("startup")
 # def on_startup():
 #     models.Base.metadata.create_all(bind=engine)
+
+# ---------------------------------------------------------------------------
+# Authenticated OpenAPI documentation
+# ---------------------------------------------------------------------------
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.utils import get_openapi
+
+
+@app.get("/openapi.json", include_in_schema=False)
+async def protected_openapi(_user: str = Depends(require_docs_auth)):
+    return get_openapi(title=app.title, version=app.version, routes=app.routes)
+
+
+@app.get("/docs", include_in_schema=False)
+async def protected_swagger(_user: str = Depends(require_docs_auth)):
+    return get_swagger_ui_html(openapi_url="/openapi.json", title=f"{app.title} – Docs")
+
+
+@app.get("/redoc", include_in_schema=False)
+async def protected_redoc(_user: str = Depends(require_docs_auth)):
+    return get_redoc_html(openapi_url="/openapi.json", title=f"{app.title} – Docs")
+
 
 # ---------------------------------------------------------------------------
 # Web UI: policy pages
