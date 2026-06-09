@@ -80,8 +80,8 @@ const translations = {
   'section.location': { en: 'Location', de: 'Standort' },
   'section.what_to_expect': { en: 'What to expect?', de: 'Was erwartet Sie?' },
   'section.expectations': {
-    en: 'The cleaner arrives at the scheduled time, with an average cleaning duration of 25 minutes. A quality inspection is performed after cleaning, and payment is processed upon service completion.',
-    de: 'Der Reiniger trifft pünktlich zum vereinbarten Termin ein. Die Reinigung dauert durchschnittlich 25 Minuten. Nach Abschluss erfolgt eine Qualitätskontrolle und die Zahlung wird abgewickelt.',
+    en: "Park your car somewhere safe with full access from both sides — a private spot is best. After the cleaning the interior may be damp, so leave the windows open until it's fully dry.",
+    de: 'Parken Sie Ihr Fahrzeug an einem sicheren Ort mit voller Türöffnung auf beiden Seiten — ein privater Stellplatz ist ideal. Nach der Reinigung kann der Innenraum feucht sein; lassen Sie die Fenster eine Zeit lang geöffnet, bis er trocken ist.',
   },
 
   // Settings
@@ -132,6 +132,15 @@ const translations = {
     en: '© 2026 CarGrime · All rights reserved.',
     de: '© 2026 CarGrime · Alle Rechte vorbehalten.',
   },
+
+  // About screen
+  'about.version': { en: 'Version', de: 'Version' },
+  'about.title': { en: 'About Us', de: 'Über uns' },
+  'about.text': {
+    en: 'CarGrime delivers professional on-site interior car cleaning. Trained cleaners come to you with premium equipment and eco-friendly products, so you can book a thorough clean in minutes — at home, at work, or wherever your car is parked.',
+    de: 'CarGrime liefert professionelle Innenreinigung für Ihr Fahrzeug — direkt vor Ort. Geschulte Reinigerinnen und Reiniger kommen mit Premium-Ausstattung und umweltfreundlichen Produkten zu Ihnen. So buchen Sie in wenigen Minuten eine gründliche Reinigung – zu Hause, bei der Arbeit oder wo Ihr Auto gerade steht.',
+  },
+  'about.contact_title': { en: 'Contact Us', de: 'Kontakt' },
 
   // New home (hero / recent booking / service tiles)
   'home.hero_offer': {

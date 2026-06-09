@@ -1,5 +1,7 @@
-// const BASE_URL = "http://127.0.0.1:8000";
-const BASE_URL = "https://clean-car-app.onrender.com";
+// Backend base URL — driven by .env (EXPO_PUBLIC_API_BASE_URL).
+// Falls back to the production Render URL so a missing env doesn't break runtime.
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://cargrime.de/';
 
 export type ProcessStepStatus = 'not_started' | 'in_progress' | 'completed' | 'failed';
 export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';

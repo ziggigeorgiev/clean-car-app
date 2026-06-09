@@ -12,13 +12,16 @@ import {
 } from 'react-native';
 import Details from "@/components/Details";
 import ContactDetails from "@/components/ContactDetails";
-import StepIndocator from '../../components/StepIndicator'; // Adjust path
+import StepIndocator from '../../components/StepIndicator';
+import { useTranslation } from "../../services/i18n";
+import { WebUrls } from "../../services/webUrls";
 
-// Define the main App component
 const AboutScreen = () => {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StepIndocator title={"About"} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
+      <StepIndocator title={t('tab.about')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Logo Section */}
         <View style={styles.logoContainer}>
@@ -32,47 +35,44 @@ const AboutScreen = () => {
             style={styles.grimeLogo}
             resizeMode="contain"
           />
-          <Text style={styles.versionText}>Version 1.0.0</Text>
+          <Text style={styles.versionText}>{t('about.version')} 1.0.0</Text>
         </View>
 
         {/* About Us Section */}
         <Details
-          sectionTitle="About Us"
-          text="We are a leading technology company dedicated to creating innovative solutions that transform the way people work and live. Since our founding in 2015, we've been committed to delivering exceptional value to our customers through cutting-edge software solutions."
+          sectionTitle={t('about.title')}
+          text={t('about.text')}
         />
 
         {/* Contact Us Section */}
         <ContactDetails
           phoneNumber="123-456-7890"
-          email="support@company.com" // Example email
-          sectionTitle="Contact Us"
+          email="info@cargrime.de"
+          sectionTitle={t('about.contact_title')}
         />
 
         {/* Policy Links Section */}
         <View style={styles.policyLinksContainer}>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}
+            onPress={() => Linking.openURL(WebUrls.terms)}
           >
-            <Text style={styles.policyLinkText}>Terms & Conditions</Text>
+            <Text style={styles.policyLinkText}>{t('policy.terms')}</Text>
             <Text style={styles.policyArrow}>›</Text>
-            {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/privacy')}
+            onPress={() => Linking.openURL(WebUrls.privacy)}
           >
-            <Text style={styles.policyLinkText}>Privacy Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.privacy')}</Text>
             <Text style={styles.policyArrow}>›</Text>
-            {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/cancellation')}
+            onPress={() => Linking.openURL(WebUrls.cancellation)}
           >
-            <Text style={styles.policyLinkText}>Cancellation Policy</Text>
+            <Text style={styles.policyLinkText}>{t('policy.cancellation')}</Text>
             <Text style={styles.policyArrow}>›</Text>
-            {/* <Icon name="chevron-forward" size={20} color="#A0A0A0" /> */}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -80,7 +80,6 @@ const AboutScreen = () => {
   );
 };
 
-// Define the styles using StyleSheet.create
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 3,
-    overflow: 'hidden', // Ensures borders look good with rounded corners
+    overflow: 'hidden',
   },
   policyLink: {
     flexDirection: 'row',
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
   },
   policyArrow: {
     fontSize: 20,
-    color: COLORS.text, // Light gray arrow
+    color: COLORS.text,
   },
 });
 

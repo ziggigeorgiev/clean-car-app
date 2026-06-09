@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cleen.app",
+      "bundleIdentifier": "de.cargrime.app",
       "config": {
         "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs"
       }
@@ -26,7 +26,7 @@
           "apiKey": "AIzaSyBbax4c2uwl8G6nH3CbOh06Ewze2IZ8udw"
         }
       },
-      "package": "com.cleen.app"
+      "package": "de.cargrime.app"
     },
     "web": {
       "bundler": "metro",

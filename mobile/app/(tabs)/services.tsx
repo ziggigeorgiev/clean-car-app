@@ -23,6 +23,7 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import Price from '../../components/Price';
 import { useTranslation } from '../../services/i18n';
 import { getServiceIcon } from '../../services/serviceIcons';
+import { WebUrls } from '../../services/webUrls';
 import { Image } from 'react-native';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
@@ -230,7 +231,7 @@ const ServicesScreen = () => {
 
           {/* Terms Text */}
           <Text style={styles.termsText}>
-            {t('services.terms_prefix')}<Text style={styles.linkText} onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}>{t('services.terms_link')}</Text>
+            {t('services.terms_prefix')}<Text style={styles.linkText} onPress={() => Linking.openURL(WebUrls.terms)}>{t('services.terms_link')}</Text>
           </Text>
         </ScrollView>
 

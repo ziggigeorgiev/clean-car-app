@@ -27,6 +27,7 @@ import ProgressDetails from "@/components/ProgressDetails";
 import Details from "@/components/Details";
 import StepIndocator from "@/components/StepIndicator";
 import { useTranslation } from "@/services/i18n";
+import { WebUrls } from "@/services/webUrls";
 
 interface ServiceItem {
   name: string;
@@ -193,7 +194,7 @@ const OrderDetailScreen: React.FC = () => {
         <View style={styles.policyLinksContainer}>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/terms')}
+            onPress={() => Linking.openURL(WebUrls.terms)}
           >
             <Text style={styles.policyLinkText}>{t('policy.terms')}</Text>
             <Text style={styles.policyArrow}>›</Text>
@@ -201,7 +202,7 @@ const OrderDetailScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/privacy')}
+            onPress={() => Linking.openURL(WebUrls.privacy)}
           >
             <Text style={styles.policyLinkText}>{t('policy.privacy')}</Text>
             <Text style={styles.policyArrow}>›</Text>
@@ -209,7 +210,7 @@ const OrderDetailScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.policyLink}
-            onPress={() => Linking.openURL('https://clean-car-app.onrender.com/cancellation')}
+            onPress={() => Linking.openURL(WebUrls.cancellation)}
           >
             <Text style={styles.policyLinkText}>{t('policy.cancellation')}</Text>
             <Text style={styles.policyArrow}>›</Text>
