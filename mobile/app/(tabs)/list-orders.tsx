@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from '@react-navigation/native';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import { Text, View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import OrderItemCard from '../../components/OrderCard';
@@ -18,57 +18,62 @@ import { useTranslation } from '../../services/i18n';
 const OrderListScreen: React.FC = () => {
   const { t } = useTranslation();
 
-  // Using useRouter from expo-router to handle navigation
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
+
+  const fetchData = useCallback(async () => {
+    const phoneIdentifier = await Device.getPhoneIdentifier();
+    if (!phoneIdentifier) {
+      console.error("Phone identifier is not available.");
+      return;
+    }
+    try {
+      const data = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
+      setOrders(data);
+    } catch (error) {
+      console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
+    }
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchData = async () => {
+      (async () => {
         setLoading(true);
-
-        const phoneIdentifier = await Device.getPhoneIdentifier();
-        if (!phoneIdentifier) {
-          console.error("Phone identifier is not available.");
-          return;
-        }
-
-        try {
-          const orders = await CleanCarAPI.getOrdersByPhoneIdentifier(phoneIdentifier);
-          
-          setOrders(orders);
-        } catch (error) {
-          console.error(`Error fetching orders for phone identifier ${phoneIdentifier}:`, error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-    
-      fetchData();
-    }, [])
+        await fetchData();
+        setLoading(false);
+      })();
+    }, [fetchData])
   );
 
-  if (loading) return <LoadingSpinner message={t('loading.generic')} />;
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
+  if (loading && !refreshing) return <LoadingSpinner message={t('loading.generic')} />;
 
   return (
     <View style={styles.container}>
       <StepIndocator title={t('screen.orders')} backRoute={""} backParams={{}} totalSteps={0} currentStep={0} />
-      {/* <View style={styles.header}>
-        <Text style={styles.headerTitle}>Orders</Text>
-        <Text style={styles.orderCount}>({orders.length})</Text>
-      </View> */}
       <FlatList
         data={orders}
-        keyExtractor={( item ) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <OrderItemCard item={item} />}
         contentContainerStyle={styles.listContentContainer}
-        // Add performance optimizations for larger lists
         initialNumToRender={5}
         maxToRenderPerBatch={10}
         windowSize={10}
         ListEmptyComponent={<NoResultsFound message={t('empty.no_orders')} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={COLORS.primary}
+          />
+        }
       />
     </View>
   );
