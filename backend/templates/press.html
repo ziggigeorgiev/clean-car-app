@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}CarGrime — Press &amp; review kit{% endblock %}
+{% block content %}
+  <style>
+    .press h2 { margin-top: 28px; }
+    .press h3 { margin-top: 20px; font-size: 15px; color: var(--text); }
+    .press pre {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .press table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .press table th, .press table td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .press table th { color: var(--text-light); font-weight: 600; }
+    .press .asset {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 4px 6px 4px 0;
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--primary);
+    }
+    .press .note { color: var(--text-light); font-size: 13px; }
+  </style>
+
+  <div class="press">
+    <h1>CarGrime — Press &amp; Review Kit</h1>
+    <p class="note">Single page bundling everything Apple/Google reviewers and journalists need. Last updated: {{ today }}.</p>
+
+    <h2>At a glance</h2>
+    <table>
+      <tr><th>App name</th><td>CarGrime</td></tr>
+      <tr><th>Category</th><td>Apple: Lifestyle · Play: Auto &amp; Vehicles</td></tr>
+      <tr><th>Bundle ID / Package</th><td>de.cargrime.app</td></tr>
+      <tr><th>Primary color</th><td><span style="display:inline-block;width:14px;height:14px;background:#2C4D9F;border-radius:3px;vertical-align:middle;"></span> #2C4D9F</td></tr>
+      <tr><th>Support email</th><td><a href="mailto:info@cargrime.de">info@cargrime.de</a></td></tr>
+      <tr><th>Privacy Policy</th><td><a href="/privacy">cargrime.de/privacy</a></td></tr>
+      <tr><th>Terms</th><td><a href="/terms">cargrime.de/terms</a></td></tr>
+      <tr><th>Cancellation Policy</th><td><a href="/cancellation">cargrime.de/cancellation</a></td></tr>
+    </table>
+
+    <h2>Brand assets</h2>
+    <p>
+      <a class="asset" href="/static/cleen-logo.png" download>cleen-logo.png</a>
+      <a class="asset" href="/static/grime-logo.png" download>grime-logo.png</a>
+      <a class="asset" href="/static/hero-interior.png" download>hero-interior.png</a>
+    </p>
+
+    <h2>Listing copy — English</h2>
+    <h3>App name (≤30)</h3>
+    <pre>CarGrime — Car Cleaning</pre>
+    <h3>Subtitle (Apple, ≤30)</h3>
+    <pre>Interior car clean at home</pre>
+    <h3>Short description (Play, ≤80)</h3>
+    <pre>Professional on-site interior car cleaning. Cleaners come to your address.</pre>
+    <h3>Promotional text (Apple, ≤170)</h3>
+    <pre>Professional interior car cleaning, delivered where you park. Book in seconds — vacuum, seat wash, leather care and more, by trained pros at your home or office.</pre>
+    <h3>Keywords (Apple, ≤100)</h3>
+    <pre>car,cleaning,interior,detailing,vacuum,mobile,booking,wash,leather,seat,trunk,wipe,detail</pre>
+    <h3>Full description</h3>
+    <pre>CarGrime brings professional car interior cleaning right to where your car is parked — at home, at work, or anywhere you can park safely. Open the app, pick a time, choose the services you need, and a trained cleaner shows up with everything required to leave your interior fresh.
+
+WHY CARGRIME
+• Trained cleaners. Premium equipment. Eco-friendly products.
+• You stay where you are — no driving to a wash, no waiting in line.
+• Transparent pricing. The total you see in the app is what you pay.
+• Pay only after the cleaning is done.
+• Available in German and English.
+
+OUR SERVICES
+Basic:
+• Interior vacuum — carpets, mats, seats and trunk.
+• Dashboard &amp; trim wipe-down — all hard surfaces.
+• Seat wash (fabric) — deep clean for cloth seats.
+• Carpet shampoo — wet extraction for stains.
+• Leather conditioning — cleans and protects.
+
+Extras:
+• Window cleaning (interior) — streak-free finish.
+• Baby seat cleaning — including straps.
+• Pet hair removal — specialized brushes.
+• Trunk cleaning — deep vacuum and wipe.
+• Headliner cleaning — roof fabric spot clean.
+
+HOW IT WORKS
+1. Pick your location.
+2. Pick a time slot.
+3. Pick services and confirm.
+
+That's it. You'll get a confirmation email, see your booking in the Orders tab, and watch your order progress live.
+
+WHAT TO EXPECT
+Park your car somewhere safe with full access from both sides — a private spot is best. After the cleaning the interior may be damp, so leave the windows open for a while until it's fully dry.
+
+DESIGNED FOR REAL LIFE
+Save your plate, phone and email once in Settings — the app pre-fills everything for your next booking. Switch language anytime: German is default; English is one tap away. We never sell your data.
+
+QUESTIONS?
+Reach us anytime at info@cargrime.de.
+
+CarGrime — your car, freshly cleaned, wherever you park.</pre>
+
+    <h2>Listing copy — Deutsch</h2>
+    <h3>App-Name (≤30)</h3>
+    <pre>CarGrime — Autoreinigung</pre>
+    <h3>Untertitel (Apple, ≤30)</h3>
+    <pre>Innenreinigung vor Ort</pre>
+    <h3>Kurzbeschreibung (Play, ≤80)</h3>
+    <pre>Professionelle Innenreinigung Ihres Autos — direkt am Parkplatz.</pre>
+    <h3>Werbetext (Apple, ≤170)</h3>
+    <pre>Professionelle Innenreinigung Ihres Autos — direkt am Parkplatz. In Sekunden buchen: Staubsaugen, Sitzreinigung, Lederpflege und mehr. Geschulte Profis bei Ihnen.</pre>
+    <h3>Keywords (Apple, ≤100)</h3>
+    <pre>Auto,Reinigung,Innenraum,Detailing,Pflege,Termin,Saugen,Leder,Sitz,Kofferraum,mobil,Wagen</pre>
+    <h3>Vollständige Beschreibung</h3>
+    <pre>CarGrime bringt die professionelle Innenreinigung direkt dorthin, wo Ihr Auto parkt — zu Hause, am Arbeitsplatz oder überall, wo Sie sicher parken können. App öffnen, Termin wählen, Leistungen auswählen — ein geschulter Reiniger kommt mit allem, was nötig ist, und übergibt Ihnen einen frisch gereinigten Innenraum.
+
+WARUM CARGRIME
+• Geschulte Reiniger. Premium-Ausstattung. Umweltfreundliche Produkte.
+• Sie bleiben, wo Sie sind — keine Fahrt zur Waschstraße, kein Warten.
+• Transparente Preise. Der angezeigte Betrag ist der Endbetrag.
+• Zahlung erst nach Abschluss der Reinigung.
+• Verfügbar auf Deutsch und Englisch.
+
+UNSERE LEISTUNGEN
+Standard:
+• Innenraum-Staubsauger — Teppiche, Matten, Sitze und Kofferraum.
+• Armaturenbrett &amp; Zierleisten — alle harten Oberflächen.
+• Sitzwäsche (Stoff) — Tiefenreinigung von Stoffsitzen.
+• Teppichshampoo — Nassextraktion bei Flecken.
+• Lederpflege — Reinigung und Schutz.
+
+Extras:
+• Fensterreinigung innen — streifenfrei.
+• Kindersitzreinigung — inklusive Gurte.
+• Tierhaarentfernung — mit Spezialbürsten.
+• Kofferraum-Reinigung — gründliches Saugen und Wischen.
+• Decken-Reinigung — Punktreinigung des Dachhimmels.
+
+SO FUNKTIONIERT'S
+1. Standort wählen.
+2. Uhrzeit auswählen.
+3. Leistungen aussuchen und bestätigen.
+
+Fertig. Sie erhalten eine Bestätigung per E-Mail, sehen Ihre Buchung im Tab „Aufträge" und verfolgen den Fortschritt live.
+
+WAS SIE ERWARTET
+Parken Sie Ihr Fahrzeug an einem sicheren Ort mit voller Türöffnung auf beiden Seiten — ein privater Stellplatz ist ideal. Nach der Reinigung kann der Innenraum feucht sein; lassen Sie die Fenster eine Zeit lang geöffnet, bis er trocken ist.
+
+PRAKTISCH IM ALLTAG
+Kennzeichen, Telefonnummer und E-Mail einmal in den Einstellungen speichern — die App füllt die Felder bei der nächsten Buchung aus. Sprache jederzeit umschaltbar: Deutsch ist Standard, Englisch ein Tipp entfernt. Wir verkaufen Ihre Daten nicht.
+
+FRAGEN?
+Schreiben Sie uns jederzeit an info@cargrime.de.
+
+CarGrime — Ihr Auto, frisch gereinigt, wo immer Sie parken.</pre>
+
+    <h2>Release notes — v1.0.0</h2>
+    <h3>English (TestFlight + Play release notes)</h3>
+    <pre>Hello! This is the first public version of CarGrime.
+
+What's in this release:
+• Book on-site interior car cleanings — pick a location, time and services in seconds.
+• Five core services plus five optional extras (windows, baby seat, pet hair, trunk, headliner).
+• Live order status — see when the cleaner is on the way and when each step is done.
+• Booking confirmation by email.
+• Bilingual: German is the default, English is one tap away in Settings.
+
+Thanks for testing — please send any feedback to info@cargrime.de.</pre>
+    <h3>Deutsch</h3>
+    <pre>Hallo! Dies ist die erste öffentliche Version von CarGrime.
+
+Was diese Version bietet:
+• Innenreinigung Ihres Autos direkt vor Ort buchen — Ort, Zeit und Leistungen in Sekunden auswählen.
+• Fünf Standardleistungen plus fünf optionale Extras (Fenster, Kindersitz, Tierhaare, Kofferraum, Dachhimmel).
+• Live-Status zu Ihrem Auftrag — sehen Sie, wann der Reiniger unterwegs ist und welcher Schritt erledigt ist.
+• Buchungsbestätigung per E-Mail.
+• Zweisprachig: Deutsch ist Standard, Englisch in den Einstellungen einen Tipp entfernt.
+
+Vielen Dank fürs Testen — Feedback gerne an info@cargrime.de.</pre>
+
+    <h2>Apple privacy nutrition label</h2>
+    <p class="note">Use these answers under <em>App Store Connect → App Privacy</em>.</p>
+    <table>
+      <tr><th>Category</th><th>Type</th><th>Collected?</th><th>Linked to user?</th><th>Tracking?</th><th>Purposes</th></tr>
+      <tr><td>Contact Info</td><td>Email Address</td><td>Optional (Settings)</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Contact Info</td><td>Phone Number</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Location</td><td>Coarse Location</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Identifiers</td><td>Device ID (anonymous UUID generated on first launch)</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Other User Data</td><td>Vehicle Registration Number</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+    </table>
+    <p>Everything else (Health, Financial Info, Sensitive Info, Contacts, User Content, Browsing/Search History, Purchases, Usage Data, Diagnostics, other Identifiers) is declared as <strong>Not collected</strong>.</p>
+    <p><strong>Tracking</strong>: No. CarGrime does not track users across apps or websites owned by other companies.</p>
+    <p><strong>Third-party SDKs</strong>: Google Maps (location is rendered on a map; Google may collect technical identifiers from the SDK).</p>
+
+    <h2>Contact</h2>
+    <p>Press, partnerships and questions: <a href="mailto:info@cargrime.de">info@cargrime.de</a>.</p>
+  </div>
+{% endblock %}

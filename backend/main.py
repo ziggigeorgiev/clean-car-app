@@ -225,6 +225,12 @@ async def web_cancellation(request: Request, locale: str = Depends(web_locale)):
     return render_web(request, "cancellation.html", locale, {"today": date.today().isoformat()})
 
 
+@app.get("/press", response_class=HTMLResponse)
+async def web_press(request: Request, locale: str = Depends(web_locale)):
+    """Public press / review kit page consolidating store copy + assets."""
+    return render_web(request, "press.html", locale, {"today": date.today().isoformat()})
+
+
 # ---------------------------------------------------------------------------
 # Web UI: cleaner dashboard
 # ---------------------------------------------------------------------------

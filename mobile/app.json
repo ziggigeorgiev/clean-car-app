@@ -1,38 +1,76 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "CarGrime",
+    "slug": "cargrime",
+    "scheme": "cargrime",
+    "owner": "cargrime",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
+    "icon": "./assets/images/icon.png",
+
+    "description": "Book professional on-site car interior cleaning. Trained cleaners come to your home or workplace.",
+    "primaryColor": "#2C4D9F",
+    "platforms": ["ios", "android", "web"],
+    "locales": {
+      "de": "./assets/locales/de.json",
+      "en": "./assets/locales/en.json"
+    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.cargrime.app",
+      "buildNumber": "1",
       "config": {
         "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs"
+      },
+      "infoPlist": {
+        "CFBundleDisplayName": "CarGrime",
+        "NSCameraUsageDescription": "CarGrime never uses the camera.",
+        "NSPhotoLibraryUsageDescription": "CarGrime never uses your photo library.",
+        "NSLocationWhenInUseUsageDescription": "We use your location to set the cleaning address.",
+        "NSCalendarsUsageDescription": "Add booking reminders to your calendar.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false
+        },
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
+
     "android": {
+      "package": "de.cargrime.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#2C4D9F"
       },
       "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "INTERNET"
+      ],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBbax4c2uwl8G6nH3CbOh06Ewze2IZ8udw"
         }
-      },
-      "package": "de.cargrime.app"
+      }
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "CarGrime",
+      "shortName": "CarGrime",
+      "themeColor": "#2C4D9F",
+      "backgroundColor": "#ffffff"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -44,11 +82,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-calendar",
+      "expo-location"
     ],
+
     "experiments": {
       "typedRoutes": true
     },
+
     "extra": {
       "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs",
       "router": {},
