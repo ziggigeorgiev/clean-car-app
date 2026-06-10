@@ -53,7 +53,7 @@ const AboutScreen = () => {
 
         {/* Contact Us Section */}
         <ContactDetails
-          phoneNumber="123-456-7890"
+          phoneNumber="+49 177 1914891"
           email="info@cargrime.de"
           sectionTitle={t('about.contact_title')}
         />
