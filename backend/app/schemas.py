@@ -1,6 +1,6 @@
 # app/schemas.py
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict # Import ConfigDict for Pydantic v2+
 
@@ -12,6 +12,10 @@ class CurrencyEnum(str, enum.Enum): # Inherit from str for JSON serialization
     USD = "USD"
     GBP = "GBP"
     # Add other currencies as needed
+
+class BrandEnum(str, enum.Enum): # White-label tenant (must match models.BrandEnum)
+    CAR = "car"
+    HOME = "home"
 
 class OrderStatusEnum(str, enum.Enum): # Inherit from str for PostgreSQL compatibility and Pydantic
     OPEN = "open"
@@ -47,6 +51,7 @@ class Location(LocationBase):
 
 # --- Service Schemas ---
 class ServiceBase(BaseModel):
+    brand: BrandEnum = BrandEnum.CAR # Which white-label app this service belongs to
     category: ServiceCategoryEnum = ServiceCategoryEnum.BASIC # Default category
     name: str
     description: Optional[str] = None
@@ -64,6 +69,15 @@ class Service(ServiceBase):
     model_config = ConfigDict(from_attributes=True) # For Pydantic v2+
     # class Config: # For Pydantic v1
     #     orm_mode = True
+
+# A booked service together with its quantity. Returned on orders so the home
+# (couch/mattress) app can show "Sofa cleaning × 2". For the car app quantity
+# is always 1.
+class ServiceItem(BaseModel):
+    service: Service
+    quantity: int = 1
+
+    model_config = ConfigDict(from_attributes=True)
 
 # --- Availability Schemas ---
 class AvailabilityBase(BaseModel):
@@ -100,13 +114,18 @@ class ProcessStep(ProcessStepBase):
 
 # --- Order Schemas ---
 class OrderBase(BaseModel):
+    brand: BrandEnum = BrandEnum.CAR # Which white-label app placed the order
     phone_identifier: str
     status: OrderStatusEnum = OrderStatusEnum.OPEN # Default status
-    plate_number: str
+    plate_number: Optional[str] = None # No plate for the home (couch/mattress) app
     phone_number: str
     location: LocationCreate
     availability_id: int
     service_ids: List[int] = [] # For creating an order, provide service IDs
+    # Optional per-service quantities, keyed by service id. When omitted (or a
+    # given id is missing), the quantity defaults to 1 — so the car app can keep
+    # sending just `service_ids`.
+    service_quantities: Optional[Dict[int, int]] = None
     email: Optional[str] = None # Optional contact email for confirmation
     locale: Optional[str] = None # Customer's app language (e.g. "de", "en") — used to localize emails
 
@@ -122,6 +141,8 @@ class Order(OrderBase):
     location: Location # Reference the Location schema
     availability: Availability # Reference the Availability schema
     services: List[Service]# Reference the Service schema (list for many-to-many)
+    # Quantity-aware view of the booked services (each item = service + quantity).
+    service_items: List[ServiceItem] = []
     process_steps: List[ProcessStep]
 
     model_config = ConfigDict(from_attributes=True) # For Pydantic v2+

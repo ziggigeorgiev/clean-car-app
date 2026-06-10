@@ -15,18 +15,32 @@ BUSINESS_TZ = ZoneInfo("Europe/Berlin")
 
 # --- New CRUD functions for your new models ---
 
-def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 100) -> List[models.Order]:
+def get_orders(
+    db: Session,
+    phone_identifier: str,
+    brand: Optional[models.BrandEnum] = None,
+    skip: int = 0,
+    limit: int = 100,
+) -> List[models.Order]:
     """
     Retrieves a list of orders from the database,
     eagerly loading related location, services, and availability.
+    When ``brand`` is provided, only that brand's orders are returned.
     """
+    query = db.query(models.Order).filter(
+        models.Order.phone_identifier == phone_identifier  # Filter by phone identifier
+    )
+    if brand is not None:
+        query = query.filter(models.Order.brand == brand)
     return (
-        db.query(models.Order)
-        .filter(models.Order.phone_identifier == phone_identifier)  # Filter by phone identifier
+        query
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
-            selectinload(models.Order.services)
+            selectinload(models.Order.services),
+            selectinload(models.Order.service_associations).joinedload(
+                models.OrderServiceAssociation.service
+            ),
         )
         .order_by(models.Order.created_at.desc())  # Optional: order by creation date
         .offset(skip)
@@ -35,22 +49,32 @@ def get_orders(db: Session, phone_identifier: str, skip: int = 0, limit: int = 1
     )
 
 
-def get_order_by_phone_identifier_and_id(db: Session, phone_identifier: str, order_id: int) -> Optional[models.Order]:
+def get_order_by_phone_identifier_and_id(
+    db: Session,
+    phone_identifier: str,
+    order_id: int,
+    brand: Optional[models.BrandEnum] = None,
+) -> Optional[models.Order]:
     """
     Retrieves a single order by its ID,
     eagerly loading related location, services, and availability.
     """
     print("Fetching order with ID:", order_id)  # Debugging line
+    query = db.query(models.Order).filter(
+        models.Order.phone_identifier == phone_identifier,  # Ensure the order belongs to the user
+        models.Order.id == order_id,
+    )
+    if brand is not None:
+        query = query.filter(models.Order.brand == brand)
     return (
-        db.query(models.Order)
-        .filter(
-            models.Order.phone_identifier == phone_identifier,  # Ensure the order belongs to the user
-            models.Order.id == order_id
-        )
+        query
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
-            selectinload(models.Order.services)
+            selectinload(models.Order.services),
+            selectinload(models.Order.service_associations).joinedload(
+                models.OrderServiceAssociation.service
+            ),
         )
         .first()
     )
@@ -77,16 +101,27 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
     db.add(db_location)
 
     db_order = models.Order(
+        brand=order.brand,
         phone_identifier=order.phone_identifier,
-        plate_number=order.plate_number,
+        plate_number=(order.plate_number or None),  # home app has no plate
         phone_number=order.phone_number,
         email=(order.email or None),  # store None when not provided
         location=db_location,
         availability=db_availability,
-        services=db_services, # Assign the list of service objects
+        # Services are attached below as association rows so we can carry the
+        # per-service quantity (the car app always uses 1).
     )
     db.add(db_order)
     db.flush() # Flush to get the db_order.id before committing
+
+    quantities = order.service_quantities or {}
+    for svc in db_services:
+        qty = quantities.get(svc.id, 1)
+        if not isinstance(qty, int) or qty < 1:
+            qty = 1
+        db.add(models.OrderServiceAssociation(
+            order_id=db_order.id, service_id=svc.id, quantity=qty,
+        ))
 
     # Store translation keys; the mobile app resolves them via i18n.
     process_steps = [
@@ -226,13 +261,21 @@ def bulk_create_availabilities_for_day(
     return created
 
 
-def get_active_services(db: Session, skip: int = 0, limit: int = 100) -> List[models.Service]:
+def get_active_services(
+    db: Session,
+    brand: Optional[models.BrandEnum] = None,
+    skip: int = 0,
+    limit: int = 100,
+) -> List[models.Service]:
     """
     Retrieves a list of services that are currently active.
+    When ``brand`` is provided, only that brand's catalog is returned.
     """
+    query = db.query(models.Service).filter(models.Service.is_active == True)
+    if brand is not None:
+        query = query.filter(models.Service.brand == brand)
     return (
-        db.query(models.Service)
-        .filter(models.Service.is_active == True) # Filter for is_active = True
+        query
         .order_by(models.Service.name) # Optional: order by service name
         .offset(skip)
         .limit(limit)
@@ -242,6 +285,7 @@ def get_active_services(db: Session, skip: int = 0, limit: int = 100) -> List[mo
 
 def create_service(db: Session, service: schemas.ServiceCreate) -> models.Service:
     db_service = models.Service(
+        brand=service.brand,
         category=service.category,
         name=service.name,
         description=service.description,

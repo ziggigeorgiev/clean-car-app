@@ -1,4 +1,5 @@
 import { COLORS } from '@/constants/colors';
+import { BRAND_ASSETS } from '@/constants/brandAssets';
 import React from 'react';
 import {
   SafeAreaView,
@@ -33,12 +34,12 @@ const AboutScreen = () => {
         {/* Logo Section */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/images/cleen-logo.png')}
+            source={BRAND_ASSETS.logo}
             style={styles.cleenLogo}
             resizeMode="contain"
           />
           <Image
-            source={require('../../assets/images/grime-logo.png')}
+            source={BRAND_ASSETS.wordmark}
             style={styles.grimeLogo}
             resizeMode="contain"
           />

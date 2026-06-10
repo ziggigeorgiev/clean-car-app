@@ -184,28 +184,51 @@ async def protected_redoc(_user: str = Depends(require_docs_auth)):
 # ---------------------------------------------------------------------------
 # Web UI: policy pages
 # ---------------------------------------------------------------------------
+# Per-brand web landing config: store links + which i18n key prefix to use.
+# Add a new entry here when launching another white-label app.
+WEB_BRANDS = {
+    models.BrandEnum.CAR: {
+        "ios_url": "https://apps.apple.com/app/cargrime",
+        "android_url": "https://play.google.com/store/apps/details?id=de.cargrime.app",
+        "key_prefix": "car",
+    },
+    models.BrandEnum.HOME: {
+        "ios_url": "https://apps.apple.com/app/homegrime",
+        "android_url": "https://play.google.com/store/apps/details?id=de.homegrime.app",
+        "key_prefix": "home",
+    },
+}
+
+
 @app.get("/", response_class=HTMLResponse)
 async def web_root(
     request: Request,
+    brand: models.BrandEnum = models.BrandEnum.CAR,
     locale: str = Depends(web_locale),
     db: Session = Depends(get_db),
 ):
-    """Public marketing landing page — services overview + app download."""
+    """Public marketing landing page — services overview + app download.
+
+    The same page serves every white-label app; `?brand=` selects the catalog,
+    store links and copy. Defaults to `car`.
+    """
     services = (
         db.query(models.Service)
-        .filter(models.Service.is_active.is_(True))
+        .filter(models.Service.is_active.is_(True), models.Service.brand == brand)
         .order_by(models.Service.id)
         .all()
     )
+    web_brand = WEB_BRANDS.get(brand, WEB_BRANDS[models.BrandEnum.CAR])
     return render_web(
         request,
         "index.html",
         locale,
         {
             "services": services,
-            # TODO: replace with real App Store / Play Store URLs once published.
-            "ios_url": "https://apps.apple.com/app/cleancar",
-            "android_url": "https://play.google.com/store/apps/details?id=de.cleancar.app",
+            "brand": brand.value,
+            "brand_key": web_brand["key_prefix"],
+            "ios_url": web_brand["ios_url"],
+            "android_url": web_brand["android_url"],
         },
     )
 
@@ -364,8 +387,14 @@ async def health_check():
     summary="Get All Orders",
     description="Retrieves a list of all orders with their associated location, services, and availability."
 )
-async def read_orders(phone_identifier: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    orders = crud.get_orders(db, phone_identifier, skip=skip, limit=limit)
+async def read_orders(
+    phone_identifier: str,
+    brand: models.BrandEnum = models.BrandEnum.CAR,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    orders = crud.get_orders(db, phone_identifier, brand=brand, skip=skip, limit=limit)
     return orders
 
 # Get Order By ID Endpoint (NEW)
@@ -375,14 +404,21 @@ async def read_orders(phone_identifier: str, skip: int = 0, limit: int = 100, db
     summary="Get Order by ID",
     description="Retrieves a single order by its unique ID, including associated location, services, and availability."
 )
-async def read_order_by_id(phone_identifier: str, order_id: int, db: Session = Depends(get_db)):
+async def read_order_by_id(
+    phone_identifier: str,
+    order_id: int,
+    brand: models.BrandEnum = models.BrandEnum.CAR,
+    db: Session = Depends(get_db),
+):
     """
     Retrieves a single order from the database by its ID.
 
     - **order_id**: The unique integer ID of the order to retrieve.
     """
     print("Fetching order with ID:", order_id)  # Debugging line
-    db_order = crud.get_order_by_phone_identifier_and_id(db, phone_identifier=phone_identifier, order_id=order_id)
+    db_order = crud.get_order_by_phone_identifier_and_id(
+        db, phone_identifier=phone_identifier, order_id=order_id, brand=brand,
+    )
     if db_order is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -417,20 +453,25 @@ async def create_new_order(
     print(f"[order_create] order={db_order.id} email={order.email!r}", flush=True)
 
     try:
-        total = sum((s.price or 0) for s in db_order.services)
+        # Quantity-aware: each association carries (service, quantity). The car
+        # app always has quantity 1; the home app may book several units.
+        items = list(db_order.service_items)
+        total = sum((it.service.price or 0) * (it.quantity or 1) for it in items)
         currency = (
-            db_order.services[0].currency.value
-            if db_order.services and db_order.services[0].currency is not None
+            items[0].service.currency.value
+            if items and items[0].service.currency is not None
             else "EUR"
         )
         common = dict(
             order_id=db_order.id,
+            brand=db_order.brand.value if db_order.brand else "car",
             plate_number=db_order.plate_number,
             phone_number=db_order.phone_number,
             address=db_order.location.address if db_order.location else "",
             availability_time=db_order.availability.time if db_order.availability else None,
-            service_names=[s.name for s in db_order.services],
-            total_price=total if db_order.services else None,
+            service_names=[it.service.name for it in items],
+            service_quantities=[it.quantity or 1 for it in items],
+            total_price=total if items else None,
             currency=currency,
         )
         customer_locale = order.locale or "de"
@@ -571,12 +612,19 @@ async def bulk_create_availabilities_for_day(
     summary="Get Active Services",
     description="Retrieves a list of all services that are currently active (is_active = True)."
 )
-async def read_active_services(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_active_services(
+    brand: models.BrandEnum = models.BrandEnum.CAR,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
     """
-    Retrieves a list of services that are marked as active.
+    Retrieves a list of services that are marked as active for the given brand
+    (white-label app). Defaults to `car` so the original app keeps working
+    without sending a `brand` query param.
     Supports pagination using `skip` and `limit` parameters.
     """
-    active_services = crud.get_active_services(db, skip=skip, limit=limit)
+    active_services = crud.get_active_services(db, brand=brand, skip=skip, limit=limit)
     return active_services
 
 

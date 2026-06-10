@@ -9,7 +9,7 @@ const MunichCard = () => {
   return (
     <View style={styles.heroContainer}>
         <ImageBackground
-          source={require('../assets/images/munich.jpeg')} 
+          source={require('../assets/images/car-hero.png')}
           style={styles.heroImage}
           imageStyle={styles.heroImageStyle}
         >

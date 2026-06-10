@@ -13,6 +13,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { COLORS } from '@/constants/colors';
+import { BRAND_ASSETS } from '@/constants/brandAssets';
 import { CleanCarAPI } from '@/services/CleanCarApi';
 import { Device } from '@/services/Device';
 import { useTranslation } from '@/services/i18n';
@@ -115,12 +116,12 @@ const HomeScreen = () => {
       <View style={styles.header}>
         <View style={styles.brandRow}>
           <Image
-            source={require('@/assets/images/cleen-logo.png')}
+            source={BRAND_ASSETS.logo}
             style={styles.brandLogo}
             resizeMode="contain"
           />
           <Image
-            source={require('@/assets/images/grime-logo.png')}
+            source={BRAND_ASSETS.wordmark}
             style={styles.brandWordmark}
             resizeMode="contain"
           />
@@ -132,7 +133,7 @@ const HomeScreen = () => {
       {/* Hero promo card */}
       <View style={styles.heroCard}>
         <Image
-          source={require('@/assets/images/hero-interior.png')}
+          source={BRAND_ASSETS.hero}
           style={styles.heroImage}
           resizeMode="cover"
         />

@@ -25,6 +25,7 @@ import { useTranslation } from '../../services/i18n';
 import { getServiceIcon } from '../../services/serviceIcons';
 import { WebUrls } from '../../services/webUrls';
 import { Image } from 'react-native';
+import { BRAND } from '../../constants/brand';
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
 // npx react-native link react-native-vector-icons
@@ -49,13 +50,19 @@ const ServicesScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const [services, setServices] = useState<Service[]>([]);
-  const [selectedExtras, setSelectedExtras] = useState<{ [id: number]: boolean }>({});
+  // Quantity per service id (0 = not selected). In 'toggle' mode this is just
+  // 0/1; in 'quantity' mode (home app) it can be any positive integer.
+  const [selectedQty, setSelectedQty] = useState<{ [id: number]: number }>({});
   const [showErrors, setShowErrors] = useState(false);
+
+  const isQuantityMode = BRAND.serviceMode === 'quantity';
 
   // Validation
   const plateNumberTrimmed = plateNumber.trim();
   const phoneNumberTrimmed = phoneNumber.trim();
-  const plateError = plateNumberTrimmed.length < 2 ? t('services.error_plate') : '';
+  // Plate is only required for brands that have a vehicle (car app).
+  const plateError =
+    BRAND.hasVehiclePlate && plateNumberTrimmed.length < 2 ? t('services.error_plate') : '';
   const phoneError = !/^\+?[0-9 \-()]{7,}$/.test(phoneNumberTrimmed) ? t('services.error_phone') : '';
   const isFormValid = !plateError && !phoneError;
 
@@ -74,17 +81,23 @@ const ServicesScreen = () => {
       setServices(activeServices);
 
       if (opts?.resetExtras !== false) {
-        const extras = data.filter((s: { category: string; }) => s.category === 'Extra');
-        setSelectedExtras(
-          Object.fromEntries(extras.map((e: { id: any; }) => [e.id, false]))
+        // In quantity mode every service is individually selectable (qty 0..n);
+        // in toggle mode only the "Extra" services are user-selectable.
+        const selectable = isQuantityMode
+          ? activeServices
+          : activeServices.filter((s: { category: string; }) => s.category === 'Extra');
+        setSelectedQty(
+          Object.fromEntries(selectable.map((e: { id: any; }) => [e.id, 0]))
         );
       }
 
       // Prefill only from saved settings; otherwise leave empty.
       const storedPhone = await Device.getPhoneNumber();
-      const storedPlate = await Device.getPlateNumber();
       setPhoneNumber(storedPhone ?? '');
-      setPlateNumber(storedPlate ?? '');
+      if (BRAND.hasVehiclePlate) {
+        const storedPlate = await Device.getPlateNumber();
+        setPlateNumber(storedPlate ?? '');
+      }
       setShowErrors(false);
     } catch (error) {
       console.error(`Error fetching services:`, error);
@@ -115,37 +128,54 @@ const ServicesScreen = () => {
   const basicServices = services.filter(s => s.category === 'Basic');
   const extraServices = services.filter(s => s.category === 'Extra');
 
-  const handleExtraToggle = (id: number) => {  
-    setSelectedExtras(prev => ({
+  // In quantity mode all services get a stepper; in toggle mode only extras.
+  const selectableServices = isQuantityMode ? services : extraServices;
+
+  const qtyOf = (id: number) => selectedQty[id] ?? 0;
+
+  const handleExtraToggle = (id: number) => {
+    setSelectedQty(prev => ({
       ...prev,
-      [id]: !prev[id],
+      [id]: (prev[id] ?? 0) > 0 ? 0 : 1,
     }));
-    const selectedExtraServices = extraServices.filter(
-      service => selectedExtras[service.id]
-    );
   };
 
+  const incrementQty = (id: number) => {
+    setSelectedQty(prev => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }));
+  };
+
+  const decrementQty = (id: number) => {
+    setSelectedQty(prev => ({ ...prev, [id]: Math.max(0, (prev[id] ?? 0) - 1) }));
+  };
+
+  // Selected services with their quantity attached (for preview + order).
   const totalSelectedServices = () => {
-    return [
-      ...basicServices,
-      ...extraServices.filter(
-        service => selectedExtras[service.id]
-      )
-    ]
-  }
+    const selectedSelectable = selectableServices
+      .filter(service => qtyOf(service.id) > 0)
+      .map(service => ({ ...service, quantity: qtyOf(service.id) }));
+    // Toggle mode always includes the Basic package; quantity mode does not
+    // (everything is explicitly chosen by the customer).
+    return isQuantityMode
+      ? selectedSelectable
+      : [...basicServices.map(s => ({ ...s, quantity: 1 })), ...selectedSelectable];
+  };
 
   const handlePlaceOrder = () => {
     if (!isFormValid) {
       setShowErrors(true);
       return;
     }
-    const services = totalSelectedServices().map(s => s.id)
+    const selected = totalSelectedServices();
+    const serviceIds = selected.map(s => s.id);
+    const serviceQuantities: Record<number, number> = {};
+    selected.forEach(s => { serviceQuantities[s.id] = s.quantity; });
     console.log("location", location)
     router.push({ pathname: '/confirm', params: {
         location: location,
         availability: availability,
-        services: JSON.stringify(services),
-        plateNumber: plateNumberTrimmed,
+        services: JSON.stringify(serviceIds),
+        serviceQuantities: JSON.stringify(serviceQuantities),
+        plateNumber: BRAND.hasVehiclePlate ? plateNumberTrimmed : '',
         phoneNumber: phoneNumberTrimmed
       }
     });
@@ -162,21 +192,27 @@ const ServicesScreen = () => {
         <StepIndocator title={t('screen.services')} backRoute={"/availability"} backParams={{location: location}} totalSteps={3} currentStep={3} />
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
 
-          {/* Vehicle Details Section */}
+          {/* Contact / Vehicle Details Section */}
           <View style={styles.sectionContainer}>
-            <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('services.vehicle_details')}</Text>
-            <View style={[styles.inputContainer, showErrors && plateError ? styles.inputContainerError : null]}>
-              <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder={t('services.registration_number')}
-                placeholderTextColor="#8e8e93"
-                value={plateNumber}
-                onChangeText={setPlateNumber}
-                autoCapitalize="characters"
-              />
-            </View>
-            {showErrors && plateError ? <Text style={styles.errorText}>{plateError}</Text> : null}
+            <Text style={[styles.sectionTitle, {marginTop: 20}]}>
+              {BRAND.hasVehiclePlate ? t('services.vehicle_details') : t('section.contact_info')}
+            </Text>
+            {BRAND.hasVehiclePlate && (
+              <>
+                <View style={[styles.inputContainer, showErrors && plateError ? styles.inputContainerError : null]}>
+                  <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('services.registration_number')}
+                    placeholderTextColor="#8e8e93"
+                    value={plateNumber}
+                    onChangeText={setPlateNumber}
+                    autoCapitalize="characters"
+                  />
+                </View>
+                {showErrors && plateError ? <Text style={styles.errorText}>{plateError}</Text> : null}
+              </>
+            )}
             <View style={[styles.inputContainer, showErrors && phoneError ? styles.inputContainerError : null]}>
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput
@@ -191,28 +227,58 @@ const ServicesScreen = () => {
             {showErrors && phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
           </View>
 
-          {/* Additional Services Section */}
+          {/* Services Section: quantity steppers (home) or on/off extras (car) */}
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>{t('services.additional')}</Text>
-            {extraServices.map(service => (
-              <TouchableOpacity
-                key={service.id}
-                style={styles.serviceItem}
-                onPress={() => handleExtraToggle(service.id)}
-              >
-                <View style={styles.serviceLeft}>
-                  <View style={[styles.outerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#D1EAD0' : '#E0E0E0' } ]}>
-                    <View style={[styles.innerCheckboxContainer, { backgroundColor: selectedExtras[service.id] ? '#28A745': '#90949C' }]}>
-                      <Text style={styles.checkmarkIcon}>{selectedExtras[service.id] ? '✓' : '+'}</Text>
+            <Text style={styles.sectionTitle}>
+              {isQuantityMode ? t('home.our_services') : t('services.additional')}
+            </Text>
+            {selectableServices.map(service => (
+              <View key={service.id} style={styles.serviceItem}>
+                {isQuantityMode ? (
+                  <>
+                    <View style={styles.serviceLeft}>
+                      <View>
+                        <Text style={styles.serviceName}>{tService(service, 'name')}</Text>
+                        <Text style={styles.serviceDescription}>{tService(service, 'description')}</Text>
+                      </View>
                     </View>
-                  </View>
-                  <View>
-                    <Text style={styles.serviceName}>{tService(service, 'name')}</Text>
-                    <Text style={styles.serviceDescription}>{tService(service, 'description')}</Text>
-                  </View>
-                </View>
-                <Price price={service.price} currency={service.currency} />
-              </TouchableOpacity>
+                    <View style={styles.qtyControls}>
+                      <Price price={service.price} currency={service.currency} />
+                      <View style={styles.stepper}>
+                        <TouchableOpacity
+                          style={[styles.stepperBtn, qtyOf(service.id) === 0 && styles.stepperBtnDisabled]}
+                          onPress={() => decrementQty(service.id)}
+                          disabled={qtyOf(service.id) === 0}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.stepperValue}>{qtyOf(service.id)}</Text>
+                        <TouchableOpacity style={styles.stepperBtn} onPress={() => incrementQty(service.id)}>
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.toggleRow}
+                    onPress={() => handleExtraToggle(service.id)}
+                  >
+                    <View style={styles.serviceLeft}>
+                      <View style={[styles.outerCheckboxContainer, { backgroundColor: qtyOf(service.id) > 0 ? '#D1EAD0' : '#E0E0E0' } ]}>
+                        <View style={[styles.innerCheckboxContainer, { backgroundColor: qtyOf(service.id) > 0 ? '#28A745': '#90949C' }]}>
+                          <Text style={styles.checkmarkIcon}>{qtyOf(service.id) > 0 ? '✓' : '+'}</Text>
+                        </View>
+                      </View>
+                      <View>
+                        <Text style={styles.serviceName}>{tService(service, 'name')}</Text>
+                        <Text style={styles.serviceDescription}>{tService(service, 'description')}</Text>
+                      </View>
+                    </View>
+                    <Price price={service.price} currency={service.currency} />
+                  </TouchableOpacity>
+                )}
+              </View>
             ))}
           </View>
 
@@ -424,7 +490,46 @@ const styles = StyleSheet.create({
   linkText: {
     color: COLORS.primary,
     // textDecorationLine: 'underline',
-  }
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  qtyControls: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  stepperBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperBtnDisabled: {
+    backgroundColor: '#C7C7C7',
+  },
+  stepperBtnText: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 20,
+  },
+  stepperValue: {
+    minWidth: 32,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
 });
 
 export default ServicesScreen;

@@ -5,13 +5,26 @@ import { COLORS } from '@/constants/colors';
 import { router, useLocalSearchParams } from "expo-router";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import StepIndocator from '@/components/StepIndicator';
-import * as Calendar from 'expo-calendar';
+// NOTE: expo-calendar is a native module that isn't bundled in Expo Go. We load
+// it lazily inside the handler (see loadCalendar) so the screen still renders in
+// Expo Go; the "Add to Calendar" button just shows a friendly message there.
+// It works fully in a dev/standalone build.
 import { CleanCarAPI } from '@/services/CleanCarApi';
 import { Device } from '@/services/Device';
 import { useTranslation } from '@/services/i18n';
 
 // Duration of a single booking slot (minutes). Keep in sync with backend bulk_create_for_day step_minutes.
 const BOOKING_DURATION_MINUTES = 90;
+
+// Lazily require expo-calendar. Returns the module, or null if the native
+// module isn't available (e.g. running in Expo Go).
+function loadCalendar(): typeof import('expo-calendar') | null {
+  try {
+    return require('expo-calendar');
+  } catch {
+    return null;
+  }
+}
 
 const AcknowledgeScreen = () => {
   const { t } = useTranslation();
@@ -24,6 +37,16 @@ const AcknowledgeScreen = () => {
   const createCalendarEvent = async () => {
     if (!orderId) {
       Alert.alert("No order ID available");
+      return;
+    }
+
+    // Not available in Expo Go — show a friendly note instead of crashing.
+    const Calendar = loadCalendar();
+    if (!Calendar) {
+      Alert.alert(
+        t('btn.add_to_calendar'),
+        'Adding to the calendar needs the full app build and is not available here.'
+      );
       return;
     }
 
@@ -56,7 +79,7 @@ const AcknowledgeScreen = () => {
       const end = new Date(start.getTime() + BOOKING_DURATION_MINUTES * 60 * 1000);
 
       const serviceNames = (order.services || []).map((s: any) => s.name).filter(Boolean).join(', ');
-      const title = order.plate_number ? `Car cleaning: ${order.plate_number}` : 'Car cleaning';
+      const title = order.plate_number ? `Cleaning: ${order.plate_number}` : 'Cleaning';
       const notes = [
         `Order #${order.id}`,
         serviceNames ? `Services: ${serviceNames}` : null,

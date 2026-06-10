@@ -1,4 +1,5 @@
 import { COLORS } from '@/constants/colors';
+import { BRAND_ASSETS } from '@/constants/brandAssets';
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Svg, { Path } from 'react-native-svg'; // Import Svg and Path
@@ -64,7 +65,7 @@ const DeliveryIcon = ({step}: {step: number}) => {
       {/* Inner circle and truck icon, positioned absolutely over the SVG */}
       <View style={styles.innerCircleAbsolute}>
         <Image
-            source={require('../assets/images/cleen-logo.png')} 
+            source={BRAND_ASSETS.logo}
             style={styles.truckIcon}
         />
       </View>

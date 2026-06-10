@@ -16,9 +16,12 @@ export const Transformations = {
         return a.name.localeCompare(b.name);
     }); 
     
-    // Step 1: Group services by category and calculate total price per category
+    // Step 1: Group services by category and calculate total price per category.
+    // `quantity` defaults to 1, so the car app (no quantities) is unaffected;
+    // the home app passes a quantity per service and prices multiply.
     const groupedByCategory = sortedServices.reduce((acc, service) => {
         const { category, price, currency } = service;
+        const quantity = service.quantity ?? 1;
 
         if (!acc[category]) {
         acc[category] = {
@@ -27,7 +30,7 @@ export const Transformations = {
             items: []
         };
         }
-        acc[category].totalPrice += price;
+        acc[category].totalPrice += price * quantity;
         acc[category].items.push(service);
         return acc;
     }, {});
@@ -42,6 +45,7 @@ export const Transformations = {
       type: 'primary' | 'secondary';
       serviceId?: number;
       categoryKey?: string;
+      quantity?: number;
     }[] = [];
 
     // Iterate over the categories in the order they appear in the original list
@@ -66,13 +70,15 @@ export const Transformations = {
         });
 
         // Add "secondary" entries for each service in the category
-        categoryData.items.forEach((service: { id?: number; name: any; price: any; currency: any; }) => {
+        categoryData.items.forEach((service: { id?: number; name: any; price: any; currency: any; quantity?: number; }) => {
+            const quantity = service.quantity ?? 1;
             transformedList.push({
                 name: service.name,
-                price: service.price,
+                price: service.price * quantity,
                 currency: service.currency,
                 type: "secondary",
                 serviceId: service.id,
+                quantity,
             });
         });
     });

@@ -5,13 +5,14 @@
   },
 
   "build": {
-    "_comment": "Three profiles: development = native dev client for local; preview = standalone TestFlight/internal-distribution build; production = store-ready build.",
+    "_comment": "Per-brand profiles. car-* build the original CarGrime app (EXPO_PUBLIC_BRAND=car); home-* build the FreshSofa app and extend their car counterpart, adding EXPO_PUBLIC_BRAND=home (env is merged on extends, so the API/WEB URLs carry over). Each brand uses its own channel so OTA updates never cross apps. Build with e.g. `eas build --profile car-production` or `eas build --profile home-production`.",
 
-    "development": {
+    "car-development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development",
+      "channel": "car-development",
       "env": {
+        "EXPO_PUBLIC_BRAND": "car",
         "EXPO_PUBLIC_API_BASE_URL": "https://cargrime.de",
         "EXPO_PUBLIC_WEB_BASE_URL": "https://cargrime.de"
       },
@@ -25,11 +26,11 @@
       }
     },
 
-    "preview": {
-      "extends": "development",
+    "car-preview": {
+      "extends": "car-development",
       "developmentClient": false,
       "distribution": "internal",
-      "channel": "preview",
+      "channel": "car-preview",
       "ios": {
         "simulator": false,
         "resourceClass": "m-medium"
@@ -39,10 +40,11 @@
       }
     },
 
-    "production": {
+    "car-production": {
       "autoIncrement": true,
-      "channel": "production",
+      "channel": "car-production",
       "env": {
+        "EXPO_PUBLIC_BRAND": "car",
         "EXPO_PUBLIC_API_BASE_URL": "https://cargrime.de",
         "EXPO_PUBLIC_WEB_BASE_URL": "https://cargrime.de"
       },
@@ -52,14 +54,52 @@
       "android": {
         "buildType": "app-bundle"
       }
+    },
+
+    "home-development": {
+      "extends": "car-development",
+      "channel": "home-development",
+      "env": {
+        "EXPO_PUBLIC_BRAND": "home"
+      }
+    },
+
+    "home-preview": {
+      "extends": "car-preview",
+      "channel": "home-preview",
+      "env": {
+        "EXPO_PUBLIC_BRAND": "home"
+      }
+    },
+
+    "home-production": {
+      "extends": "car-production",
+      "channel": "home-production",
+      "env": {
+        "EXPO_PUBLIC_BRAND": "home"
+      }
     }
   },
 
   "submit": {
-    "production": {
+    "car-production": {
       "ios": {
         "appleId": "REPLACE_WITH_YOUR_APPLE_ID_EMAIL",
         "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": "internal",
+        "releaseStatus": "draft",
+        "changesNotSentForReview": false
+      }
+    },
+
+    "home-production": {
+      "ios": {
+        "appleId": "REPLACE_WITH_YOUR_APPLE_ID_EMAIL",
+        "ascAppId": "REPLACE_WITH_HOME_APP_STORE_CONNECT_APP_ID",
         "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
       },
       "android": {

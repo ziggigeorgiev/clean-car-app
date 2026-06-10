@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { COLORS } from "../constants/colors";
+import { BRAND_ASSETS } from "../constants/brandAssets";
 import { useTranslation } from "../services/i18n";
 
 type Props = {
@@ -13,12 +14,12 @@ export default function NoResultsFound({ title, message }: Props) {
     <View style={styles.emptyState}>
       <View style={styles.logoStack}>
         <Image
-          source={require('../assets/images/cleen-logo.png')}
+          source={BRAND_ASSETS.logo}
           style={styles.cleenLogo}
           resizeMode="contain"
         />
         <Image
-          source={require('../assets/images/grime-logo.png')}
+          source={BRAND_ASSETS.wordmark}
           style={styles.grimeLogo}
           resizeMode="contain"
         />

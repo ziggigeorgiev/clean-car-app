@@ -5,6 +5,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BRAND_ID } from '../constants/brand';
 
 export type Locale = 'de' | 'en';
 export const DEFAULT_LOCALE: Locale = 'de';
@@ -281,6 +282,21 @@ const translations = {
 type TranslationKey = keyof typeof translations;
 type ParamMap = Record<string, string | number>;
 
+// Per-brand string overrides. When the active brand (EXPO_PUBLIC_BRAND) has an
+// entry for a key, it wins over the global `translations` table below; anything
+// not overridden falls back to the shared copy. This is how the home
+// (couch/mattress) app shows different wording for the same screens.
+const BRAND_OVERRIDES: Partial<
+  Record<typeof BRAND_ID, Partial<Record<TranslationKey, { en: string; de: string }>>>
+> = {
+  home: {
+    'home.hero_offer': {
+      en: 'Book your professional couch & mattress cleaning at your place now',
+      de: 'Buchen Sie jetzt Ihre professionelle Polster- und Matratzenreinigung bei Ihnen vor Ort',
+    },
+  },
+};
+
 /** Minimal shape of a service that the i18n helpers expect. */
 export type TranslatableService = {
   id: number;
@@ -318,7 +334,8 @@ function format(template: string, params?: ParamMap): string {
 }
 
 export function translate(locale: Locale, key: TranslationKey, params?: ParamMap): string {
-  const entry = translations[key];
+  // Prefer a brand-specific override when one exists for the active brand.
+  const entry = BRAND_OVERRIDES[BRAND_ID]?.[key] ?? translations[key];
   if (!entry) return String(key);
   const value = entry[locale] ?? entry.en ?? String(key);
   return format(value, params);

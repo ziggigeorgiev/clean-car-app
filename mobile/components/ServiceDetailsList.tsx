@@ -12,6 +12,7 @@ export interface ServiceItem {
   type: 'primary' | 'secondary'; // Added type for service item
   serviceId?: number; // for secondary rows: id of the underlying DB service
   categoryKey?: string; // for primary rows: 'basic' / 'extra' (used for i18n)
+  quantity?: number; // for secondary rows: booked quantity (home app)
 }
 
 interface ServiceDetailsListProps {
@@ -35,7 +36,9 @@ const ServiceDetailsList: React.FC<ServiceDetailsListProps> = ({
   const renderLabel = (service: ServiceItem) => {
     if (service.type === 'secondary' && service.serviceId != null) {
       // Translate using the underlying DB service id with DB-name fallback
-      return tService({ id: service.serviceId, name: service.name }, 'name');
+      const label = tService({ id: service.serviceId, name: service.name }, 'name');
+      // Show "× N" only when more than one unit was booked (home app).
+      return service.quantity && service.quantity > 1 ? `${label} × ${service.quantity}` : label;
     }
     if (service.type === 'primary' && service.categoryKey) {
       // Translate the category aggregate label

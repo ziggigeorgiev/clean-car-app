@@ -32,6 +32,11 @@ class ServiceCategoryEnum(str, enum.Enum): # Inherit from str for PostgreSQL com
     BASIC= "Basic"
     EXTRA = "Extra"
 
+class BrandEnum(str, enum.Enum): # White-label tenant: which app a row belongs to
+    CAR = "car"    # original on-site car interior cleaning app
+    HOME = "home"  # couch / mattress / upholstery cleaning app
+    # Add new brands here as the white-label catalog grows.
+
 class ProcessStepStatusEnum(str, enum.Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
@@ -56,6 +61,12 @@ class Service(Base):
     __tablename__ = "services"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    # Which white-label app this service belongs to. Existing rows are backfilled
+    # to "car" by the migration, so the original app keeps its full catalog.
+    brand: Mapped[BrandEnum] = mapped_column(
+        Enum(BrandEnum), nullable=False, default=BrandEnum.CAR,
+        server_default=BrandEnum.CAR.name, index=True,  # stored as the enum NAME ("CAR")
+    )
     category: Mapped[ServiceCategoryEnum] = mapped_column(Enum(ServiceCategoryEnum), nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True) # Optional
@@ -98,6 +109,18 @@ class OrderServiceAssociation(Base):
     __tablename__ = "order_service_association"
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), primary_key=True)
     service_id: Mapped[int] = mapped_column(ForeignKey("services.id"), primary_key=True)
+    # How many units of this service were booked. The car app always books 1;
+    # the home (couch/mattress) app lets the customer pick a quantity.
+    quantity: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1, server_default="1"
+    )
+
+    # Convenience relationship so the API can expose (service, quantity) pairs.
+    # viewonly + overlaps keep it from fighting the Order.services / Service.orders
+    # secondary relationships that map the same table.
+    service: Mapped["Service"] = relationship(
+        "Service", viewonly=True, overlaps="orders,services",
+    )
 
 class ProcessStep(Base):
     __tablename__ = "process_steps"
@@ -130,8 +153,15 @@ class Order(Base):
         String(36), unique=True, index=True, nullable=False, default=_generate_uuid
     )
 
+    # Which white-label app produced this order. Backfilled to "car" by migration.
+    brand: Mapped[BrandEnum] = mapped_column(
+        Enum(BrandEnum), nullable=False, default=BrandEnum.CAR,
+        server_default=BrandEnum.CAR.name, index=True,  # stored as the enum NAME ("CAR")
+    )
+
     phone_identifier: Mapped[str] = mapped_column(String, index=True, nullable=False)
-    plate_number: Mapped[str] = mapped_column(String, nullable=False)
+    # Nullable: the home (couch/mattress) app has no vehicle plate.
+    plate_number: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
     # Optional — only set if the customer saved an email in their Settings.
     email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
@@ -166,6 +196,18 @@ class Order(Base):
         secondary="order_service_association",
         back_populates="orders"
     )
+
+    # Quantity-aware view of the same association rows. Used by the API to return
+    # (service, quantity) pairs for the home app. viewonly + overlaps avoid
+    # clashing with the `services` secondary relationship above.
+    service_associations: Mapped[List["OrderServiceAssociation"]] = relationship(
+        "OrderServiceAssociation", viewonly=True, overlaps="orders,services",
+    )
+
+    @property
+    def service_items(self) -> List["OrderServiceAssociation"]:
+        """Alias used by the response schema (each item has .service + .quantity)."""
+        return self.service_associations
 
     def __repr__(self):
         return (f"<Order(id={self.id}, plate_number='{self.plate_number}', "

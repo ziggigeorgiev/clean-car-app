@@ -45,7 +45,7 @@ const ConfirmScreen: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   
-  const { location, availability, services, plateNumber, phoneNumber} = useLocalSearchParams();
+  const { location, availability, services, serviceQuantities, plateNumber, phoneNumber} = useLocalSearchParams();
   
   console.log("--------------------")
   console.log("location", location)
@@ -92,7 +92,12 @@ const ConfirmScreen: React.FC = () => {
           const dataServices = await CleanCarAPI.getServices();
           if (cancelled) return;
           const wantedIds = JSON.parse(services as string);
-          const selected = dataServices.filter((s: { id: any; }) => wantedIds.includes(s.id));
+          const quantities: Record<number, number> = serviceQuantities
+            ? JSON.parse(serviceQuantities as string)
+            : {};
+          const selected = dataServices
+            .filter((s: { id: any; }) => wantedIds.includes(s.id))
+            .map((s: { id: number; }) => ({ ...s, quantity: quantities[s.id] ?? 1 }));
           setSelectedServices(Transformations.transformServices(selected || []));
 
           const dataAvailability = await CleanCarAPI.getAvailability(JSON.parse(availability as string));
@@ -107,7 +112,7 @@ const ConfirmScreen: React.FC = () => {
       };
       fetchData();
       return () => { cancelled = true; };
-    }, [availability, services])
+    }, [availability, services, serviceQuantities])
   );
   
   const confirm = async () => {
@@ -132,13 +137,14 @@ const ConfirmScreen: React.FC = () => {
       const email = (await Device.getEmail()) || undefined;
       const order = await CleanCarAPI.createOrder(
         {
-          phone_identifier: await Device.getPhoneIdentifier(),
+          phone_identifier: (await Device.getPhoneIdentifier()) ?? '',
           status: "open",
-          plate_number: plateNumber,
-          phone_number: phoneNumber,
+          plate_number: plateNumber ? String(plateNumber) : null,
+          phone_number: phoneNumber as string,
           location: JSON.parse(location as string),
           availability_id: selectedAvailability.id,
           service_ids: JSON.parse(services as string),
+          service_quantities: serviceQuantities ? JSON.parse(serviceQuantities as string) : undefined,
           email,
           locale,
         }

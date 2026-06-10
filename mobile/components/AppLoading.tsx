@@ -8,6 +8,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import { COLORS } from '@/constants/colors';
+import { BRAND_ASSETS } from '@/constants/brandAssets';
 import { translate, Locale, DEFAULT_LOCALE } from '@/services/i18n';
 
 type Props = {
@@ -20,12 +21,12 @@ const AppLoading: React.FC<Props> = ({ locale = DEFAULT_LOCALE }) => {
     <View style={styles.container}>
       <View style={styles.center}>
         <Image
-          source={require('@/assets/images/cleen-logo.png')}
+          source={BRAND_ASSETS.logo}
           style={styles.cleen}
           resizeMode="contain"
         />
         <Image
-          source={require('@/assets/images/grime-logo.png')}
+          source={BRAND_ASSETS.wordmark}
           style={styles.grime}
           resizeMode="contain"
         />

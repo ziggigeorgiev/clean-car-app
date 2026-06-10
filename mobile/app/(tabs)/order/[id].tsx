@@ -44,7 +44,7 @@ interface CleaningStep {
 interface Order {
   id: number;
   status: string;
-  plate_number: string;
+  plate_number?: string | null;
   location: {
     address: string;
     latitude: number;
@@ -52,6 +52,7 @@ interface Order {
   };
   phone_number: string;
   services: any[];
+  service_items?: { service: any; quantity: number }[];
   availability?: {
     time: string;
   };
@@ -84,7 +85,13 @@ const OrderDetailScreen: React.FC = () => {
       const order = await CleanCarAPI.getOrderByByPhoneIdentifierAndId(phoneIdentifier, parseInt(orderId));
       setOrder(order);
 
-      const transformedServices = Transformations.transformServices(order?.services || []);
+      // Prefer the quantity-aware view (home app shows "Sofa × 2"); fall back to
+      // the plain services list for older orders / the car app.
+      const items = order?.service_items;
+      const servicesForDisplay = items && items.length
+        ? items.map((it: { service: any; quantity: number }) => ({ ...it.service, quantity: it.quantity }))
+        : (order?.services || []);
+      const transformedServices = Transformations.transformServices(servicesForDisplay);
       setServices(transformedServices);
 
       const transformedProcessSteps = Transformations.transformProcessSteps(order?.process_steps || [])

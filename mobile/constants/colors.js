@@ -43,7 +43,7 @@ const oceanTheme = {
 };
 
 const sunsetTheme = {
-  primary: "#FF7E67",
+  primary: "#E38C39",
   background: "#FFF3F0",
   text: "#2C1810",
   border: "#FFD5CC",
@@ -86,7 +86,18 @@ const roseGoldTheme = {
   shadow: "#000000",
 };
 
-const cleenTheme = {
+const homeTheme = {
+  primary: "#E38C39",
+  background: "#FFFFFF",
+  text: "#222222",
+  border: "#ECECEC",
+  white: "#FFFFFF",
+  textLight: "#686868",
+  card: "#FFFFFF",
+  shadow: "#000000",
+};
+
+const carTheme = {
   primary: "#204EA5",
   background: "#FFFFFF",
   text: "#222222",
@@ -106,8 +117,18 @@ export const THEMES = {
   mint: mintTheme,
   midnight: midnightTheme,
   roseGold: roseGoldTheme,
-  cleen: cleenTheme,
+  car: carTheme,
+  home: homeTheme,
 };
 
-// 👇 change this to switch theme
-export const COLORS = THEMES.cleen;
+// Theme is selected by the white-label brand (EXPO_PUBLIC_BRAND). The original
+// car app keeps the "cleen" theme; the home (couch/mattress) app uses "mint".
+// Override the mapping here when adding a brand.
+const BRAND_THEME = {
+  car: "car",
+  home: "home", // home shares the car theme for now
+};
+
+const ACTIVE_BRAND = process.env.EXPO_PUBLIC_BRAND === "home" ? "home" : "car";
+
+export const COLORS = THEMES[BRAND_THEME[ACTIVE_BRAND]] || THEMES.cleen;

@@ -32,7 +32,27 @@ from email.message import EmailMessage
 from typing import Iterable, Optional
 from zoneinfo import ZoneInfo
 
-from .translations import translate as _tr, normalize_locale, DEFAULT_LOCALE
+from .translations import (
+    translate as _tr,
+    translate_brand as _trb,
+    normalize_locale,
+    DEFAULT_LOCALE,
+)
+
+
+def _service_lines(service_names, quantities, loc):
+    """Resolve service translation keys to labels, appending ' × N' when N > 1.
+
+    Returns the list of display strings (used for both text and HTML emails).
+    """
+    names = [n for n in service_names if n]
+    qtys = list(quantities or [])
+    lines = []
+    for idx, name in enumerate(names):
+        label = _tr(name, loc)
+        qty = qtys[idx] if idx < len(qtys) else 1
+        lines.append(f"{label} × {qty}" if qty and qty > 1 else label)
+    return lines
 
 logger = logging.getLogger(__name__)
 
@@ -212,19 +232,21 @@ def _gcal_link(title: str, start: datetime, end: datetime, details: str, locatio
 def send_booking_confirmation(
     to: str,
     order_id: int,
-    plate_number: str,
+    plate_number: Optional[str],
     phone_number: str,
     address: str,
     availability_time: Optional[datetime],
     service_names: Iterable[str],
+    service_quantities: Optional[Iterable[int]] = None,
     total_price: Optional[float] = None,
     currency: str = "EUR",
     locale: str = DEFAULT_LOCALE,
+    brand: str = "car",
 ) -> bool:
     """Build and send a booking confirmation email."""
     loc = normalize_locale(locale)
     when = _format_berlin(availability_time)
-    services_list = [_tr(s, loc) for s in service_names if s]
+    services_list = _service_lines(service_names, service_quantities, loc)
     services_text = "\n".join(f"  • {s}" for s in services_list) or "  • —"
     services_html = "".join(f"<li>{s}</li>" for s in services_list) or "<li>—</li>"
 
@@ -244,12 +266,19 @@ def send_booking_confirmation(
         total_line_txt = f"\n{L_TOTAL}: {total_price:.2f} {currency}\n"
         total_line_html = f"<p><strong>{L_TOTAL}:</strong> {total_price:.2f} {currency}</p>"
 
-    subject     = _tr("email.customer.subject",  loc, order_id=order_id)
-    greeting    = _tr("email.customer.greeting", loc)
-    intro       = _tr("email.customer.intro",    loc)
-    outro       = _tr("email.customer.outro",    loc)
-    heading     = _tr("email.customer.heading",  loc)
-    signature   = _tr("email.customer.signature", loc)
+    subject     = _trb("email.customer.subject",  loc, brand, order_id=order_id)
+    greeting    = _trb("email.customer.greeting", loc, brand)
+    intro       = _trb("email.customer.intro",    loc, brand)
+    outro       = _trb("email.customer.outro",    loc, brand)
+    heading     = _trb("email.customer.heading",  loc, brand)
+    signature   = _trb("email.customer.signature", loc, brand)
+
+    # The home (couch/mattress) app has no vehicle plate — omit that row.
+    vehicle_line_txt = f"{L_VEHICLE}:  {plate_number}\n" if plate_number else ""
+    vehicle_row_html = (
+        f'<tr><td style="padding:4px 12px 4px 0;color:#666;">{L_VEHICLE}</td>'
+        f'<td>{plate_number}</td></tr>'
+    ) if plate_number else ""
 
     body_text = (
         f"{greeting}\n\n"
@@ -257,7 +286,7 @@ def send_booking_confirmation(
         f"{L_ORDER}:    #{order_id}\n"
         f"{L_WHEN}:     {when} {L_TZ}\n"
         f"{L_WHERE}:    {address or '-'}\n"
-        f"{L_VEHICLE}:  {plate_number or '-'}\n"
+        f"{vehicle_line_txt}"
         f"{L_PHONE}:    {phone_number or '-'}\n\n"
         f"{L_SERVICES}:\n{services_text}\n"
         f"{total_line_txt}\n"
@@ -275,7 +304,7 @@ def send_booking_confirmation(
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_ORDER}</td><td>#{order_id}</td></tr>
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHEN}</td><td>{when} <span style="color:#888;">{L_TZ}</span></td></tr>
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHERE}</td><td>{address or '-'}</td></tr>
-    <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_VEHICLE}</td><td>{plate_number or '-'}</td></tr>
+    {vehicle_row_html}
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_PHONE}</td><td>{phone_number or '-'}</td></tr>
   </table>
   <p style="margin:8px 0 4px 0;color:#666;">{L_SERVICES}</p>
@@ -293,16 +322,18 @@ def send_booking_confirmation(
 def send_cleaner_notification(
     order_id: int,
     order_uuid: str,
-    plate_number: str,
+    plate_number: Optional[str],
     phone_number: str,
     address: str,
     availability_time: Optional[datetime],
     service_names: Iterable[str],
+    service_quantities: Optional[Iterable[int]] = None,
     customer_email: Optional[str] = None,
     total_price: Optional[float] = None,
     currency: str = "EUR",
     to: Optional[str] = None,
     locale: str = DEFAULT_LOCALE,
+    brand: str = "car",
 ) -> bool:
     """
     Notify the cleaning team about a new booking. Includes a deep link to the
@@ -311,7 +342,7 @@ def send_cleaner_notification(
     recipient = to or CLEANER_NOTIFY_EMAIL
     loc = normalize_locale(locale)
     when_label = _format_berlin(availability_time)
-    services_list = [_tr(s, loc) for s in service_names if s]
+    services_list = _service_lines(service_names, service_quantities, loc)
     services_text = "\n".join(f"  • {s}" for s in services_list) or "  • —"
     services_html = "".join(f"<li>{s}</li>" for s in services_list) or "<li>—</li>"
 
@@ -326,9 +357,9 @@ def send_cleaner_notification(
     L_TZ       = _tr("email.field.tz_suffix", loc)
     cta_open    = _tr("email.cleaner.cta_open",     loc)
     cta_gcal    = _tr("email.cleaner.cta_calendar", loc)
-    intro_label = _tr("email.cleaner.intro",        loc)
-    heading     = _tr("email.cleaner.heading",      loc, order_id=order_id)
-    footer      = _tr("email.cleaner.footer",       loc)
+    intro_label = _trb("email.cleaner.intro",       loc, brand)
+    heading     = _trb("email.cleaner.heading",     loc, brand, order_id=order_id)
+    footer      = _trb("email.cleaner.footer",      loc, brand)
 
     total_line_txt = ""
     total_line_html = ""
@@ -344,10 +375,11 @@ def send_cleaner_notification(
         end_dt = (
             start_dt.replace(tzinfo=ZoneInfo("UTC")) if start_dt.tzinfo is None else start_dt
         ) + timedelta(minutes=BOOKING_DURATION_MINUTES)
-        gcal_title = f"Car cleaning — {plate_number or 'order'}"
+        gcal_title = f"Cleaning — {plate_number or f'order #{order_id}'}"
+        gcal_plate_line = f"Plate: {plate_number}\\n" if plate_number else ""
         gcal_details = (
-            f"CleanCar order #{order_id}\\n"
-            f"Plate: {plate_number}\\n"
+            f"Order #{order_id}\\n"
+            f"{gcal_plate_line}"
             f"Phone: {phone_number}\\n"
             f"Services: {', '.join(services_list) or '—'}\\n\\n"
             f"Manage: {cleaner_url}"
@@ -362,7 +394,7 @@ def send_cleaner_notification(
     else:
         gcal_url = None
 
-    subject = _tr("email.cleaner.subject", loc, order_id=order_id, when=when_label)
+    subject = _trb("email.cleaner.subject", loc, brand, order_id=order_id, when=when_label)
 
     body_text_lines = [
         intro_label,
@@ -370,9 +402,10 @@ def send_cleaner_notification(
         f"{L_ORDER}:    #{order_id}",
         f"{L_WHEN}:     {when_label} {L_TZ}",
         f"{L_WHERE}:    {address or '-'}",
-        f"{L_VEHICLE}:  {plate_number or '-'}",
-        f"{L_PHONE}:    {phone_number or '-'}",
     ]
+    if plate_number:  # only the car app has a plate
+        body_text_lines.append(f"{L_VEHICLE}:  {plate_number}")
+    body_text_lines.append(f"{L_PHONE}:    {phone_number or '-'}")
     if customer_email:
         body_text_lines.append(f"{L_EMAIL}:    {customer_email}")
     body_text_lines += [
@@ -399,6 +432,11 @@ def send_cleaner_notification(
         f'<td><a href="mailto:{customer_email}">{customer_email}</a></td></tr>'
     ) if customer_email else ""
 
+    vehicle_row_html = (
+        f'<tr><td style="padding:4px 12px 4px 0;color:#666;">{L_VEHICLE}</td>'
+        f'<td>{plate_number}</td></tr>'
+    ) if plate_number else ""
+
     body_html = f"""\
 <!DOCTYPE html>
 <html>
@@ -407,7 +445,7 @@ def send_cleaner_notification(
   <table style="border-collapse:collapse;margin:16px 0;">
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHEN}</td><td>{when_label} <span style="color:#888;">{L_TZ}</span></td></tr>
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHERE}</td><td>{address or '-'}</td></tr>
-    <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_VEHICLE}</td><td>{plate_number or '-'}</td></tr>
+    {vehicle_row_html}
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_PHONE}</td><td><a href="tel:{phone_number}">{phone_number or '-'}</a></td></tr>
     {customer_row_html}
   </table>

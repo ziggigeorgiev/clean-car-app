@@ -15,6 +15,7 @@ import { Device } from '../../services/Device';
 import { COLORS } from '../../constants/colors';
 import StepIndocator from '../../components/StepIndicator';
 import { useTranslation, Locale } from '../../services/i18n';
+import { BRAND } from '../../constants/brand';
 
 // You might need to install react-native-vector-icons:
 // npm install react-native-vector-icons
@@ -133,17 +134,19 @@ const SettingsScreen = () => {
 
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('settings.personal_info')}</Text>
-            <View style={styles.inputContainer}>
-              <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder={t('services.registration_number')}
-                placeholderTextColor="#8e8e93"
-                value={plateNumber}
-                onChangeText={setPlateNumber}
-                autoCapitalize="characters"
-              />
-            </View>
+            {BRAND.hasVehiclePlate && (
+              <View style={styles.inputContainer}>
+                <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('services.registration_number')}
+                  placeholderTextColor="#8e8e93"
+                  value={plateNumber}
+                  onChangeText={setPlateNumber}
+                  autoCapitalize="characters"
+                />
+              </View>
+            )}
             <View style={styles.inputContainer}>
               <MaterialCommunityIcons name="phone" size={20} color="#8e8e93" style={styles.inputIcon} />
               <TextInput

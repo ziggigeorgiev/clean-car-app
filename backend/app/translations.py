@@ -107,6 +107,11 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "email.customer.heading":     {"en": "Booking confirmed",          "de": "Buchung bestätigt"},
     "email.customer.signature":   {"en": "— CleanCar",                  "de": "— CleanCar"},
 
+    # Brand-specific overrides (home = couch / mattress / upholstery app). These
+    # are looked up first via the `.home` suffix; missing ones fall back to the
+    # generic key above.
+    "email.customer.signature.home": {"en": "— FreshSofa",             "de": "— FreshSofa"},
+
     # ----- cleaner notification email ---------------------------------------
     "email.cleaner.subject":      {"en": "[CleanCar] New booking — Order #{order_id} @ {when}",
                                    "de": "[CleanCar] Neue Buchung — Auftrag #{order_id} @ {when}"},
@@ -118,6 +123,14 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "email.cleaner.cta_calendar": {"en": "Add to Google Calendar",      "de": "Zu Google Kalender hinzufügen"},
     "email.cleaner.footer":       {"en": "CleanCar internal notification.",
                                    "de": "Interne Benachrichtigung von CleanCar."},
+
+    # Brand-specific (home) overrides for the cleaner email.
+    "email.cleaner.subject.home": {"en": "[FreshSofa] New booking — Order #{order_id} @ {when}",
+                                   "de": "[FreshSofa] Neue Buchung — Auftrag #{order_id} @ {when}"},
+    "email.cleaner.intro.home":   {"en": "New booking for FreshSofa:",
+                                   "de": "Neue Buchung für FreshSofa:"},
+    "email.cleaner.footer.home":  {"en": "FreshSofa internal notification.",
+                                   "de": "Interne Benachrichtigung von FreshSofa."},
 
     # ----- shared field labels ----------------------------------------------
     "email.field.order":    {"en": "Order",     "de": "Auftrag"},
@@ -229,6 +242,18 @@ def translate(raw: str | None, locale: Locale = DEFAULT_LOCALE, **params) -> str
         except (KeyError, IndexError):
             return value
     return value
+
+
+def translate_brand(raw: str | None, locale: Locale, brand: str | None = None, **params) -> str:
+    """
+    Brand-aware translate. Tries the brand-specific key ``{raw}.{brand}`` first
+    (e.g. ``email.customer.signature.home``) and falls back to the generic key.
+    """
+    if raw and brand:
+        brand_key = f"{raw}.{brand}"
+        if brand_key in _TRANSLATIONS:
+            return translate(brand_key, locale, **params)
+    return translate(raw, locale, **params)
 
 
 def normalize_locale(locale: str | None) -> Locale:
