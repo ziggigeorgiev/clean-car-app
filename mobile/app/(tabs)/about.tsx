@@ -1,6 +1,10 @@
 import { COLORS } from '@/constants/colors';
 import { BRAND_ASSETS } from '@/constants/brandAssets';
+import { BRAND_ID } from '@/constants/brand';
 import React from 'react';
+
+// Brand-specific support email.
+const CONTACT_EMAIL = BRAND_ID === 'home' ? 'info@homegrime.de' : 'info@cargrime.de';
 import {
   SafeAreaView,
   ScrollView,
@@ -55,7 +59,7 @@ const AboutScreen = () => {
         {/* Contact Us Section */}
         <ContactDetails
           phoneNumber="+49 177 1914891"
-          email="info@cargrime.de"
+          email={CONTACT_EMAIL}
           sectionTitle={t('about.contact_title')}
         />
 

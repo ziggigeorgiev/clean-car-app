@@ -167,7 +167,7 @@
   </style>
 
   <section class="hero">
-    <img class="hero-photo" src="/static/hero-interior.png" alt="Car interior" />
+    <img class="hero-photo" src="/static/{{ brand_key | default('car') }}-hero.png" alt="" />
     <div class="hero-overlay"></div>
     <div class="hero-text">
       <h1>{{ t('web.index.hero_headline') }}</h1>
@@ -225,6 +225,12 @@
         'pet_hair.name':             '08_pet_hair_removal.png',
         'trunk_cleaning.name':       '09_kofferraum_reinigung.png',
         'headliner_cleaning.name':   '10_decken_reinigung.png',
+        'mattress_single.name':      '01_mattress_vacuum.png',
+        'mattress_double.name':      '02_mattress_shampoo.png',
+        'armchair.name':             '03_armchair_wipe.png',
+        'sofa.name':                 '04_sofa_stain_treatment.png',
+        'couch.name':                '05_sectional_foam_clean.png',
+        'fabric_chair.name':         '06_chair_spray_brush.png',
       } %}
       {% for s in services %}
         {% set currency_value = s.currency.value if s.currency.value is defined else s.currency %}

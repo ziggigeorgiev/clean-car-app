@@ -17,7 +17,11 @@ from typing import List, Dict, Optional
 from app import models, schemas, crud
 from app.database import engine, get_db, Base # Import Base for table creation
 from app.email_service import send_booking_confirmation, send_cleaner_notification
-from app.translations import translate as _tr, normalize_locale as _normalize_locale
+from app.translations import (
+    translate as _tr,
+    translate_brand as _trb,
+    normalize_locale as _normalize_locale,
+)
 
 # Uvicorn configures the root logger AFTER our module loads, which can swallow
 # basicConfig(). Attach a dedicated stream handler to our app/email loggers so
@@ -65,6 +69,7 @@ templates.env.globals["format_when"] = _format_when
 
 # --- Web UI locale ----------------------------------------------------------
 WEB_LOCALE_COOKIE = "web_locale"
+WEB_BRAND_COOKIE = "web_brand"
 _VALID_WEB_LOCALES = {"de", "en"}
 
 
@@ -89,12 +94,28 @@ def render_web(
     """Render a Jinja template with a `t()` helper bound to ``locale``."""
     ctx = dict(context or {})
     ctx["locale"] = locale
-    ctx["t"] = lambda key, **params: _tr(key, locale, **params)
+    # Make the brand available to every template (for /static/{brand_key}-*.png
+    # logo/hero images). Resolved from the domain; pages that already pass a
+    # brand_key (e.g. the landing page, honouring ?brand=) keep theirs.
+    ctx.setdefault("brand_key", resolve_web_brand(request).value)
+    # Brand-aware translate: tries `{key}.{brand}` first (e.g. the home hero
+    # copy), then falls back to the shared/car string.
+    _brand_key = ctx["brand_key"]
+    ctx["t"] = lambda key, **params: _trb(key, locale, _brand_key, **params)
     response = templates.TemplateResponse(request, template, ctx)
     # Persist the choice so the user doesn't have to keep `?lang=` in the URL.
     response.set_cookie(
         WEB_LOCALE_COOKIE,
         locale,
+        max_age=60 * 60 * 24 * 365,
+        httponly=False,
+        samesite="lax",
+    )
+    # Persist the brand too, so internal links (which carry no ?brand=) keep the
+    # brand on hosts that aren't cargrime.de/homegrime.de (e.g. localhost).
+    response.set_cookie(
+        WEB_BRAND_COOKIE,
+        _brand_key,
         max_age=60 * 60 * 24 * 365,
         httponly=False,
         samesite="lax",
@@ -199,19 +220,57 @@ WEB_BRANDS = {
     },
 }
 
+# Map web hostnames to brands. cargrime.de → car, homegrime.de → home.
+# Anything not listed (the Render URL, localhost, previews) falls back to CAR.
+WEB_HOST_BRANDS = {
+    "cargrime.de": models.BrandEnum.CAR,
+    "www.cargrime.de": models.BrandEnum.CAR,
+    "homegrime.de": models.BrandEnum.HOME,
+    "www.homegrime.de": models.BrandEnum.HOME,
+}
+
+
+def resolve_web_brand(
+    request: Request,
+    brand: Optional[models.BrandEnum] = None,
+) -> models.BrandEnum:
+    """Pick the brand for a web request.
+
+    Priority: explicit ``?brand=`` (handy for local testing) → the request's
+    ``Host`` header (cargrime.de → car, homegrime.de → home) → CAR fallback.
+    """
+    if brand is not None:
+        return brand
+    host = (request.headers.get("host") or "").split(":")[0].lower()
+    if host in WEB_HOST_BRANDS:
+        return WEB_HOST_BRANDS[host]
+    # Be forgiving about subdomains / unforeseen variants.
+    if "homegrime" in host:
+        return models.BrandEnum.HOME
+    if "cargrime" in host:
+        return models.BrandEnum.CAR
+    # Unknown host (localhost, Render preview, etc.): fall back to the brand
+    # cookie set on the last page, so navigation keeps the brand even though
+    # the links themselves carry no ?brand=. Default to CAR.
+    cookie_brand = (request.cookies.get(WEB_BRAND_COOKIE) or "").lower()
+    if cookie_brand in ("car", "home"):
+        return models.BrandEnum(cookie_brand)
+    return models.BrandEnum.CAR
+
 
 @app.get("/", response_class=HTMLResponse)
 async def web_root(
     request: Request,
-    brand: models.BrandEnum = models.BrandEnum.CAR,
+    brand: Optional[models.BrandEnum] = None,
     locale: str = Depends(web_locale),
     db: Session = Depends(get_db),
 ):
     """Public marketing landing page — services overview + app download.
 
-    The same page serves every white-label app; `?brand=` selects the catalog,
-    store links and copy. Defaults to `car`.
+    The brand is taken from the domain (cargrime.de → car, homegrime.de → home);
+    an explicit ``?brand=`` query param overrides it for local testing.
     """
+    brand = resolve_web_brand(request, brand)
     services = (
         db.query(models.Service)
         .filter(models.Service.is_active.is_(True), models.Service.brand == brand)
@@ -233,19 +292,32 @@ async def web_root(
     )
 
 
+# Policy pages have a per-brand template: car uses "<name>.html", home uses
+# "<name>_home.html". Brand comes from the domain (homegrime.de → home), with
+# ?brand= as an override for testing.
+def _policy_template(base: str, brand: models.BrandEnum) -> str:
+    return f"{base}_home.html" if brand == models.BrandEnum.HOME else f"{base}.html"
+
+
 @app.get("/terms", response_class=HTMLResponse)
-async def web_terms(request: Request, locale: str = Depends(web_locale)):
-    return render_web(request, "terms.html", locale, {"today": date.today().isoformat()})
+async def web_terms(request: Request, brand: Optional[models.BrandEnum] = None, locale: str = Depends(web_locale)):
+    b = resolve_web_brand(request, brand)
+    return render_web(request, _policy_template("terms", b), locale,
+                      {"today": date.today().isoformat(), "brand_key": b.value})
 
 
 @app.get("/privacy", response_class=HTMLResponse)
-async def web_privacy(request: Request, locale: str = Depends(web_locale)):
-    return render_web(request, "privacy.html", locale, {"today": date.today().isoformat()})
+async def web_privacy(request: Request, brand: Optional[models.BrandEnum] = None, locale: str = Depends(web_locale)):
+    b = resolve_web_brand(request, brand)
+    return render_web(request, _policy_template("privacy", b), locale,
+                      {"today": date.today().isoformat(), "brand_key": b.value})
 
 
 @app.get("/cancellation", response_class=HTMLResponse)
-async def web_cancellation(request: Request, locale: str = Depends(web_locale)):
-    return render_web(request, "cancellation.html", locale, {"today": date.today().isoformat()})
+async def web_cancellation(request: Request, brand: Optional[models.BrandEnum] = None, locale: str = Depends(web_locale)):
+    b = resolve_web_brand(request, brand)
+    return render_web(request, _policy_template("cancellation", b), locale,
+                      {"today": date.today().isoformat(), "brand_key": b.value})
 
 
 @app.get("/press", response_class=HTMLResponse)

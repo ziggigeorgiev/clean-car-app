@@ -160,8 +160,14 @@ const ServicesScreen = () => {
       : [...basicServices.map(s => ({ ...s, quantity: 1 })), ...selectedSelectable];
   };
 
+  // Total price of the current selection (quantity-aware). The order can only
+  // be placed when this is greater than 0 (i.e. at least one paid service).
+  const totalAmount = totalSelectedServices()
+    .reduce((sum, s) => sum + (s.price || 0) * (s.quantity || 1), 0);
+  const canPlaceOrder = isFormValid && totalAmount > 0;
+
   const handlePlaceOrder = () => {
-    if (!isFormValid) {
+    if (!canPlaceOrder) {
       setShowErrors(true);
       return;
     }
@@ -304,10 +310,10 @@ const ServicesScreen = () => {
         {/* Place Order Button (Fixed at Bottom) */}
         <View style={styles.placeOrderButtonContainer}>
           <TouchableOpacity
-            style={[styles.placeOrderButton, !isFormValid && styles.placeOrderButtonDisabled]}
+            style={[styles.placeOrderButton, !canPlaceOrder && styles.placeOrderButtonDisabled]}
             onPress={handlePlaceOrder}
-            disabled={!isFormValid}
-            activeOpacity={isFormValid ? 0.7 : 1}
+            disabled={!canPlaceOrder}
+            activeOpacity={canPlaceOrder ? 0.7 : 1}
           >
             <Text style={styles.placeOrderButtonText}>
               {t('btn.place_order')}

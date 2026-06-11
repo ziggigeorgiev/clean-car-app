@@ -38,13 +38,14 @@ const SettingsScreen = () => {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const [name, setName] = useState('');
   const [plateNumber, setPlateNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [phoneIdentifier, setPhoneIdentifier] = useState('');
 
   // Snapshot of the values as last loaded/saved, used to detect changes.
-  const [initial, setInitial] = useState({ plateNumber: '', phoneNumber: '', email: '' });
+  const [initial, setInitial] = useState({ name: '', plateNumber: '', phoneNumber: '', email: '' });
 
   // Fetch services from API
   useEffect(() => {
@@ -53,6 +54,9 @@ const SettingsScreen = () => {
       try {
         const phoneIdentifier = await Device.getPhoneIdentifier()
         setPhoneIdentifier(phoneIdentifier ?? 'NA')
+
+        const name = (await Device.getName()) ?? '';
+        setName(name)
 
         const phoneNumber = (await Device.getPhoneNumber()) ?? '';
         setPhoneNumber(phoneNumber)
@@ -63,7 +67,7 @@ const SettingsScreen = () => {
         const email = (await Device.getEmail()) ?? '';
         setEmail(email)
 
-        setInitial({ plateNumber, phoneNumber, email });
+        setInitial({ name, plateNumber, phoneNumber, email });
       } catch (error) {
         console.error(`Error fetching settings:`, error);
       } finally {
@@ -76,16 +80,18 @@ const SettingsScreen = () => {
   }, []);
 
   const isDirty =
+    name !== initial.name ||
     plateNumber !== initial.plateNumber ||
     phoneNumber !== initial.phoneNumber ||
     email !== initial.email;
 
   const saveSettings = async () => {
     if (!isDirty) return;
+    await Device.setName(name);
     await Device.setPhoneNumber(phoneNumber);
     await Device.setPlateNumber(plateNumber);
     await Device.setEmail(email);
-    setInitial({ plateNumber, phoneNumber, email });
+    setInitial({ name, plateNumber, phoneNumber, email });
     setSaved(true);
   };
   
@@ -134,6 +140,17 @@ const SettingsScreen = () => {
 
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('settings.personal_info')}</Text>
+            <View style={styles.inputContainer}>
+              <MaterialCommunityIcons name="account" size={20} color="#8e8e93" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder={t('settings.name')}
+                placeholderTextColor="#8e8e93"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
+            </View>
             {BRAND.hasVehiclePlate && (
               <View style={styles.inputContainer}>
                 <MaterialCommunityIcons name="car" size={20} color="#8e8e93" style={styles.inputIcon} />

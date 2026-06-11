@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}{{ t('web.policy.terms.title') }}{% endblock %}
+{% block content %}
+  <h1>{{ t('web.policy.terms.heading') }}</h1>
+  <p class="muted">{{ t('web.last_updated') }} {{ today }}</p>
+
+{% if locale == 'de' %}
+
+  <h2>1. Über diese Bedingungen</h2>
+  <p>Diese Allgemeinen Geschäftsbedingungen ("AGB") regeln die Nutzung der HomeGrime-App sowie der vor Ort erbrachten Polster-, Sofa- und Matratzenreinigung ("Service") durch HomeGrime ("wir", "uns"). Mit der Buchung über die App erkennen Sie diese AGB an.</p>
+
+  <h2>2. Buchungen</h2>
+  <p>Bei der Buchung geben Sie eine Telefonnummer, die Adresse, an der die Reinigung stattfinden soll, sowie die gewünschten Leistungen und deren Anzahl an (z. B. Anzahl der Sofasitze, Sessel oder Matratzen). Wir versuchen, einen Reiniger pünktlich zum vereinbarten Termin bereitzustellen. Wir behalten uns vor, Buchungen abzulehnen oder zu verschieben, wenn der Termin nicht mehr verfügbar ist; in diesem Fall melden wir uns bei Ihnen.</p>
+
+  <h2>3. Preise &amp; Zahlung</h2>
+  <p>Die Preise jeder Leistung sind in der App vor der Buchung sichtbar und gelten je Stück (pro Sitz, Sessel, Stuhl oder Matratze). Der Gesamtbetrag entspricht der Summe der ausgewählten Positionen und Mengen. Die Zahlung erfolgt nach Abschluss der Reinigung, sofern nicht anders vereinbart.</p>
+  <p><strong>Zuschlag für stark verschmutzte Möbel.</strong> Bei überdurchschnittlicher Verschmutzung (z. B. großflächige oder eingetrocknete Flecken, starke Tierhaare, Tierurin, Schimmel) kann ein Aufschlag fällig werden. Der Reiniger informiert Sie über den geschätzten Aufschlag <em>vor</em> Beginn der Arbeiten; Sie entscheiden, ob die Reinigung wie angeboten durchgeführt wird.</p>
+  <p><strong>Übergrößen / Sonderformen.</strong> Für große Wohnlandschaften, Eck-/U-Sofas, Schlafsofas, Boxspring- oder besonders dicke Matratzen kann ein Aufschlag berechnet werden. Auch dieser wird Ihnen vor Beginn mitgeteilt. Wenn Sie unsicher sind, wie viele Sitze Sie buchen sollen, geben Sie dies bitte an, damit wir die richtige Menge ansetzen.</p>
+
+  <h2>4. Zugang &amp; Pflichten des Kunden</h2>
+  <p><strong>Zugang zum Möbelstück.</strong> Bitte sorgen Sie für freien Zugang rund um das zu reinigende Möbelstück. Stellen Sie zerbrechliche Gegenstände, Elektronik, Lampen und Dekoration vorher beiseite und entfernen Sie lose Kissen, Decken und persönliche Gegenstände.</p>
+  <p><strong>Anwesenheit.</strong> Zum vereinbarten Termin muss eine volljährige Person anwesend sein, die den Zugang ermöglicht und den Umfang bestätigt.</p>
+  <p><strong>Strom &amp; Wasser.</strong> Unsere Geräte (Sprühextraktion) benötigen einen Stromanschluss in Reichweite sowie Zugang zu Frischwasser und einem Abfluss zum Entleeren. Bitte stellen Sie diese bereit.</p>
+  <p><strong>Platz für die Arbeit.</strong> Für die Reinigung und das anschließende Trocknen benötigen wir etwas Raum um das Möbelstück. Bei Matratzen ist es hilfreich, wenn die Matratze frei zugänglich aufgestellt werden kann.</p>
+  <p><strong>Parken.</strong> Bitte weisen Sie, falls erforderlich, auf eine Park- oder Haltemöglichkeit für das Fahrzeug des Reinigers in der Nähe hin. Park-, Verwarnungs- oder Abschleppgebühren am vorgesehenen Ort gehen zulasten des Kunden, nicht des Reinigers.</p>
+  <p><strong>Mitteilungspflicht bei Hindernissen.</strong> Ist die Reinigung aus Gründen, die in Ihrer Sphäre liegen, nicht möglich (z. B. kein Zugang zur Wohnung, Möbel nicht erreichbar, kein Strom/Wasser, falsche Mengenangabe), und informieren Sie uns nicht rechtzeitig (mind. 2 Stunden vor Beginn), kann eine Ausfallgebühr in Höhe von 50&nbsp;% des Buchungsbetrags anfallen. Details siehe <a href="/cancellation">Stornierungsbedingungen</a>.</p>
+
+  <h2>5. Durchführung &amp; Hinweise nach der Reinigung</h2>
+  <p><strong>Trocknungszeit.</strong> Nach einer Nassreinigung bleiben Polster und Matratzen feucht. Bitte benutzen Sie das Möbelstück erst wieder, wenn es vollständig getrocknet ist – je nach Material, Polsterdicke und Raumklima in der Regel <strong>4–12 Stunden</strong>, bei Matratzen teils länger. Sorgen Sie für gute Belüftung. Eine zu frühe Nutzung kann zu Geruch, Stockflecken oder Wasserrändern führen.</p>
+  <p><strong>Kein vollständiges Entfernungsversprechen.</strong> Nicht jeder Fleck lässt sich entfernen. Alte, eingetrocknete, hitze- oder farbstoffhaltige Flecken (z. B. Rotwein, Tinte, Blut, Make-up), Wasserränder sowie durchgesickerte Flüssigkeiten können dauerhaft sein. Wir erzielen die bestmögliche Verbesserung, garantieren aber kein fleckenfreies Ergebnis.</p>
+  <p><strong>Gerüche.</strong> Tief in den Matratzenkern oder die Polsterung eingedrungene Gerüche (Tierurin, Rauch, Schimmel) lassen sich nicht immer in einer Sitzung vollständig beseitigen. Mehrere Termine oder eine Spezialbehandlung können nötig sein.</p>
+  <p><strong>Wetter / Bedingungen.</strong> Bei Bedingungen, die ein sicheres Arbeiten oder Trocknen unmöglich machen, kann der Termin kostenfrei verschoben werden.</p>
+
+  <h2>6. Zustand &amp; Material der Möbel</h2>
+  <p><strong>Vorbestehende Schäden.</strong> Wir haften nicht für Abnutzung, verblasste Stellen, durchgesessene Polster, Risse, lose Nähte oder Flecken, die bereits vor der Reinigung vorhanden waren. Bei der Übernahme erfolgt ein kurzer Rundgang (oder Fotos) zur Dokumentation.</p>
+  <p><strong>Empfindliche Materialien.</strong> Bitte teilen Sie empfindliche oder hochwertige Bezüge vorher mit (z. B. Samt, Seide, Viskose, Leinen, Wolle, Alcantara, Leder). Bei manchen Materialien besteht ein erhöhtes Risiko für Einlaufen, Farbveränderung, Ausbluten von Farben, Wasserränder oder Florveränderungen. Werden solche Materialien nicht angegeben, gehen daraus entstehende Beschädigungen zulasten des Kunden.</p>
+  <p><strong>Pflegeetiketten.</strong> Wir richten uns nach dem Reinigungscode des Herstellers (W = wasserbasiert, S = lösemittelbasiert, W/S, X = keine Nassreinigung). Möbel mit Code „X“ oder ohne Etikett können wir ablehnen oder nur nach gesonderter Risikoabsprache behandeln.</p>
+  <p><strong>Leder.</strong> Lederreinigung umfasst Reinigung und Pflege; bei rissigem, ausgetrocknetem oder beschichtetem Leder kann das Ergebnis eingeschränkt sein.</p>
+  <p><strong>Biogefährdung / extreme Verschmutzung.</strong> Bei Erbrochenem, Blut, Urin, Kot, Schimmel oder ähnlichen Kontaminationen behalten wir uns vor, die Reinigung abzulehnen; eine anteilige Gebühr kann anfallen.</p>
+
+  <h2>7. Haftung bei Schäden während der Reinigung</h2>
+  <p>Schäden, die nachweislich während der Reinigung durch unseren Reiniger verursacht wurden, sind binnen 24 Stunden nach Abschluss mit Fotos zu melden. Die Haftung ist auf den Betrag der jeweiligen Buchung begrenzt, soweit gesetzlich zulässig.</p>
+
+  <h2>8. Persönliche Gegenstände</h2>
+  <p>Wir übernehmen keine Haftung für Bargeld, Schmuck, Elektronik, Fernbedienungen, Dokumente oder andere Wertgegenstände, die im oder unter dem Möbelstück (z. B. zwischen den Kissen) zurückgelassen werden. Bitte entnehmen Sie diese vor dem Termin.</p>
+
+  <h2>9. Haustiere, Kinder &amp; Allergien</h2>
+  <p>Während der Reinigung sollten sich <strong>Haustiere und Kinder nicht im Arbeitsbereich</strong> aufhalten. Bei Allergien oder Empfindlichkeiten gegen Duftstoffe oder Reinigungsmittel informieren Sie den Reiniger vor Beginn, damit neutrale Produkte verwendet werden.</p>
+
+  <h2>10. Stornierungen</h2>
+  <p>Sie können jede Buchung bis zum vereinbarten Beginn stornieren. Details und etwaige Gebühren finden Sie in unseren <a href="/cancellation">Stornierungsbedingungen</a>.</p>
+
+  <h2>11. Aktionscodes</h2>
+  <p>Aktionscodes sind, sofern nicht anders angegeben, einmalig einlösbar, nicht in bar auszahlbar und nicht mit anderen Aktionen kombinierbar.</p>
+
+  <h2>12. Recht auf Verweigerung</h2>
+  <p>Wir behalten uns das Recht vor, jede Buchung aus Gründen von Sicherheit, Hygiene oder eindeutigem Fehlverhalten abzulehnen, mit Rückerstattung etwaig bereits gezahlter Beträge.</p>
+
+  <h2>13. Änderungen dieser Bedingungen</h2>
+  <p>Wir können diese AGB von Zeit zu Zeit anpassen. Wesentliche Änderungen werden in der App angekündigt. Die weitere Nutzung des Service nach einer Aktualisierung gilt als Annahme.</p>
+
+  <h2>14. Anwendbares Recht &amp; Gerichtsstand</h2>
+  <p>Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist, soweit zulässig, München.</p>
+
+  <h2>15. Kontakt</h2>
+  <p>Fragen? Schreiben Sie uns an <a href="mailto:info@homegrime.de">info@homegrime.de</a> oder rufen Sie uns an unter <a href="tel:+491771914891">+49 177 1914891</a>.</p>
+
+{% else %}
+
+  <h2>1. About these terms</h2>
+  <p>These Terms &amp; Conditions ("Terms") govern your use of the HomeGrime mobile application and on-site upholstery, sofa and mattress cleaning services (the "Service") provided by HomeGrime ("we", "us"). By placing a booking through the Service you agree to these Terms.</p>
+
+  <h2>2. Bookings</h2>
+  <p>When you place a booking you provide a contact phone number, the address where the cleaning takes place, and the selected services and quantities (e.g. number of sofa seats, armchairs or mattresses). We will attempt to schedule a cleaner for the requested time slot. We may decline or reschedule a booking if the slot becomes unavailable, in which case we will contact you.</p>
+
+  <h2>3. Pricing &amp; payment</h2>
+  <p>Prices for each service are shown in the app before you confirm and are charged per item (per seat, armchair, chair or mattress). The final amount equals the sum of the selected items and quantities. Payment is collected upon completion unless agreed otherwise.</p>
+  <p><strong>Extra-dirty surcharge.</strong> Items with above-average soiling (e.g. large or deeply set stains, heavy pet hair, pet urine, mold) may incur a surcharge. The cleaner will inform you of the estimated surcharge <em>before</em> any work begins; you may decide whether to proceed.</p>
+  <p><strong>Oversized / special shapes.</strong> Large sectionals, corner/U-shaped sofas, sofa beds, box-spring or extra-thick mattresses may incur a surcharge, communicated before the service starts. If you're unsure how many seats to book, please tell us so we set the correct quantity.</p>
+
+  <h2>4. Access &amp; customer obligations</h2>
+  <p><strong>Access to the item.</strong> Please provide clear access around the item to be cleaned. Move fragile objects, electronics, lamps and decor aside beforehand, and remove loose cushions, throws and personal items.</p>
+  <p><strong>Someone present.</strong> An adult must be present at the appointment to provide access and confirm the scope.</p>
+  <p><strong>Power &amp; water.</strong> Our equipment (spray extraction) needs a power outlet within reach and access to fresh water and a drain for emptying. Please make these available.</p>
+  <p><strong>Working space.</strong> We need some room around the item for cleaning and drying. For mattresses it helps if the mattress can be stood up or freely accessed.</p>
+  <p><strong>Parking.</strong> Where relevant, please point out nearby parking for the cleaner's vehicle. Parking tickets, fines or towing fees at the location are the customer's responsibility, not the cleaner's.</p>
+  <p><strong>Notice if the service can't go ahead.</strong> If the cleaning can't be performed for reasons on your side (no access to the home, item unreachable, no power/water, wrong quantity) and you don't tell us in time (at least 2 hours before start), a 50% no-notice fee may apply. See the <a href="/cancellation">Cancellation Policy</a>.</p>
+
+  <h2>5. Service execution &amp; aftercare</h2>
+  <p><strong>Drying time.</strong> After a wet clean, upholstery and mattresses stay damp. Please do not use the item until it is fully dry — typically <strong>4–12 hours</strong> depending on material, padding thickness and room conditions, sometimes longer for mattresses. Ventilate the room well. Using it too early can cause odor, mildew or water rings.</p>
+  <p><strong>No full-removal promise.</strong> Not every stain can be removed. Old, set-in, heat- or dye-based stains (red wine, ink, blood, make-up), water rings and liquids that have soaked through may be permanent. We achieve the best possible improvement but cannot guarantee a stain-free result.</p>
+  <p><strong>Odors.</strong> Odors deep in a mattress core or padding (pet urine, smoke, mold) can't always be fully removed in one session. Multiple visits or specialist treatment may be required.</p>
+  <p><strong>Conditions.</strong> If conditions make safe work or drying impossible, the appointment may be rescheduled at no charge.</p>
+
+  <h2>6. Item condition &amp; materials</h2>
+  <p><strong>Pre-existing damage.</strong> We are not responsible for wear, faded areas, sagging, tears, loose seams or stains present before the cleaning. A quick walk-around (or photos) documents the starting condition.</p>
+  <p><strong>Delicate materials.</strong> Please disclose delicate or high-value fabrics in advance (velvet, silk, viscose, linen, wool, alcantara, leather). Some carry a higher risk of shrinkage, color change, dye bleed, water rings or pile distortion. Damage from undisclosed materials is the customer's responsibility.</p>
+  <p><strong>Care labels.</strong> We follow the manufacturer's cleaning code (W = water-based, S = solvent, W/S, X = no wet cleaning). Items coded "X" or without a label may be declined or treated only after a separate risk agreement.</p>
+  <p><strong>Leather.</strong> Leather cleaning includes cleaning and conditioning; results may be limited on cracked, dried-out or coated leather.</p>
+  <p><strong>Biohazards / extreme contamination.</strong> Vomit, blood, urine, feces, mold or similar may lead us to refuse the service; a partial fee may still apply.</p>
+
+  <h2>7. Liability for damage during cleaning</h2>
+  <p>Damage demonstrably caused by our cleaner during the service must be reported within 24 hours of completion, with photo evidence. Our liability is limited to the value of the affected booking, to the maximum extent permitted by law.</p>
+
+  <h2>8. Personal items</h2>
+  <p>We accept no liability for cash, jewelry, electronics, remote controls, documents or other valuables left in or under the item (e.g. between cushions). Please remove them before the appointment.</p>
+
+  <h2>9. Pets, children &amp; allergies</h2>
+  <p><strong>Pets and children should stay out of the work area</strong> during the cleaning. If you have allergies or sensitivities to fragrances or cleaning chemicals, tell the cleaner before they start so neutral products can be used.</p>
+
+  <h2>10. Cancellations</h2>
+  <p>You may cancel a booking any time before its scheduled start. See our <a href="/cancellation">Cancellation Policy</a> for details and any fees.</p>
+
+  <h2>11. Promo codes</h2>
+  <p>Unless stated otherwise, promo codes are single-use, have no cash value, and cannot be combined with other offers.</p>
+
+  <h2>12. Right to refuse service</h2>
+  <p>We reserve the right to decline any booking on grounds of safety, hygiene, or clear misconduct, refunding any prepaid amount.</p>
+
+  <h2>13. Changes to these Terms</h2>
+  <p>We may update these Terms from time to time. Material changes will be communicated in-app. Continued use after an update constitutes acceptance.</p>
+
+  <h2>14. Governing law &amp; jurisdiction</h2>
+  <p>These Terms are governed by the laws of Germany, excluding the UN Convention on Contracts for the International Sale of Goods. To the extent permitted, exclusive jurisdiction is Munich, Germany.</p>
+
+  <h2>15. Contact</h2>
+  <p>Questions? Reach us at <a href="mailto:info@homegrime.de">info@homegrime.de</a> or call us at <a href="tel:+491771914891">+49 177 1914891</a>.</p>
+
+{% endif %}
+{% endblock %}

@@ -54,7 +54,7 @@ const translations = {
   // Acknowledge
   'ack.confirmed': { en: 'Booking confirmed!', de: 'Buchung bestätigt!' },
   'ack.scheduled': { en: 'Your car cleaning service is scheduled', de: 'Ihre Fahrzeugreinigung ist geplant' },
-  'ack.help': { en: 'Need help? Call us at 1-800-CLEEN', de: 'Brauchen Sie Hilfe? Rufen Sie uns an: 1-800-CLEEN' },
+  'ack.help': { en: 'Need help? Call us at +49 177 1914891', de: 'Brauchen Sie Hilfe? Rufen Sie uns an: +49 177 1914891' },
 
   // Services screen
   'services.vehicle_details': { en: 'Vehicle Details', de: 'Fahrzeugdaten' },
@@ -90,6 +90,7 @@ const translations = {
   'settings.device_id': { en: 'Device ID:', de: 'Geräte-ID:' },
   'settings.device_info_help': { en: 'This information is used to track your activity in our system.', de: 'Diese Information wird verwendet, um Ihre Aktivität in unserem System zuzuordnen.' },
   'settings.personal_info': { en: 'Personal information', de: 'Persönliche Daten' },
+  'settings.name': { en: 'Name', de: 'Name' },
   'settings.email': { en: 'Email', de: 'E-Mail' },
   'settings.personal_help': { en: 'This information is used to prefill some of the inputs for faster booking complition. In case you provide email we are going to send you booking confirmation on the email.', de: 'Diese Daten werden verwendet, um Felder vorauszufüllen und Ihnen die Buchung zu erleichtern. Wenn Sie eine E-Mail-Adresse angeben, senden wir Ihnen die Buchungsbestätigung per E-Mail.' },
   'settings.saved': { en: 'The modifications were saved successfully.', de: 'Die Änderungen wurden erfolgreich gespeichert.' },
@@ -236,6 +237,43 @@ const translations = {
     de: 'Punktreinigung des Dachhimmels — Flecken, Rauchrückstände und Staub.',
   },
 
+  // ----- home (couch / mattress) catalog ----------------------------------
+  'mattress_single.name': { en: 'Single mattress cleaning', de: 'Matratzenreinigung (Einzel)' },
+  'mattress_single.description': {
+    en: 'Deep clean and sanitize one single mattress, both sides.',
+    de: 'Tiefenreinigung und Hygienisierung einer Einzelmatratze, beidseitig.',
+  },
+
+  'mattress_double.name': { en: 'Double mattress cleaning', de: 'Matratzenreinigung (Doppel)' },
+  'mattress_double.description': {
+    en: 'Deep clean and sanitize one double, queen or king mattress, both sides.',
+    de: 'Tiefenreinigung und Hygienisierung einer Doppel-, Queen- oder King-Matratze, beidseitig.',
+  },
+
+  'armchair.name': { en: 'Armchair cleaning', de: 'Sesselreinigung' },
+  'armchair.description': {
+    en: 'Full upholstery clean of a single armchair.',
+    de: 'Komplette Polsterreinigung eines einzelnen Sessels.',
+  },
+
+  'sofa.name': { en: 'Sofa cleaning (2–3 seats)', de: 'Sofareinigung (2–3 Sitzer)' },
+  'sofa.description': {
+    en: 'Deep extraction clean of a standard 2–3 seater sofa, cushions included.',
+    de: 'Tiefenreinigung eines Standard-Sofas (2–3 Sitzer), inkl. Kissen.',
+  },
+
+  'couch.name': { en: 'Corner couch cleaning', de: 'Eckcouch-Reinigung' },
+  'couch.description': {
+    en: 'Deep clean of a large L-shaped or corner couch, cushions included.',
+    de: 'Tiefenreinigung einer großen L-förmigen Couch bzw. Eckcouch, inkl. Kissen.',
+  },
+
+  'fabric_chair.name': { en: 'Fabric chair cleaning', de: 'Stuhlreinigung (Stoff)' },
+  'fabric_chair.description': {
+    en: 'Upholstery clean of a single fabric dining or office chair — seat and back.',
+    de: 'Polsterreinigung eines einzelnen Stoffstuhls (Ess- oder Bürostuhl) — Sitz und Rückenlehne.',
+  },
+
   // Category aggregate labels shown above the per-service list.
   'category.basic.name': { en: 'Basic cleaning', de: 'Standardreinigung' },
   'category.extra.name': { en: 'Extra services', de: 'Zusatzleistungen' },
@@ -293,6 +331,18 @@ const BRAND_OVERRIDES: Partial<
     'home.hero_offer': {
       en: 'Book your professional couch & mattress cleaning at your place now',
       de: 'Buchen Sie jetzt Ihre professionelle Polster- und Matratzenreinigung bei Ihnen vor Ort',
+    },
+    'app.copyright': {
+      en: '© 2026 HomeGrime · All rights reserved.',
+      de: '© 2026 HomeGrime · Alle Rechte vorbehalten.',
+    },
+    'about.text': {
+      en: 'HomeGrime delivers professional on-site couch, sofa and mattress cleaning. Trained cleaners come to you with premium equipment and eco-friendly products, so you can book a thorough deep clean in minutes — right where your furniture is, at home or at work.',
+      de: 'HomeGrime liefert professionelle Polster-, Sofa- und Matratzenreinigung — direkt bei Ihnen vor Ort. Geschulte Reinigerinnen und Reiniger kommen mit Premium-Ausstattung und umweltfreundlichen Produkten zu Ihnen. So buchen Sie in wenigen Minuten eine gründliche Tiefenreinigung – bequem zu Hause oder im Büro.',
+    },
+    'section.expectations': {
+      en: "Please clear the space around the furniture and remove loose cushions and personal items. Make sure there's a power outlet and water access nearby. After cleaning, the upholstery or mattress will be damp — don't use it until it's fully dry (usually 4–12 hours, sometimes longer for mattresses) and keep the room well ventilated.",
+      de: 'Bitte räumen Sie den Bereich um das Möbelstück frei und entfernen Sie lose Kissen sowie persönliche Gegenstände. Sorgen Sie für einen Strom- und Wasseranschluss in der Nähe. Nach der Reinigung sind Polster bzw. Matratze feucht — bitte benutzen Sie sie erst wieder, wenn sie vollständig getrocknet sind (in der Regel 4–12 Stunden, bei Matratzen teils länger), und lüften Sie den Raum gut.',
     },
   },
 };

@@ -14,12 +14,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { COLORS } from '@/constants/colors';
 import { BRAND_ASSETS } from '@/constants/brandAssets';
+import { BRAND_ID } from '@/constants/brand';
 import { CleanCarAPI } from '@/services/CleanCarApi';
 import { Device } from '@/services/Device';
 import { useTranslation } from '@/services/i18n';
 import { formatDateTime } from '@/services/DateFormat';
 import Price from '@/components/Price';
 import { getServiceIcon } from '@/services/serviceIcons';
+
+// Open-order accent (kept in sync with components/OrderCard.tsx): home uses a
+// light tint of #E38C39, car keeps the light blue.
+const OPEN_BADGE_BG = BRAND_ID === 'home' ? '#FBE6D1' : '#C8DEFC';
+const OPEN_TEXT_COLOR = BRAND_ID === 'home' ? '#E38C39' : COLORS.primary;
 
 type Service = {
   id: number;
@@ -79,7 +85,8 @@ const HomeScreen = () => {
 
   const orderCurrency = (o: Order) => (o.services?.[0]?.currency || 'EUR');
 
-  // Matches the badge style used in the orders tab (OrderCard.tsx)
+  // Matches the badge style used in the orders tab (OrderCard.tsx). The open
+  // accent is brand-specific: home uses a light tint of #E38C39, car light blue.
   const statusBadge = (status: string) => {
     const isCompleted = status === 'completed';
     const isCancelled = status === 'cancelled';
@@ -91,7 +98,7 @@ const HomeScreen = () => {
             ? styles.completedBadge
             : isCancelled
             ? styles.cancelledBadge
-            : styles.openBadge,
+            : { backgroundColor: OPEN_BADGE_BG },
         ]}
       >
         <Text
@@ -101,7 +108,7 @@ const HomeScreen = () => {
               ? styles.completedText
               : isCancelled
               ? styles.cancelledText
-              : styles.openText,
+              : { color: OPEN_TEXT_COLOR },
           ]}
         >
           {status}

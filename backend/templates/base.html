@@ -6,8 +6,9 @@
   <title>{% block title %}CleanCar{% endblock %}</title>
   <style>
     :root {
-      --primary: #2C4D9F;
-      --primary-dark: #1F3877;
+      /* Accent color (buttons, links, badges) is brand-specific. */
+      --primary: {% if brand_key == 'home' %}#E38C39{% else %}#2C4D9F{% endif %};
+      --primary-dark: {% if brand_key == 'home' %}#C9772A{% else %}#1F3877{% endif %};
       --text: #1A2238;
       --text-light: #6B7280;
       --bg: #F5F7FB;
@@ -42,7 +43,7 @@
       display: block;
     }
     header .brand img.brand-wordmark {
-      height: 35px;
+      height: {% if brand_key == 'home' %}46px{% else %}35px{% endif %};
       width: auto;
       display: block;
     }
@@ -154,8 +155,8 @@
 <body>
   <header style="display:flex; justify-content:space-between; align-items:center;">
     <a class="brand" href="/" aria-label="{{ t('web.brand') if t else 'CleanCar' }}">
-      <img class="brand-icon" src="/static/cleen-logo.png" alt="" />
-      <img class="brand-wordmark" src="/static/grime-logo.png" alt="{{ t('web.brand') if t else 'CleanCar' }}" />
+      <img class="brand-icon" src="/static/{{ brand_key | default('car') }}-logo.png" alt="" />
+      <img class="brand-wordmark" src="/static/{{ brand_key | default('car') }}-prime.png" alt="{{ t('web.brand') if t else 'CleanCar' }}" />
     </a>
     {% if t %}
       <div class="lang-switch" style="display:flex; gap:6px; font-size:13px;">

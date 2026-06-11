@@ -62,9 +62,9 @@
 
     <h2>Brand assets</h2>
     <p>
-      <a class="asset" href="/static/cleen-logo.png" download>cleen-logo.png</a>
-      <a class="asset" href="/static/grime-logo.png" download>grime-logo.png</a>
-      <a class="asset" href="/static/hero-interior.png" download>hero-interior.png</a>
+      <a class="asset" href="/static/{{ brand_key | default('car') }}-logo.png" download>{{ brand_key | default('car') }}-logo.png</a>
+      <a class="asset" href="/static/{{ brand_key | default('car') }}-prime.png" download>{{ brand_key | default('car') }}-prime.png</a>
+      <a class="asset" href="/static/{{ brand_key | default('car') }}-hero.png" download>{{ brand_key | default('car') }}-hero.png</a>
     </p>
 
     <h2>Listing copy — English</h2>

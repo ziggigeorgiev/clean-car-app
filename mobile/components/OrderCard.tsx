@@ -3,9 +3,15 @@ import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native
 import { useRouter } from 'expo-router';
 
 import { COLORS } from "../constants/colors";
+import { BRAND_ID } from "../constants/brand";
 import Price from './Price';
 import { formatDateTime } from "../services/DateFormat";
 import { useTranslation } from "../services/i18n";
+
+// Open-order accent is brand-specific: home uses a light tint of #E38C39,
+// car keeps the light blue.
+const OPEN_BADGE_BG = BRAND_ID === 'home' ? '#FBE6D1' : '#C8DEFC';
+const OPEN_TEXT_COLOR = BRAND_ID === 'home' ? '#E38C39' : COLORS.primary;
 
 interface Service {
   price: number;
@@ -69,7 +75,7 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
               ? styles.completedBadge
               : isCancelled
               ? styles.cancelledBadge
-              : styles.openBadge,
+              : { backgroundColor: OPEN_BADGE_BG },
           ]}
         >
           <Text
@@ -79,7 +85,7 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({ item }) => {
                 ? styles.completedText
                 : isCancelled
                 ? styles.cancelledText
-                : styles.openText,
+                : { color: OPEN_TEXT_COLOR },
             ]}
           >
             {item.status}

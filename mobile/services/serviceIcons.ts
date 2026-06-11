@@ -17,6 +17,15 @@ const ICONS: Record<string, IconSource> = {
   'pet_hair.name':             require('@/assets/images/icons/08_pet_hair_removal.png'),
   'trunk_cleaning.name':       require('@/assets/images/icons/09_kofferraum_reinigung.png'),
   'headliner_cleaning.name':   require('@/assets/images/icons/10_decken_reinigung.png'),
+
+  // Home (couch / mattress) catalog. Keys are distinct from the car catalog,
+  // so both brands share this map without collisions.
+  'mattress_single.name':      require('@/assets/images/icons/01_mattress_vacuum.png'),
+  'mattress_double.name':      require('@/assets/images/icons/02_mattress_shampoo.png'),
+  'armchair.name':             require('@/assets/images/icons/03_armchair_wipe.png'),
+  'sofa.name':                 require('@/assets/images/icons/04_sofa_stain_treatment.png'),
+  'couch.name':                require('@/assets/images/icons/05_sectional_foam_clean.png'),
+  'fabric_chair.name':         require('@/assets/images/icons/06_chair_spray_brush.png'),
 };
 
 /** Returns the asset for the given service `name` key, or `null` if unknown. */

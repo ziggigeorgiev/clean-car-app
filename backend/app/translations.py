@@ -73,6 +73,31 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "headliner_cleaning.description": {"en": "Spot-cleans the roof fabric — stains, smoke residue and dust.",
                                        "de": "Punktreinigung des Dachhimmels — Flecken, Rauchrückstände und Staub."},
 
+    # ----- home (couch / mattress) catalog ----------------------------------
+    "mattress_single.name":        {"en": "Single mattress cleaning", "de": "Matratzenreinigung (Einzel)"},
+    "mattress_single.description": {"en": "Deep clean and sanitize one single mattress, both sides.",
+                                    "de": "Tiefenreinigung und Hygienisierung einer Einzelmatratze, beidseitig."},
+
+    "mattress_double.name":        {"en": "Double mattress cleaning", "de": "Matratzenreinigung (Doppel)"},
+    "mattress_double.description": {"en": "Deep clean and sanitize one double, queen or king mattress, both sides.",
+                                    "de": "Tiefenreinigung und Hygienisierung einer Doppel-, Queen- oder King-Matratze, beidseitig."},
+
+    "armchair.name":               {"en": "Armchair cleaning", "de": "Sesselreinigung"},
+    "armchair.description":        {"en": "Full upholstery clean of a single armchair.",
+                                    "de": "Komplette Polsterreinigung eines einzelnen Sessels."},
+
+    "sofa.name":                   {"en": "Sofa cleaning (2–3 seats)", "de": "Sofareinigung (2–3 Sitzer)"},
+    "sofa.description":            {"en": "Deep extraction clean of a standard 2–3 seater sofa, cushions included.",
+                                    "de": "Tiefenreinigung eines Standard-Sofas (2–3 Sitzer), inkl. Kissen."},
+
+    "couch.name":                  {"en": "Corner couch cleaning", "de": "Eckcouch-Reinigung"},
+    "couch.description":           {"en": "Deep clean of a large L-shaped or corner couch, cushions included.",
+                                    "de": "Tiefenreinigung einer großen L-förmigen Couch bzw. Eckcouch, inkl. Kissen."},
+
+    "fabric_chair.name":           {"en": "Fabric chair cleaning", "de": "Stuhlreinigung (Stoff)"},
+    "fabric_chair.description":    {"en": "Upholstery clean of a single fabric dining or office chair — seat and back.",
+                                    "de": "Polsterreinigung eines einzelnen Stoffstuhls (Ess- oder Bürostuhl) — Sitz und Rückenlehne."},
+
     # ----- process steps ----------------------------------------------------
     "step.booking_confirmed.name": {"en": "Thanks for your order",
                                     "de": "Vielen Dank für Ihre Bestellung"},
@@ -195,6 +220,14 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "web.policy.cancellation.heading": {"en": "Cancellation Policy",
                                         "de": "Stornierungsbedingungen"},
 
+    # Home brand browser-tab titles (heading text is brand-neutral, reused).
+    "web.policy.terms.title.home":   {"en": "Terms & Conditions — HomeGrime",
+                                      "de": "AGB — HomeGrime"},
+    "web.policy.privacy.title.home": {"en": "Privacy Policy — HomeGrime",
+                                      "de": "Datenschutzerklärung — HomeGrime"},
+    "web.policy.cancellation.title.home": {"en": "Cancellation Policy — HomeGrime",
+                                           "de": "Stornierungsbedingungen — HomeGrime"},
+
     # Generic policy section labels (used only as placeholders — the long copy
     # stays in the existing templates for now, but the page chrome translates.)
     "web.policy.questions":         {"en": "Questions? Reach us at",
@@ -206,6 +239,12 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "web.index.hero_headline":      {"en": "Book your professional car cleaning at your place",
                                      "de": "Buchen Sie Ihre professionelle Autoreinigung bei Ihnen vor Ort"},
     "web.index.hero_sub":           {"en": "Trained cleaners, premium equipment, eco-friendly products. Download the app and book in seconds.",
+                                     "de": "Geschulte Reiniger, Premium-Ausstattung, umweltfreundliche Produkte. Laden Sie die App herunter und buchen Sie in Sekunden."},
+
+    # Home (couch / mattress) brand overrides for the landing-page hero.
+    "web.index.hero_headline.home": {"en": "Book your professional couch & mattress cleaning at your place",
+                                     "de": "Buchen Sie Ihre professionelle Polster- und Matratzenreinigung bei Ihnen vor Ort"},
+    "web.index.hero_sub.home":      {"en": "Trained cleaners, premium equipment, eco-friendly products. Download the app and book in seconds.",
                                      "de": "Geschulte Reiniger, Premium-Ausstattung, umweltfreundliche Produkte. Laden Sie die App herunter und buchen Sie in Sekunden."},
     "web.index.download_heading":   {"en": "Get the app",
                                      "de": "App herunterladen"},
@@ -223,6 +262,8 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
                                      "de": "Rechtliches"},
     "web.footer.copyright":         {"en": "© 2026 CarGrime · All rights reserved.",
                                      "de": "© 2026 CarGrime · Alle Rechte vorbehalten."},
+    "web.footer.copyright.home":    {"en": "© 2026 HomeGrime · All rights reserved.",
+                                     "de": "© 2026 HomeGrime · Alle Rechte vorbehalten."},
 }
 
 

@@ -34,6 +34,12 @@ export const Device = {
   setEmail: async (email: string) => {
     return await AsyncStorage.setItem('email', email);
   },
+  getName: async () => {
+    return await AsyncStorage.getItem('name');
+  },
+  setName: async (name: string) => {
+    return await AsyncStorage.setItem('name', name);
+  },
 
   /**
    * Mark that an order has just been placed. The next time the order flow

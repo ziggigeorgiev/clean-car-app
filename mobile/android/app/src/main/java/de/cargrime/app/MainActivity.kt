@@ -1,4 +1,4 @@
-package com.cleen.app
+package de.cargrime.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
