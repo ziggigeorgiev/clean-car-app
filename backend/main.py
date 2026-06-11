@@ -355,9 +355,15 @@ async def cleaner_orders(
     locale: str = Depends(web_locale),
     _user: str = Depends(require_cleaner_auth),
 ):
+    # Scope the dashboard to the brand of the domain it's opened on
+    # (homegrime.de → home orders, cargrime.de → car orders).
+    brand = resolve_web_brand(request)
     orders = (
         db.query(models.Order)
-        .filter(models.Order.status == models.OrderStatusEnum.OPEN)
+        .filter(
+            models.Order.status == models.OrderStatusEnum.OPEN,
+            models.Order.brand == brand,
+        )
         .options(
             joinedload(models.Order.location),
             joinedload(models.Order.availability),
@@ -379,6 +385,10 @@ async def cleaner_order_detail(
 ):
     order = _load_order_for_cleaner(db, order_uuid)
     if order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+    # Keep brands separated: a car order can't be opened on homegrime.de and
+    # vice versa (the email links already point at the matching domain).
+    if order.brand != resolve_web_brand(request):
         raise HTTPException(status_code=404, detail="Order not found")
     flash = None
     if ok:
