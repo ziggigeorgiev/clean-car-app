@@ -5,8 +5,6 @@
   },
 
   "build": {
-    "_comment": "Per-brand profiles. car-* build the original CarGrime app (EXPO_PUBLIC_BRAND=car); home-* build the FreshSofa app and extend their car counterpart, adding EXPO_PUBLIC_BRAND=home (env is merged on extends, so the API/WEB URLs carry over). Each brand uses its own channel so OTA updates never cross apps. Build with e.g. `eas build --profile car-production` or `eas build --profile home-production`.",
-
     "car-development": {
       "developmentClient": true,
       "distribution": "internal",

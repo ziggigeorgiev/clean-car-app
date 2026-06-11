@@ -58,12 +58,46 @@ logger = logging.getLogger(__name__)
 
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
 
-# Public base URL for links embedded in emails (cleaner page, etc.). Override
-# via env var when running on a different host / locally.
-PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://clean-car-app.onrender.com").rstrip("/")
+# Sender, cleaner recipient and the booking-link base URL are all resolved
+# per brand from env vars — see _brand_email_config below.
 
-# Where cleaner notifications go.
-CLEANER_NOTIFY_EMAIL = os.getenv("CLEANER_NOTIFY_EMAIL", "info@cargrime.de")
+
+def _env_brand(key: str, brand: str, default: Optional[str] = None) -> Optional[str]:
+    """Read the brand-specific env var ``{key}_{CAR|HOME}``, else ``default``.
+
+    Only the suffixed variable is used — set e.g. SMTP_USER_HOME / SMTP_USER_CAR
+    (there is no unsuffixed fallback)."""
+    suffix = "HOME" if (brand or "car").lower() == "home" else "CAR"
+    val = os.getenv(f"{key}_{suffix}")
+    return val if val is not None else default
+
+
+def _brand_email_config(brand: str) -> dict:
+    """Full per-brand email identity + SMTP credentials.
+
+    Every value can be set with a ``_CAR`` / ``_HOME`` suffixed env var (falling
+    back to the unsuffixed name). The "from" domain must be allowed by the SMTP
+    account / verified with your provider.
+    """
+    b = (brand or "car").lower()
+    is_home = b == "home"
+    default_from = "HomeGrime <info@homegrime.de>" if is_home else "CarGrime <info@cargrime.de>"
+    default_to = "info@homegrime.de" if is_home else "info@cargrime.de"
+    default_url = "https://homegrime.de" if is_home else "https://cargrime.de"
+    return {
+        "smtp_host": _env_brand("SMTP_HOST", brand),
+        "smtp_port": int(_env_brand("SMTP_PORT", brand, "587")),
+        "smtp_user": _env_brand("SMTP_USER", brand, ""),
+        "smtp_password": _env_brand("SMTP_PASSWORD", brand, ""),
+        "smtp_use_tls": _env_brand("SMTP_USE_TLS", brand, "1") == "1",
+        "from": (
+            _env_brand("SMTP_FROM", brand)
+            or _env_brand("RESEND_FROM", brand)
+            or default_from
+        ),
+        "cleaner_to": _env_brand("CLEANER_NOTIFY_EMAIL", brand, default_to),
+        "base_url": (_env_brand("PUBLIC_BASE_URL", brand, default_url) or default_url).rstrip("/"),
+    }
 
 # Duration of a booking slot (must match BOOKING_DURATION_MINUTES on the
 # mobile side; used to compute calendar event end times).
@@ -123,13 +157,10 @@ def _send_via_resend(to: str, from_addr: str, subject: str, body_text: str, body
         return False
 
 
-def _send_via_smtp(to: str, from_addr: str, subject: str, body_text: str, body_html: Optional[str]) -> bool:
-    """Send via SMTP (smtplib). Returns True on success."""
-    host = os.environ["SMTP_HOST"]
-    port = int(os.getenv("SMTP_PORT", "587"))
-    user = os.getenv("SMTP_USER", "")
-    password = os.getenv("SMTP_PASSWORD", "")
-    use_tls = os.getenv("SMTP_USE_TLS", "1") == "1"
+def _send_via_smtp(to: str, from_addr: str, subject: str, body_text: str, body_html: Optional[str],
+                   host: str, port: int, user: str, password: str, use_tls: bool) -> bool:
+    """Send via SMTP (smtplib) using the supplied (brand-specific) credentials.
+    Returns True on success."""
     timeout = int(os.getenv("SMTP_TIMEOUT", "10"))
 
     msg = EmailMessage()
@@ -160,40 +191,46 @@ def _send_via_smtp(to: str, from_addr: str, subject: str, body_text: str, body_h
     return True
 
 
-def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] = None) -> bool:
-    """Send an email to ``to`` and return True on success, False otherwise."""
+def send_email(to: str, subject: str, body_text: str, body_html: Optional[str] = None,
+               brand: str = "car") -> bool:
+    """Send an email to ``to`` and return True on success, False otherwise.
+
+    SMTP credentials, the sender address and the send decision are all resolved
+    per ``brand`` (see _brand_email_config), so the home and car apps send from
+    their own mailbox.
+    """
+    cfg = _brand_email_config(brand)
     use_resend = bool(os.getenv("RESEND_API_KEY"))
-    use_smtp = bool(os.getenv("SMTP_HOST"))
+    use_smtp = bool(cfg["smtp_host"])
     print(
-        f"[email] send_email start to={to!r} resend={use_resend} smtp={use_smtp}",
+        f"[email] send_email start brand={brand} to={to!r} resend={use_resend} smtp={use_smtp}",
         flush=True,
     )
     if not (use_resend or use_smtp):
-        logger.warning("Email not configured (no RESEND_API_KEY or SMTP_HOST); skipping email to %s", to)
-        print(f"[email] SKIPPED — neither RESEND_API_KEY nor SMTP_HOST is set", flush=True)
+        logger.warning("Email not configured (no RESEND_API_KEY or SMTP_HOST_*); skipping email to %s", to)
+        print(f"[email] SKIPPED — neither RESEND_API_KEY nor SMTP_HOST(_{brand}) is set", flush=True)
         return False
     if not to:
         logger.warning("Empty recipient; skipping email")
         print(f"[email] SKIPPED — empty recipient", flush=True)
         return False
 
-    from_addr = (
-        os.getenv("RESEND_FROM")
-        or os.getenv("SMTP_FROM")
-        or os.getenv("SMTP_USER")
-        or "onboarding@resend.dev"
-    )
+    from_addr = cfg["from"]
 
     logger.info(
-        "Sending email backend=%s from=%s to=%s subject=%r",
-        "resend" if use_resend else "smtp", from_addr, to, subject,
+        "Sending email backend=%s brand=%s from=%s to=%s subject=%r",
+        "resend" if use_resend else "smtp", brand, from_addr, to, subject,
     )
 
     try:
         if use_resend:
             ok = _send_via_resend(to, from_addr, subject, body_text, body_html)
         else:
-            ok = _send_via_smtp(to, from_addr, subject, body_text, body_html)
+            ok = _send_via_smtp(
+                to, from_addr, subject, body_text, body_html,
+                host=cfg["smtp_host"], port=cfg["smtp_port"], user=cfg["smtp_user"],
+                password=cfg["smtp_password"], use_tls=cfg["smtp_use_tls"],
+            )
         if ok:
             logger.info("Sent email to %s subject=%r", to, subject)
             print(f"[email] SENT to={to}", flush=True)
@@ -316,7 +353,9 @@ def send_booking_confirmation(
 </html>
 """
 
-    return send_email(to=to, subject=subject, body_text=body_text, body_html=body_html)
+    return send_email(
+        to=to, subject=subject, body_text=body_text, body_html=body_html, brand=brand,
+    )
 
 
 def send_cleaner_notification(
@@ -339,7 +378,8 @@ def send_cleaner_notification(
     Notify the cleaning team about a new booking. Includes a deep link to the
     cleaner page for this order and a one-click "Add to Google Calendar" button.
     """
-    recipient = to or CLEANER_NOTIFY_EMAIL
+    cfg = _brand_email_config(brand)
+    recipient = to or cfg["cleaner_to"]
     loc = normalize_locale(locale)
     when_label = _format_berlin(availability_time)
     services_list = _service_lines(service_names, service_quantities, loc)
@@ -367,7 +407,7 @@ def send_cleaner_notification(
         total_line_txt = f"\n{L_TOTAL}: {total_price:.2f} {currency}\n"
         total_line_html = f"<p><strong>{L_TOTAL}:</strong> {total_price:.2f} {currency}</p>"
 
-    cleaner_url = f"{PUBLIC_BASE_URL}/cleaner/orders/{order_uuid}"
+    cleaner_url = f"{cfg['base_url']}/cleaner/orders/{order_uuid}"
 
     # Build the Google Calendar add-event link.
     if availability_time is not None:
@@ -461,4 +501,5 @@ def send_cleaner_notification(
 </html>
 """
 
-    return send_email(to=recipient, subject=subject, body_text=body_text, body_html=body_html)
+    return send_email(to=recipient, subject=subject, body_text=body_text, body_html=body_html,
+                      brand=brand)
