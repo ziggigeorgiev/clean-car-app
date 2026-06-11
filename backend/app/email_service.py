@@ -84,12 +84,16 @@ def _brand_email_config(brand: str) -> dict:
     default_from = "HomeGrime <info@homegrime.de>" if is_home else "CarGrime <info@cargrime.de>"
     default_to = "info@homegrime.de" if is_home else "info@cargrime.de"
     default_url = "https://homegrime.de" if is_home else "https://cargrime.de"
+    port = int(_env_brand("SMTP_PORT", brand, "587"))
+    # Port 465 = implicit SSL (SMTPS) → STARTTLS must be OFF. Port 587 = STARTTLS.
+    # Default accordingly so a missing SMTP_USE_TLS_* can't pick the wrong mode.
+    default_use_tls = "0" if port == 465 else "1"
     return {
         "smtp_host": _env_brand("SMTP_HOST", brand),
-        "smtp_port": int(_env_brand("SMTP_PORT", brand, "587")),
+        "smtp_port": port,
         "smtp_user": _env_brand("SMTP_USER", brand, ""),
         "smtp_password": _env_brand("SMTP_PASSWORD", brand, ""),
-        "smtp_use_tls": _env_brand("SMTP_USE_TLS", brand, "1") == "1",
+        "smtp_use_tls": _env_brand("SMTP_USE_TLS", brand, default_use_tls) == "1",
         "from": (
             _env_brand("SMTP_FROM", brand)
             or _env_brand("RESEND_FROM", brand)
