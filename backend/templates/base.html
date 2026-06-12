@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}CleanCar{% endblock %}</title>
+  <title>{% block title %}{% if brand_key == 'home' %}HomeGrime{% else %}CarGrime{% endif %}{% endblock %}</title>
+  <link rel="icon" type="image/png" href="/static/{{ brand_key | default('car') }}-logo.png">
+  <link rel="apple-touch-icon" href="/static/{{ brand_key | default('car') }}-logo.png">
   <style>
     :root {
       /* Accent color (buttons, links, badges) is brand-specific. */
