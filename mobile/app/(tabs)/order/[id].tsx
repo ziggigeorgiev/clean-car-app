@@ -44,6 +44,7 @@ interface CleaningStep {
 interface Order {
   id: number;
   status: string;
+  name?: string | null;
   plate_number?: string | null;
   location: {
     address: string;
@@ -159,6 +160,7 @@ const OrderDetailScreen: React.FC = () => {
           sectionTitle={t('section.availability')}
         />
         <ContactDetails
+          name={order?.name ?? ""}
           phoneNumber={order?.phone_number ?? ""}
           plateNumber={order?.plate_number ?? ""}
           sectionTitle={t('section.contact_info')}

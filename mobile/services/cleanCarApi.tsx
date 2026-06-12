@@ -16,6 +16,7 @@ export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 export interface Order {
   id: number;
   brand?: string;
+  name?: string | null;
   plate_number?: string | null;
   phone_number: string;
   location_id: number;
@@ -67,6 +68,7 @@ export interface OrderCreatePayload {
   brand?: string;
   phone_identifier: string;
   status?: string;
+  name?: string;
   plate_number?: string | null;
   phone_number: string;
   location: LocationCreatePayload;

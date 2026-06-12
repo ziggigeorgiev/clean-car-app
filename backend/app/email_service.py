@@ -283,6 +283,7 @@ def send_booking_confirmation(
     currency: str = "EUR",
     locale: str = DEFAULT_LOCALE,
     brand: str = "car",
+    name: Optional[str] = None,
 ) -> bool:
     """Build and send a booking confirmation email."""
     loc = normalize_locale(locale)
@@ -293,6 +294,7 @@ def send_booking_confirmation(
 
     # Pull all visible strings from the translation table.
     L_ORDER    = _tr("email.field.order",    loc)
+    L_NAME     = _tr("email.field.name",     loc)
     L_WHEN     = _tr("email.field.when",     loc)
     L_WHERE    = _tr("email.field.where",    loc)
     L_VEHICLE  = _tr("email.field.vehicle",  loc)
@@ -321,10 +323,17 @@ def send_booking_confirmation(
         f'<td>{plate_number}</td></tr>'
     ) if plate_number else ""
 
+    name_line_txt = f"{L_NAME}:     {name}\n" if name else ""
+    name_row_html = (
+        f'<tr><td style="padding:4px 12px 4px 0;color:#666;">{L_NAME}</td>'
+        f'<td>{name}</td></tr>'
+    ) if name else ""
+
     body_text = (
         f"{greeting}\n\n"
         f"{intro}\n\n"
         f"{L_ORDER}:    #{order_id}\n"
+        f"{name_line_txt}"
         f"{L_WHEN}:     {when} {L_TZ}\n"
         f"{L_WHERE}:    {address or '-'}\n"
         f"{vehicle_line_txt}"
@@ -343,6 +352,7 @@ def send_booking_confirmation(
   <p>{intro}</p>
   <table style="border-collapse:collapse;margin:16px 0;">
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_ORDER}</td><td>#{order_id}</td></tr>
+    {name_row_html}
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHEN}</td><td>{when} <span style="color:#888;">{L_TZ}</span></td></tr>
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHERE}</td><td>{address or '-'}</td></tr>
     {vehicle_row_html}
@@ -377,6 +387,7 @@ def send_cleaner_notification(
     to: Optional[str] = None,
     locale: str = DEFAULT_LOCALE,
     brand: str = "car",
+    name: Optional[str] = None,
 ) -> bool:
     """
     Notify the cleaning team about a new booking. Includes a deep link to the
@@ -391,6 +402,7 @@ def send_cleaner_notification(
     services_html = "".join(f"<li>{s}</li>" for s in services_list) or "<li>—</li>"
 
     L_ORDER    = _tr("email.field.order",    loc)
+    L_NAME     = _tr("email.field.name",     loc)
     L_WHEN     = _tr("email.field.when",     loc)
     L_WHERE    = _tr("email.field.where",    loc)
     L_VEHICLE  = _tr("email.field.vehicle",  loc)
@@ -444,6 +456,10 @@ def send_cleaner_notification(
         intro_label,
         "",
         f"{L_ORDER}:    #{order_id}",
+    ]
+    if name:
+        body_text_lines.append(f"{L_NAME}:     {name}")
+    body_text_lines += [
         f"{L_WHEN}:     {when_label} {L_TZ}",
         f"{L_WHERE}:    {address or '-'}",
     ]
@@ -481,12 +497,18 @@ def send_cleaner_notification(
         f'<td>{plate_number}</td></tr>'
     ) if plate_number else ""
 
+    name_row_html = (
+        f'<tr><td style="padding:4px 12px 4px 0;color:#666;">{L_NAME}</td>'
+        f'<td>{name}</td></tr>'
+    ) if name else ""
+
     body_html = f"""\
 <!DOCTYPE html>
 <html>
 <body style="font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1a1a1a;max-width:560px;margin:0 auto;padding:24px;">
   <h2 style="color:#0EA5A4;margin:0 0 12px 0;">{heading}</h2>
   <table style="border-collapse:collapse;margin:16px 0;">
+    {name_row_html}
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHEN}</td><td>{when_label} <span style="color:#888;">{L_TZ}</span></td></tr>
     <tr><td style="padding:4px 12px 4px 0;color:#666;">{L_WHERE}</td><td>{address or '-'}</td></tr>
     {vehicle_row_html}

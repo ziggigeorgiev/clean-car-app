@@ -160,6 +160,8 @@ class Order(Base):
     )
 
     phone_identifier: Mapped[str] = mapped_column(String, index=True, nullable=False)
+    # Customer name (collected at booking; nullable for legacy orders).
+    name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # Nullable: the home (couch/mattress) app has no vehicle plate.
     plate_number: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)

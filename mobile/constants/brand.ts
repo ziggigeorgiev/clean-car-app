@@ -25,6 +25,12 @@ export interface BrandConfig {
    * 'quantity' → each service has a quantity stepper (home app, e.g. 2 sofas).
    */
   serviceMode: 'toggle' | 'quantity';
+  /**
+   * Public website for this brand — used for the in-app Terms/Privacy/
+   * Cancellation links so each app opens its own domain. This is the source of
+   * truth; EXPO_PUBLIC_WEB_BASE_URL only overrides it for local testing.
+   */
+  webBaseUrl: string;
 }
 
 export const BRANDS: Record<BrandId, BrandConfig> = {
@@ -33,12 +39,14 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
     apiBrand: 'car',
     hasVehiclePlate: true,
     serviceMode: 'toggle',
+    webBaseUrl: 'https://cargrime.de',
   },
   home: {
     id: 'home',
     apiBrand: 'home',
     hasVehiclePlate: false,
     serviceMode: 'quantity',
+    webBaseUrl: 'https://homegrime.de',
   },
 };
 

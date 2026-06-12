@@ -159,6 +159,7 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
 
     # ----- shared field labels ----------------------------------------------
     "email.field.order":    {"en": "Order",     "de": "Auftrag"},
+    "email.field.name":     {"en": "Name",      "de": "Name"},
     "email.field.when":     {"en": "When",      "de": "Termin"},
     "email.field.where":    {"en": "Where",     "de": "Ort"},
     "email.field.vehicle":  {"en": "Vehicle",   "de": "Fahrzeug"},

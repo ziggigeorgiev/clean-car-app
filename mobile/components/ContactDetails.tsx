@@ -4,6 +4,7 @@ import { COLORS } from "../constants/colors";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'; // For location pin icon
 
 type ContactDetailsProps = {
+  name?: string;
   phoneNumber?: string;
   plateNumber?: string;
   email?: string;
@@ -11,6 +12,7 @@ type ContactDetailsProps = {
 };
 
 const ContactDetails = ({
+  name,
   phoneNumber,
   plateNumber,
   email,
@@ -26,6 +28,12 @@ const ContactDetails = ({
         {/* Let's adjust the rendering to reflect that. */}
       </View>
 
+      { name && (<View style={styles.detailRow}>
+        <MaterialCommunityIcons name="account" size={20} color={COLORS.textLight} style={styles.icon} />
+        <Text style={styles.detailText}>
+          {name}
+        </Text>
+      </View>) }
       {/* Render each service item */}
       { phoneNumber && (<View style={styles.detailRow}>
         <MaterialCommunityIcons name="phone" size={20} color={COLORS.textLight} style={styles.icon} />

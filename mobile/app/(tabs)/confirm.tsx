@@ -45,7 +45,7 @@ const ConfirmScreen: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   
-  const { location, availability, services, serviceQuantities, plateNumber, phoneNumber} = useLocalSearchParams();
+  const { location, availability, services, serviceQuantities, name, plateNumber, phoneNumber} = useLocalSearchParams();
   
   console.log("--------------------")
   console.log("location", location)
@@ -139,6 +139,7 @@ const ConfirmScreen: React.FC = () => {
         {
           phone_identifier: (await Device.getPhoneIdentifier()) ?? '',
           status: "open",
+          name: name ? String(name) : undefined,
           plate_number: plateNumber ? String(plateNumber) : null,
           phone_number: phoneNumber as string,
           location: JSON.parse(location as string),
@@ -186,6 +187,7 @@ const ConfirmScreen: React.FC = () => {
         />
 
         <ContactDetails
+          name={name as string}
           phoneNumber={phoneNumber}
           plateNumber={plateNumber}
           sectionTitle={t('section.contact_info')}

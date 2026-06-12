@@ -117,6 +117,7 @@ class OrderBase(BaseModel):
     brand: BrandEnum = BrandEnum.CAR # Which white-label app placed the order
     phone_identifier: str
     status: OrderStatusEnum = OrderStatusEnum.OPEN # Default status
+    name: Optional[str] = None # Customer name collected at booking
     plate_number: Optional[str] = None # No plate for the home (couch/mattress) app
     phone_number: str
     location: LocationCreate

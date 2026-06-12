@@ -547,6 +547,7 @@ async def create_new_order(
         common = dict(
             order_id=db_order.id,
             brand=db_order.brand.value if db_order.brand else "car",
+            name=db_order.name,
             plate_number=db_order.plate_number,
             phone_number=db_order.phone_number,
             address=db_order.location.address if db_order.location else "",

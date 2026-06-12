@@ -59,6 +59,8 @@ const translations = {
   // Services screen
   'services.vehicle_details': { en: 'Vehicle Details', de: 'Fahrzeugdaten' },
   'services.registration_number': { en: 'Registration Number', de: 'Kennzeichen' },
+  'services.name': { en: 'Name', de: 'Name' },
+  'services.error_name': { en: 'Name is required', de: 'Name ist erforderlich' },
   'services.phone_number': { en: 'Phone Number', de: 'Telefonnummer' },
   'services.additional': { en: 'Additional Services', de: 'Zusatzleistungen' },
   'services.provided': { en: 'Services Provided', de: 'Enthaltene Leistungen' },

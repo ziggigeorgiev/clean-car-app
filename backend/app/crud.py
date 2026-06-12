@@ -103,6 +103,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
     db_order = models.Order(
         brand=order.brand,
         phone_identifier=order.phone_identifier,
+        name=(order.name or None),
         plate_number=(order.plate_number or None),  # home app has no plate
         phone_number=order.phone_number,
         email=(order.email or None),  # store None when not provided

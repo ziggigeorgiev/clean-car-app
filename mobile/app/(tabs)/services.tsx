@@ -46,6 +46,7 @@ const ServicesScreen = () => {
   const { t, tService } = useTranslation();
   const [loading, setLoading] = useState(false);
 
+  const [name, setName] = useState('');
   const [plateNumber, setPlateNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -58,13 +59,16 @@ const ServicesScreen = () => {
   const isQuantityMode = BRAND.serviceMode === 'quantity';
 
   // Validation
+  const nameTrimmed = name.trim();
   const plateNumberTrimmed = plateNumber.trim();
   const phoneNumberTrimmed = phoneNumber.trim();
+  // Name is mandatory for both brands.
+  const nameError = nameTrimmed.length < 2 ? t('services.error_name') : '';
   // Plate is only required for brands that have a vehicle (car app).
   const plateError =
     BRAND.hasVehiclePlate && plateNumberTrimmed.length < 2 ? t('services.error_plate') : '';
   const phoneError = !/^\+?[0-9 \-()]{7,}$/.test(phoneNumberTrimmed) ? t('services.error_phone') : '';
-  const isFormValid = !plateError && !phoneError;
+  const isFormValid = !nameError && !plateError && !phoneError;
 
   const { location, availability} = useLocalSearchParams();
     
@@ -92,6 +96,8 @@ const ServicesScreen = () => {
       }
 
       // Prefill only from saved settings; otherwise leave empty.
+      const storedName = await Device.getName();
+      setName(storedName ?? '');
       const storedPhone = await Device.getPhoneNumber();
       setPhoneNumber(storedPhone ?? '');
       if (BRAND.hasVehiclePlate) {
@@ -181,6 +187,7 @@ const ServicesScreen = () => {
         availability: availability,
         services: JSON.stringify(serviceIds),
         serviceQuantities: JSON.stringify(serviceQuantities),
+        name: nameTrimmed,
         plateNumber: BRAND.hasVehiclePlate ? plateNumberTrimmed : '',
         phoneNumber: phoneNumberTrimmed
       }
@@ -203,6 +210,18 @@ const ServicesScreen = () => {
             <Text style={[styles.sectionTitle, {marginTop: 20}]}>
               {BRAND.hasVehiclePlate ? t('services.vehicle_details') : t('section.contact_info')}
             </Text>
+            <View style={[styles.inputContainer, showErrors && nameError ? styles.inputContainerError : null]}>
+              <MaterialCommunityIcons name="account" size={20} color="#8e8e93" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder={t('services.name')}
+                placeholderTextColor="#8e8e93"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
+            </View>
+            {showErrors && nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
             {BRAND.hasVehiclePlate && (
               <>
                 <View style={[styles.inputContainer, showErrors && plateError ? styles.inputContainerError : null]}>
