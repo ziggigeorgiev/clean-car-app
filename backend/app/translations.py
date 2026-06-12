@@ -237,6 +237,8 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     # public index
     "web.index.title":              {"en": "CarGrime — Professional on-site car cleaning",
                                      "de": "CarGrime — Professionelle Autoreinigung vor Ort"},
+    "web.index.title.home":         {"en": "HomeGrime — Professional on-site couch & mattress cleaning",
+                                     "de": "HomeGrime — Professionelle Polster- und Matratzenreinigung vor Ort"},
     "web.index.hero_headline":      {"en": "Book your professional car cleaning at your place",
                                      "de": "Buchen Sie Ihre professionelle Autoreinigung bei Ihnen vor Ort"},
     "web.index.hero_sub":           {"en": "Trained cleaners, premium equipment, eco-friendly products. Download the app and book in seconds.",
