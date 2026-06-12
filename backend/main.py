@@ -209,12 +209,12 @@ async def protected_redoc(_user: str = Depends(require_docs_auth)):
 # Add a new entry here when launching another white-label app.
 WEB_BRANDS = {
     models.BrandEnum.CAR: {
-        "ios_url": "https://apps.apple.com/app/cargrime",
+        "ios_url": "https://testflight.apple.com/join/QA6uUW47",
         "android_url": "https://play.google.com/store/apps/details?id=de.cargrime.app",
         "key_prefix": "car",
     },
     models.BrandEnum.HOME: {
-        "ios_url": "https://apps.apple.com/app/homegrime",
+        "ios_url": "https://testflight.apple.com/join/be8BacZD",
         "android_url": "https://play.google.com/store/apps/details?id=de.homegrime.app",
         "key_prefix": "home",
     },
