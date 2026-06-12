@@ -130,32 +130,32 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "email.customer.outro":       {"en": "We will be in touch shortly to confirm your cleaner.",
                                    "de": "Wir melden uns in Kürze, um Ihren Reiniger zu bestätigen."},
     "email.customer.heading":     {"en": "Booking confirmed",          "de": "Buchung bestätigt"},
-    "email.customer.signature":   {"en": "— CleanCar",                  "de": "— CleanCar"},
+    "email.customer.signature":   {"en": "— CarGrime",                  "de": "— CarGrime"},
 
     # Brand-specific overrides (home = couch / mattress / upholstery app). These
     # are looked up first via the `.home` suffix; missing ones fall back to the
     # generic key above.
-    "email.customer.signature.home": {"en": "— FreshSofa",             "de": "— FreshSofa"},
+    "email.customer.signature.home": {"en": "— HomeGrime",             "de": "— HomeGrime"},
 
     # ----- cleaner notification email ---------------------------------------
-    "email.cleaner.subject":      {"en": "[CleanCar] New booking — Order #{order_id} @ {when}",
-                                   "de": "[CleanCar] Neue Buchung — Auftrag #{order_id} @ {when}"},
+    "email.cleaner.subject":      {"en": "[CarGrime] New booking — Order #{order_id} @ {when}",
+                                   "de": "[CarGrime] Neue Buchung — Auftrag #{order_id} @ {when}"},
     "email.cleaner.heading":      {"en": "New booking — Order #{order_id}",
                                    "de": "Neue Buchung — Auftrag #{order_id}"},
-    "email.cleaner.intro":        {"en": "New booking for CleanCar:",
-                                   "de": "Neue Buchung für CleanCar:"},
+    "email.cleaner.intro":        {"en": "New booking for CarGrime:",
+                                   "de": "Neue Buchung für CarGrime:"},
     "email.cleaner.cta_open":     {"en": "Open booking",                "de": "Buchung öffnen"},
     "email.cleaner.cta_calendar": {"en": "Add to Google Calendar",      "de": "Zu Google Kalender hinzufügen"},
-    "email.cleaner.footer":       {"en": "CleanCar internal notification.",
-                                   "de": "Interne Benachrichtigung von CleanCar."},
+    "email.cleaner.footer":       {"en": "CarGrime internal notification.",
+                                   "de": "Interne Benachrichtigung von CarGrime."},
 
     # Brand-specific (home) overrides for the cleaner email.
-    "email.cleaner.subject.home": {"en": "[FreshSofa] New booking — Order #{order_id} @ {when}",
-                                   "de": "[FreshSofa] Neue Buchung — Auftrag #{order_id} @ {when}"},
-    "email.cleaner.intro.home":   {"en": "New booking for FreshSofa:",
-                                   "de": "Neue Buchung für FreshSofa:"},
-    "email.cleaner.footer.home":  {"en": "FreshSofa internal notification.",
-                                   "de": "Interne Benachrichtigung von FreshSofa."},
+    "email.cleaner.subject.home": {"en": "[HomeGrime] New booking — Order #{order_id} @ {when}",
+                                   "de": "[HomeGrime] Neue Buchung — Auftrag #{order_id} @ {when}"},
+    "email.cleaner.intro.home":   {"en": "New booking for HomeGrime:",
+                                   "de": "Neue Buchung für HomeGrime:"},
+    "email.cleaner.footer.home":  {"en": "HomeGrime internal notification.",
+                                   "de": "Interne Benachrichtigung von HomeGrime."},
 
     # ----- shared field labels ----------------------------------------------
     "email.field.order":    {"en": "Order",     "de": "Auftrag"},
@@ -170,7 +170,7 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "email.field.tz_suffix":{"en": "(Europe/Berlin)", "de": "(Europa/Berlin)"},
 
     # ----- web UI -----------------------------------------------------------
-    "web.brand":            {"en": "CleanCar",  "de": "CleanCar"},
+    "web.brand":            {"en": "CarGrime",  "de": "CarGrime"},
     "web.lang.de":          {"en": "Deutsch",   "de": "Deutsch"},
     "web.lang.en":          {"en": "English",   "de": "English"},
     "web.last_updated":     {"en": "Last updated:", "de": "Zuletzt aktualisiert:"},
@@ -209,15 +209,15 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
     "web.status.failed":            {"en": "failed",            "de": "fehlgeschlagen"},
 
     # policy pages
-    "web.policy.terms.title":       {"en": "Terms & Conditions — CleanCar",
-                                     "de": "AGB — CleanCar"},
+    "web.policy.terms.title":       {"en": "Terms & Conditions — CarGrime",
+                                     "de": "AGB — CarGrime"},
     "web.policy.terms.heading":     {"en": "Terms & Conditions",
                                      "de": "Allgemeine Geschäftsbedingungen"},
-    "web.policy.privacy.title":     {"en": "Privacy Policy — CleanCar",
-                                     "de": "Datenschutzerklärung — CleanCar"},
+    "web.policy.privacy.title":     {"en": "Privacy Policy — CarGrime",
+                                     "de": "Datenschutzerklärung — CarGrime"},
     "web.policy.privacy.heading":   {"en": "Privacy Policy",   "de": "Datenschutzerklärung"},
-    "web.policy.cancellation.title":{"en": "Cancellation Policy — CleanCar",
-                                     "de": "Stornierungsbedingungen — CleanCar"},
+    "web.policy.cancellation.title":{"en": "Cancellation Policy — CarGrime",
+                                     "de": "Stornierungsbedingungen — CarGrime"},
     "web.policy.cancellation.heading": {"en": "Cancellation Policy",
                                         "de": "Stornierungsbedingungen"},
 
@@ -235,8 +235,8 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
                                      "de": "Fragen? Erreichen Sie uns unter"},
 
     # public index
-    "web.index.title":              {"en": "CleanCar — Professional on-site car cleaning",
-                                     "de": "CleanCar — Professionelle Autoreinigung vor Ort"},
+    "web.index.title":              {"en": "CarGrime — Professional on-site car cleaning",
+                                     "de": "CarGrime — Professionelle Autoreinigung vor Ort"},
     "web.index.hero_headline":      {"en": "Book your professional car cleaning at your place",
                                      "de": "Buchen Sie Ihre professionelle Autoreinigung bei Ihnen vor Ort"},
     "web.index.hero_sub":           {"en": "Trained cleaners, premium equipment, eco-friendly products. Download the app and book in seconds.",

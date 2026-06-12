@@ -1,4 +1,0 @@
-NSLocationWhenInUseUsageDescription = "We use your location to set the cleaning address.";
-NSCalendarsUsageDescription = "Add booking reminders to your calendar.";
-NSCameraUsageDescription = "This app never uses the camera.";
-NSPhotoLibraryUsageDescription = "This app never uses your photo library.";

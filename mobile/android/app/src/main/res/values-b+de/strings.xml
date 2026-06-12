@@ -1,6 +1,0 @@
-<resources>
-  <string name="NSLocationWhenInUseUsageDescription">"Wir verwenden Ihren Standort, um die Reinigungsadresse festzulegen."</string>
-  <string name="NSCalendarsUsageDescription">"Buchungserinnerungen zu Ihrem Kalender hinzufügen."</string>
-  <string name="NSCameraUsageDescription">"Diese App verwendet die Kamera nicht."</string>
-  <string name="NSPhotoLibraryUsageDescription">"Diese App verwendet Ihre Fotos nicht."</string>
-</resources>

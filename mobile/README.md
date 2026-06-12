@@ -48,3 +48,17 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Deploy iOS
+https://expo.dev/accounts/zdravkogeorgiev/projects/mobile/settings
+https://appstoreconnect.apple.com
+
+```bash
+cd mobile
+eas login
+
+EXPO_PUBLIC_BRAND=car eas build --profile car-production --platform ios --auto-submit
+EXPO_PUBLIC_BRAND=home eas build --profile home-production --platform ios --auto-submit
+```
+
+# Deploy Android

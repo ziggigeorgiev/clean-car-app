@@ -5,9 +5,9 @@
 // brand's assets here and pick the active one by BRAND_ID — same pattern as
 // services/serviceIcons.ts.
 //
-// To give the HOME (FreshSofa) app its own artwork:
-//   1. Drop the files into assets/images/ (e.g. freshsofa-logo.png,
-//      freshsofa-wordmark.png, hero-home.png).
+// To give the HOME (HomeGrime) app its own artwork:
+//   1. Drop the files into assets/images/ (e.g. home-logo.png,
+//      home-wordmark.png, hero-home.png).
 //   2. Swap the three `require(...)` lines under `home` below to point at them.
 // Until then, home falls back to the car artwork so the app still builds.
 
@@ -20,7 +20,7 @@ const ASSETS = {
     hero: require('@/assets/images/car-hero.png'),    // home-screen hero image
   },
   home: {
-    // TODO: replace with FreshSofa artwork once added to assets/images/.
+    // TODO: replace with HomeGrime artwork once added to assets/images/.
     logo: require('@/assets/images/home-logo.png'),       // main mark
     wordmark: require('@/assets/images/home-prime.png'),   // text logo under the mark
     hero: require('@/assets/images/home-hero.png'),    // home-screen hero image

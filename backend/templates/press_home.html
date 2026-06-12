@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}HomeGrime — Press &amp; review kit{% endblock %}
+{% block content %}
+  <style>
+    .press h2 { margin-top: 28px; }
+    .press h3 { margin-top: 20px; font-size: 15px; color: var(--text); }
+    .press pre {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .press table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .press table th, .press table td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .press table th { color: var(--text-light); font-weight: 600; }
+    .press .asset {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 4px 6px 4px 0;
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--primary);
+    }
+    .press .note { color: var(--text-light); font-size: 13px; }
+  </style>
+
+  <div class="press">
+    <h1>HomeGrime — Press &amp; Review Kit</h1>
+    <p class="note">Single page bundling everything Apple/Google reviewers and journalists need. Last updated: {{ today }}.</p>
+
+    <h2>At a glance</h2>
+    <table>
+      <tr><th>App name</th><td>HomeGrime</td></tr>
+      <tr><th>Category</th><td>Apple: Lifestyle · Play: House &amp; Home</td></tr>
+      <tr><th>Bundle ID / Package</th><td>de.homegrime.app</td></tr>
+      <tr><th>Primary color</th><td><span style="display:inline-block;width:14px;height:14px;background:#E38C39;border-radius:3px;vertical-align:middle;"></span> #E38C39</td></tr>
+      <tr><th>Support email</th><td><a href="mailto:info@homegrime.de">info@homegrime.de</a></td></tr>
+      <tr><th>Support phone</th><td><a href="tel:+491771914891">+49 177 1914891</a></td></tr>
+      <tr><th>Privacy Policy</th><td><a href="/privacy">homegrime.de/privacy</a></td></tr>
+      <tr><th>Terms</th><td><a href="/terms">homegrime.de/terms</a></td></tr>
+      <tr><th>Cancellation Policy</th><td><a href="/cancellation">homegrime.de/cancellation</a></td></tr>
+    </table>
+
+    <h2>Brand assets</h2>
+    <p>
+      <a class="asset" href="/static/{{ brand_key | default('home') }}-logo.png" download>{{ brand_key | default('home') }}-logo.png</a>
+      <a class="asset" href="/static/{{ brand_key | default('home') }}-prime.png" download>{{ brand_key | default('home') }}-prime.png</a>
+      <a class="asset" href="/static/{{ brand_key | default('home') }}-hero.png" download>{{ brand_key | default('home') }}-hero.png</a>
+    </p>
+
+    <h2>Listing copy — English</h2>
+    <h3>App name (≤30)</h3>
+    <pre>HomeGrime — Sofa &amp; Mattress</pre>
+    <h3>Subtitle (Apple, ≤30)</h3>
+    <pre>Upholstery cleaning at home</pre>
+    <h3>Short description (Play, ≤80)</h3>
+    <pre>Professional on-site couch, sofa and mattress cleaning. Cleaners come to you.</pre>
+    <h3>Promotional text (Apple, ≤170)</h3>
+    <pre>Professional couch &amp; mattress cleaning, delivered to your door. Book in seconds — sofas, armchairs, mattresses and more, deep-cleaned by trained pros right at home.</pre>
+    <h3>Keywords (Apple, ≤100)</h3>
+    <pre>sofa,couch,mattress,upholstery,cleaning,deep clean,furniture,stain,armchair,booking,home,fabric</pre>
+    <h3>Full description</h3>
+    <pre>HomeGrime brings professional upholstery and mattress cleaning right to your home. Open the app, pick a time, choose how many sofas, armchairs or mattresses you need cleaned, and a trained cleaner shows up with everything required to deep-clean and refresh your furniture.
+
+WHY HOMEGRIME
+• Trained cleaners. Premium equipment. Eco-friendly products.
+• You stay home — no hauling furniture anywhere.
+• Transparent pricing per item. The total you see in the app is what you pay.
+• Pay only after the cleaning is done.
+• Available in German and English.
+
+OUR SERVICES
+• Single mattress cleaning — deep clean and sanitize, both sides.
+• Double mattress cleaning — double, queen or king, both sides.
+• Armchair cleaning — full upholstery clean of one armchair.
+• Sofa cleaning (2–3 seats) — deep extraction clean, cushions included.
+• Corner couch cleaning — large L-shaped or corner couches.
+• Fabric chair cleaning — dining or office chairs, seat and back.
+
+HOW IT WORKS
+1. Pick your location.
+2. Pick a time slot.
+3. Choose items and quantities, then confirm.
+
+That's it. You'll get a confirmation email, see your booking in the Orders tab, and watch your order progress live.
+
+WHAT TO EXPECT
+Clear the space around the furniture and remove loose cushions and personal items. After a wet clean, upholstery and mattresses stay damp — don't use them until fully dry (usually 4–12 hours) and keep the room well ventilated.
+
+DESIGNED FOR REAL LIFE
+Save your name, phone and email once in Settings — the app pre-fills everything for your next booking. Switch language anytime: German is default; English is one tap away. We never sell your data.
+
+QUESTIONS?
+Reach us anytime at info@homegrime.de.
+
+HomeGrime — your sofas and mattresses, freshly deep-cleaned at home.</pre>
+
+    <h2>Listing copy — Deutsch</h2>
+    <h3>App-Name (≤30)</h3>
+    <pre>HomeGrime — Polster &amp; Matratze</pre>
+    <h3>Untertitel (Apple, ≤30)</h3>
+    <pre>Polsterreinigung vor Ort</pre>
+    <h3>Kurzbeschreibung (Play, ≤80)</h3>
+    <pre>Professionelle Polster-, Sofa- und Matratzenreinigung — direkt bei Ihnen.</pre>
+    <h3>Werbetext (Apple, ≤170)</h3>
+    <pre>Professionelle Polster- und Matratzenreinigung — direkt bei Ihnen zu Hause. In Sekunden buchen: Sofas, Sessel, Matratzen und mehr. Geschulte Profis bei Ihnen vor Ort.</pre>
+    <h3>Keywords (Apple, ≤100)</h3>
+    <pre>Sofa,Couch,Matratze,Polster,Reinigung,Tiefenreinigung,Möbel,Fleck,Sessel,Termin,Zuhause,Stoff</pre>
+    <h3>Vollständige Beschreibung</h3>
+    <pre>HomeGrime bringt die professionelle Polster- und Matratzenreinigung direkt zu Ihnen nach Hause. App öffnen, Termin wählen, auswählen wie viele Sofas, Sessel oder Matratzen gereinigt werden sollen — ein geschulter Reiniger kommt mit allem, was nötig ist, und reinigt Ihre Möbel gründlich.
+
+WARUM HOMEGRIME
+• Geschulte Reiniger. Premium-Ausstattung. Umweltfreundliche Produkte.
+• Sie bleiben zu Hause — kein Transport von Möbeln.
+• Transparente Preise je Stück. Der angezeigte Betrag ist der Endbetrag.
+• Zahlung erst nach Abschluss der Reinigung.
+• Verfügbar auf Deutsch und Englisch.
+
+UNSERE LEISTUNGEN
+• Matratzenreinigung (Einzel) — Tiefenreinigung und Hygienisierung, beidseitig.
+• Matratzenreinigung (Doppel) — Doppel-, Queen- oder King-Matratze, beidseitig.
+• Sesselreinigung — komplette Polsterreinigung eines Sessels.
+• Sofareinigung (2–3 Sitzer) — Tiefenreinigung inkl. Kissen.
+• Eckcouch-Reinigung — große L-förmige Couches bzw. Eckcouches.
+• Stuhlreinigung (Stoff) — Ess- oder Bürostühle, Sitz und Rückenlehne.
+
+SO FUNKTIONIERT'S
+1. Standort wählen.
+2. Uhrzeit auswählen.
+3. Leistungen und Mengen aussuchen und bestätigen.
+
+Fertig. Sie erhalten eine Bestätigung per E-Mail, sehen Ihre Buchung im Tab „Aufträge" und verfolgen den Fortschritt live.
+
+WAS SIE ERWARTET
+Räumen Sie den Bereich um das Möbelstück frei und entfernen Sie lose Kissen sowie persönliche Gegenstände. Nach einer Nassreinigung bleiben Polster und Matratzen feucht — bitte erst wieder benutzen, wenn sie vollständig getrocknet sind (in der Regel 4–12 Stunden), und den Raum gut lüften.
+
+PRAKTISCH IM ALLTAG
+Name, Telefonnummer und E-Mail einmal in den Einstellungen speichern — die App füllt die Felder bei der nächsten Buchung aus. Sprache jederzeit umschaltbar: Deutsch ist Standard, Englisch ein Tipp entfernt. Wir verkaufen Ihre Daten nicht.
+
+FRAGEN?
+Schreiben Sie uns jederzeit an info@homegrime.de.
+
+HomeGrime — Ihre Sofas und Matratzen, frisch tiefengereinigt zu Hause.</pre>
+
+    <h2>Release notes — v1.0.0</h2>
+    <h3>English (TestFlight + Play release notes)</h3>
+    <pre>Hello! This is the first public version of HomeGrime.
+
+What's in this release:
+• Book on-site couch, sofa and mattress cleanings — pick a location, time and items in seconds.
+• Per-item pricing with quantities — choose how many sofas, armchairs or mattresses.
+• Live order status — see when the cleaner is on the way and when each step is done.
+• Booking confirmation by email.
+• Bilingual: German is the default, English is one tap away in Settings.
+
+Thanks for testing — please send any feedback to info@homegrime.de.</pre>
+    <h3>Deutsch</h3>
+    <pre>Hallo! Dies ist die erste öffentliche Version von HomeGrime.
+
+Was diese Version bietet:
+• Polster-, Sofa- und Matratzenreinigung direkt vor Ort buchen — Ort, Zeit und Leistungen in Sekunden auswählen.
+• Preise je Stück mit Mengen — wählen Sie, wie viele Sofas, Sessel oder Matratzen.
+• Live-Status zu Ihrem Auftrag — sehen Sie, wann der Reiniger unterwegs ist und welcher Schritt erledigt ist.
+• Buchungsbestätigung per E-Mail.
+• Zweisprachig: Deutsch ist Standard, Englisch in den Einstellungen einen Tipp entfernt.
+
+Vielen Dank fürs Testen — Feedback gerne an info@homegrime.de.</pre>
+
+    <h2>Apple privacy nutrition label</h2>
+    <p class="note">Use these answers under <em>App Store Connect → App Privacy</em>.</p>
+    <table>
+      <tr><th>Category</th><th>Type</th><th>Collected?</th><th>Linked to user?</th><th>Tracking?</th><th>Purposes</th></tr>
+      <tr><td>Contact Info</td><td>Name</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Contact Info</td><td>Email Address</td><td>Optional (Settings)</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Contact Info</td><td>Phone Number</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Location</td><td>Coarse Location</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+      <tr><td>Identifiers</td><td>Device ID (anonymous UUID generated on first launch)</td><td>Yes</td><td>Yes</td><td>No</td><td>App Functionality</td></tr>
+    </table>
+    <p>Everything else (Health, Financial Info, Sensitive Info, Contacts, User Content, Browsing/Search History, Purchases, Usage Data, Diagnostics, other Identifiers) is declared as <strong>Not collected</strong>.</p>
+    <p><strong>Tracking</strong>: No. HomeGrime does not track users across apps or websites owned by other companies.</p>
+    <p><strong>Third-party SDKs</strong>: Google Maps (location is rendered on a map; Google may collect technical identifiers from the SDK).</p>
+
+    <h2>Contact</h2>
+    <p>Press, partnerships and questions: <a href="mailto:info@homegrime.de">info@homegrime.de</a>.</p>
+  </div>
+{% endblock %}

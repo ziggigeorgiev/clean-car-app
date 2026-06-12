@@ -82,9 +82,9 @@
   "submit": {
     "car-production": {
       "ios": {
-        "appleId": "REPLACE_WITH_YOUR_APPLE_ID_EMAIL",
-        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+        "appleId": "ziggi.georgiev@googlemail.com",
+        "ascAppId": "6779528923",
+        "appleTeamId": "J2JT7S6U5T"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
@@ -96,9 +96,9 @@
 
     "home-production": {
       "ios": {
-        "appleId": "REPLACE_WITH_YOUR_APPLE_ID_EMAIL",
-        "ascAppId": "REPLACE_WITH_HOME_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+        "appleId": "ziggi.georgiev@googlemail.com",
+        "ascAppId": "6779530335",
+        "appleTeamId": "J2JT7S6U5T"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",

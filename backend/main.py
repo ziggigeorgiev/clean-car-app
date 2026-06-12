@@ -321,9 +321,11 @@ async def web_cancellation(request: Request, brand: Optional[models.BrandEnum] =
 
 
 @app.get("/press", response_class=HTMLResponse)
-async def web_press(request: Request, locale: str = Depends(web_locale)):
+async def web_press(request: Request, brand: Optional[models.BrandEnum] = None, locale: str = Depends(web_locale)):
     """Public press / review kit page consolidating store copy + assets."""
-    return render_web(request, "press.html", locale, {"today": date.today().isoformat()})
+    b = resolve_web_brand(request, brand)
+    return render_web(request, _policy_template("press", b), locale,
+                      {"today": date.today().isoformat(), "brand_key": b.value})
 
 
 # ---------------------------------------------------------------------------

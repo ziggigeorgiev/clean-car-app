@@ -4,20 +4,24 @@
     "slug": "cargrime",
     "scheme": "cargrime",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "icon": "./assets/images/icon.png",
-
     "description": "Book professional on-site car interior cleaning. Trained cleaners come to your home or workplace.",
     "primaryColor": "#2C4D9F",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "locales": {
       "de": "./assets/locales/de.json",
       "en": "./assets/locales/en.json"
     },
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.cargrime.app",
@@ -37,7 +41,6 @@
         "ITSAppUsesNonExemptEncryption": false
       }
     },
-
     "android": {
       "package": "de.cargrime.app",
       "versionCode": 1,
@@ -51,7 +54,16 @@
         "ACCESS_FINE_LOCATION",
         "READ_CALENDAR",
         "WRITE_CALENDAR",
-        "INTERNET"
+        "INTERNET",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "INTERNET",
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "config": {
         "googleMaps": {
@@ -59,7 +71,6 @@
         }
       }
     },
-
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -69,7 +80,6 @@
       "themeColor": "#2C4D9F",
       "backgroundColor": "#ffffff"
     },
-
     "plugins": [
       "expo-router",
       [
@@ -85,17 +95,19 @@
       "expo-calendar",
       "expo-location"
     ],
-
     "experiments": {
       "typedRoutes": true
     },
-
     "extra": {
       "googleMapsApiKey": "AIzaSyBg5ZdFkbAp-FXRjh11TZ_oU273xKj7PXs",
       "router": {},
       "eas": {
         "projectId": "93d88494-d1ac-4da0-b139-f46067bf7bbb"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/93d88494-d1ac-4da0-b139-f46067bf7bbb"
     }
   }
 }
