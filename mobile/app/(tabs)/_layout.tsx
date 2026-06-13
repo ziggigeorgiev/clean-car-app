@@ -1,7 +1,8 @@
 import { Tabs, router } from "expo-router";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import 'react-native-get-random-values'
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SafeScreen from "@/components/SafeScreen";
 
@@ -11,6 +12,9 @@ import { useTranslation } from "@/services/i18n";
 
 const TabsLayout = () => {
   const { t } = useTranslation();
+  // Bottom inset so the tab bar clears the Android system navigation bar
+  // (back button / gesture handle) under edge-to-edge.
+  const insets = useSafeAreaInsets();
   // This layout is used for the main tabs of the app
   return (
     // <SafeScreen>
@@ -23,8 +27,11 @@ const TabsLayout = () => {
             backgroundColor: COLORS.background,
             borderTopColor: COLORS.border,
             borderTopWidth: 2,
-            elevation: 0, 
-            height: 80,
+            elevation: 0,
+            // iOS already looked right at 80; only Android needs the system
+            // nav-bar inset under edge-to-edge.
+            height: 80 + (Platform.OS === 'android' ? insets.bottom : 0),
+            paddingBottom: Platform.OS === 'android' ? insets.bottom : 0,
           }
         }}
       >
