@@ -140,6 +140,8 @@ const SearchAddressScreen: React.FC = () => {
 
                 }}
                 fetchDetails={true} // To get latitude and longitude of the selected place
+                timeout={20000} // RN 0.81 dropped function-component defaultProps; set explicitly
+                onTimeout={() => console.warn('Google Places autocomplete request timed out')}
                 renderLeftButton={() => (
                     <View style={styles.leftButtonContainer}>
                         <Icon name="search" size={16} color={COLORS.textLight} style={styles.searchIcon} />
@@ -165,12 +167,10 @@ const SearchAddressScreen: React.FC = () => {
                 )}
                 styles={{
                     container: {
-                        color: "red",
+                        // In normal flow (not absolute) so it sits BELOW the title
+                        // instead of floating over it.
                         flex: 0,
-                        position: 'absolute',
                         width: width - 20, // Full width minus some padding
-                        zIndex: 1,
-                        marginTop: Platform.OS === 'android' ? 10 : 50, // Adjust for status bar
                         alignSelf: 'center',
                     },
                      textInputContainer: {
@@ -206,7 +206,7 @@ const SearchAddressScreen: React.FC = () => {
                 }}
                 debounce={300} // Delay before fetching results (in ms)
             />
-        </View>r
+        </View>
         </KeyboardAvoidingView>
     );
 };

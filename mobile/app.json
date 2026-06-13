@@ -85,12 +85,15 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/images/splash-transparent.png",
+          "imageWidth": 200,
           "backgroundColor": "#ffffff"
         }
       ],
       "expo-asset",
       "expo-calendar",
-      "expo-location"
+      "expo-location",
+      "./plugins/withAndroidLintFix"
     ],
     "experiments": {
       "typedRoutes": true

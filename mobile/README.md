@@ -62,3 +62,9 @@ EXPO_PUBLIC_BRAND=home eas build --profile home-production --platform ios --auto
 ```
 
 # Deploy Android
+https://play.google.com/console/u/0/developers/8049809812409756816/account
+
+```bash
+cd mobile
+EXPO_PUBLIC_BRAND=car eas build --profile car-production --platform android
+```
